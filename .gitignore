@@ -1,0 +1,89 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependency directories
+node_modules/
+.pnp/
+.pnp.js
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# React Native
+.expo/
+.expo-shared/
+android/.gradle/
+android/app/build/
+android/build/
+ios/Pods/
+ios/build/
+ios/DerivedData/
+
+# Tailwind CSS
+tailwind.config.js
+tailwind.config.cjs
+postcss.config.js
+
+# ShadCN
+shadcn.config.ts
+
+# Ignore environment and secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Build directories
+build/
+dist/
+coverage/
+out/
+
+# Metro, Expo, and other build caches
+.expo/
+.expo-shared/
+web-build/
+.expo-web/
+
+# Temporary files
+temp/
+tmp/
+.cache/
+.cypress_cache/
+.jest/
+jest/
+detox/
+*.lock
+*.keystore
+
+# Testing
+__tests__/output/
+coverage/
+junit.xml
+
+# CocoaPods generated files
+*.xcworkspace
+Pods/
+Podfile.lock
+
+# Android Studio generated files
+*.iml
+.gradle/
+local.properties
+
+# Expo
+web-build/
+node_modules/.cache/
