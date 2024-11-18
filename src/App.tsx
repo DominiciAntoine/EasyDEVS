@@ -67,6 +67,7 @@ const NestedFlow = () => {
       );
       setNodes(layoutedNodes as any);
       setEdges(layoutedEdges as any);
+      console.log(layoutedNodes)
     },
     [nodes, edges, setNodes, setEdges]
   );

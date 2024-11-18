@@ -52,7 +52,7 @@ function ResizerNode({ data }) {
                   className='relative h-5 w-2 secondary-foreground transform-none top-0'
                   type="source"
                   id={`out-${port.id}`}
-                  position={Position.Right}
+                  position={data.modelType==="atomic"?Position.Right:Position.Left}
                 />
                 {data.modelType === 'coupled' && (
                   <Handle

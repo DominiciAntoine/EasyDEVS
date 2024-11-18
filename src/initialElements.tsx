@@ -107,7 +107,6 @@ export const initialEdges = [
   },
   {
     id: 'e1-5',
-    style: { zIndex:999999 },
     source: '3',
     sourceHandle: 'in-internal-2', // Connexion à partir du port de sortie 'out-2' du nœud 1
     target: '5',
