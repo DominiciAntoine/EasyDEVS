@@ -2,9 +2,6 @@
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
 # Dependency directories
 node_modules/
@@ -20,7 +17,7 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# React Native
+# React Native (si applicable)
 .expo/
 .expo-shared/
 android/.gradle/
@@ -30,15 +27,13 @@ ios/Pods/
 ios/build/
 ios/DerivedData/
 
-# Tailwind CSS
-tailwind.config.js
-tailwind.config.cjs
+# PostCSS configuration (si utilisé avec Tailwind CSS)
 postcss.config.js
 
-# ShadCN
+# ShadCN configuration
 shadcn.config.ts
 
-# Ignore environment and secrets
+# Environment variables and secrets
 .env
 .env.local
 .env.*.local
@@ -52,29 +47,22 @@ dist/
 coverage/
 out/
 
-# Metro, Expo, and other build caches
+# Cache and temporary files
+.cache/
 .expo/
-.expo-shared/
 web-build/
-.expo-web/
-
-# Temporary files
 temp/
 tmp/
-.cache/
-.cypress_cache/
-.jest/
-jest/
-detox/
-*.lock
-*.keystore
 
 # Testing
-__tests__/output/
 coverage/
+__tests__/output/
 junit.xml
 
-# CocoaPods generated files
+# Lock file pour npm
+package-lock.json
+
+# CocoaPods generated files (macOS)
 *.xcworkspace
 Pods/
 Podfile.lock
@@ -83,7 +71,3 @@ Podfile.lock
 *.iml
 .gradle/
 local.properties
-
-# Expo
-web-build/
-node_modules/.cache/
