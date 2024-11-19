@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position, NodeResizer } from '@xyflow/react';
 
 function ResizerNode({ data }) {
   const backgroundColor = data.modelType === 'atomic' ? '#fff' : 'rgba(240, 240, 240, 0.25)'; // couleur selon type de modèle
@@ -8,6 +8,7 @@ function ResizerNode({ data }) {
   return (
     <>
       {/* Conteneur principal avec une bordure */}
+      <NodeResizer minWidth={50} minHeight={50} />
       <div className='h-full w-full border-border border rounded-lg border-solid '
 
       >
