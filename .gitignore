@@ -27,12 +27,6 @@ ios/Pods/
 ios/build/
 ios/DerivedData/
 
-# PostCSS configuration (si utilisé avec Tailwind CSS)
-postcss.config.js
-
-# ShadCN configuration
-shadcn.config.ts
-
 # Environment variables and secrets
 .env
 .env.local
