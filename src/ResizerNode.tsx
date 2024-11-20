@@ -8,7 +8,6 @@ function ResizerNode({ data }) {
   return (
     <>
       {/* Conteneur principal avec une bordure */}
-      <NodeResizer minWidth={50} minHeight={50} />
       <div className='h-full w-full border-border border rounded-lg border-solid '
 
       >

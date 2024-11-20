@@ -1,4 +1,6 @@
-import { ChangeEventHandler, useCallback, useEffect, useState } from 'react';
+'use client'
+
+import { useState, useCallback, useEffect } from 'react';
 
 import {
   Select,
@@ -6,7 +8,24 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./components/ui/select"
+} from './components/ui/select';
+
+import { AppSidebar } from "./components/app-sidebar"
+import { NavActions } from "./components/nav-actions"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from "./components/ui/breadcrumb"
+import { Separator } from "./components/ui/separator"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./components/ui/sidebar"
+
+import Modal from './modal.tsx';
 
 import {
   ReactFlow,
@@ -18,22 +37,23 @@ import {
   ConnectionMode,
   Controls,
   Panel,
-  useReactFlow, 
+  useReactFlow,
   type ColorMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/base.css';
 
-import { ZoomSlider } from "./components/zoom-slider.tsx";
-import { cn } from "./lib/utils"
+import { ZoomSlider } from './components/zoom-slider.tsx';
+import { cn } from './lib/utils';
 
 import ResizerNode from './ResizerNode.tsx';
 import BiDirectionalEdge from './BiDirectionalEdge';
-import {getLayoutedElements} from'./ElkPlaceMode.tsx';
+import { getLayoutedElements } from './ElkPlaceMode.tsx';
 
-import {
-  initialNodes,
-  initialEdges,
-} from './initialElements';
+import { initialNodes, initialEdges } from './initialElements';
+import { ModeToggle } from './components/mode-toggle.tsx';
+import { ThemeProvider } from './components/theme-provider.tsx';
+import { Button } from './components/ui/button.tsx';
+
 
 const nodeTypes = {
   resizer: ResizerNode,
@@ -53,10 +73,21 @@ const NestedFlow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes as any);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges as any);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
+  const [isModalOpen, setModalOpen] = useState(false); 
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+
+  const onInit = (rf) => {
+    setReactFlowInstance(rf);
+  };
 
   const onConnect = useCallback((connection: any) => {
     setEdges((eds) => addEdge(connection, eds));
   }, []);
+
+  const updateDiagram = (diagramData: { nodes: any[]; edges: any[] }) => {
+    setNodes(diagramData.nodes);
+    setEdges(diagramData.edges);
+  };
 
   const applyLayout = useCallback(
     async (direction = 'RIGHT') => {
@@ -65,50 +96,94 @@ const NestedFlow = () => {
         edges,
         direction
       );
+      if (reactFlowInstance && nodes?.length) {
+        reactFlowInstance.fitView();
+      }
+
       setNodes(layoutedNodes as any);
       setEdges(layoutedEdges as any);
-      console.log(layoutedNodes)
     },
     [nodes, edges, setNodes, setEdges]
   );
 
   // Calcul de la disposition initiale
   useEffect(() => {
+    
     applyLayout('RIGHT');
-  }, []);
+  },[]);
+
+  // Calcul de la disposition initiale
+  useEffect(() => {
+    if (reactFlowInstance && nodes?.length) {
+      reactFlowInstance.fitView();
+    }
+  },[reactFlowInstance, nodes.length, edges.length]);
 
   return (
-    <div id='app'>
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      defaultEdgeOptions={defaultEdgeOptions}
-      nodeTypes={nodeTypes as any}
-      edgeTypes={edgeTypes}
-      colorMode={colorMode}
-      fitView
-      connectionMode={ConnectionMode.Loose}
-    >
-      <MiniMap zoomable pannable/>
-      <Background />
-      <Panel className={cn("flex bg-primary-foreground text-foreground")} position="top-right">
-      <Select onValueChange={(value) => setColorMode(value as ColorMode)}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Light" />
-        </SelectTrigger>
-        <SelectContent className="w-[180px]">
-          <SelectItem value="light">Light</SelectItem>
-          <SelectItem value="dark">Dark</SelectItem>
-          <SelectItem value="system">System</SelectItem>
-        </SelectContent>
-      </Select>
-      </Panel>
-      <ZoomSlider />
-    </ReactFlow>
-    </div>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-14 shrink-0 items-center gap-2">
+            <div className="flex flex-1 items-center gap-2 px-3">
+              <SidebarTrigger />
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="line-clamp-1">
+                      Project Management & Task Tracking
+                    </BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+            <div className="ml-auto px-3 flex items-center gap-2">
+              <Button
+                onClick={() => setModalOpen(true)}
+              >
+                Make a New Diagram
+              </Button>
+              <NavActions />
+              <ModeToggle />
+            </div>
+          </header>
+
+          <main id='app'>
+            {/* Modal */}
+            {isModalOpen && (
+              <Modal onGenerate={updateDiagram}>
+              </Modal>
+            )}
+
+            {/* React Flow */}
+            <ReactFlow
+            onInit={onInit}
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              defaultEdgeOptions={defaultEdgeOptions}
+              nodeTypes={nodeTypes as any}
+              edgeTypes={edgeTypes}
+              colorMode={colorMode}
+              connectionMode={ConnectionMode.Loose}
+              fitView
+            >
+              <MiniMap zoomable pannable />
+              <Background />
+              <ZoomSlider />
+
+            </ReactFlow>
+          </main>
+
+
+        </SidebarInset>
+      </SidebarProvider>
+    </ThemeProvider>
+
+
   );
 };
 
