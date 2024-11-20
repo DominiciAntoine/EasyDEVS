@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect } from 'react';
 
 import {
   Select,
@@ -37,7 +37,9 @@ import {
   ConnectionMode,
   Controls,
   Panel,
-  useReactFlow,
+  ReactFlowProvider,
+  useNodesInitialized,
+   useReactFlow,
   type ColorMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/base.css';
@@ -74,11 +76,7 @@ const NestedFlow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges as any);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [isModalOpen, setModalOpen] = useState(false); 
-  const [reactFlowInstance, setReactFlowInstance] = useState(null);
-
-  const onInit = (rf) => {
-    setReactFlowInstance(rf);
-  };
+  const { fitView } = useReactFlow();
 
   const onConnect = useCallback((connection: any) => {
     setEdges((eds) => addEdge(connection, eds));
@@ -89,35 +87,28 @@ const NestedFlow = () => {
     setEdges(diagramData.edges);
   };
 
-  const applyLayout = useCallback(
-    async (direction = 'RIGHT') => {
-      const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(
-        nodes,
-        edges,
-        direction
+  const onLayout = useCallback(
+    ({ direction, useInitialNodes = false }) => {
+      const opts = direction;
+      const ns = useInitialNodes ? initialNodes : nodes;
+      const es = useInitialNodes ? initialEdges : edges;
+ 
+      getLayoutedElements(ns, es, opts).then(
+        ({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+          setNodes(layoutedNodes);
+          setEdges(layoutedEdges);
+ 
+          setTimeout(() => fitView(), 0);
+        },
       );
-      if (reactFlowInstance && nodes?.length) {
-        reactFlowInstance.fitView();
-      }
-
-      setNodes(layoutedNodes as any);
-      setEdges(layoutedEdges as any);
     },
-    [nodes, edges, setNodes, setEdges]
+    [nodes, edges],
   );
+  
 
-  // Calcul de la disposition initiale
-  useEffect(() => {
-    
-    applyLayout('RIGHT');
-  },[]);
-
-  // Calcul de la disposition initiale
-  useEffect(() => {
-    if (reactFlowInstance && nodes?.length) {
-      reactFlowInstance.fitView();
-    }
-  },[reactFlowInstance, nodes.length, edges.length]);
+  useLayoutEffect(() => {
+    onLayout({ direction: 'RIGHT', useInitialNodes: false });
+  }, []);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -158,7 +149,6 @@ const NestedFlow = () => {
 
             {/* React Flow */}
             <ReactFlow
-            onInit={onInit}
               nodes={nodes}
               edges={edges}
               onNodesChange={onNodesChange}
@@ -187,4 +177,11 @@ const NestedFlow = () => {
   );
 };
 
-export default NestedFlow;
+
+const App = () => (
+  <ReactFlowProvider>
+    <NestedFlow />
+  </ReactFlowProvider>
+);
+
+export default App;

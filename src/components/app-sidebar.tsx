@@ -94,54 +94,44 @@ const data = {
   ],
   favorites: [
     {
-      name: "Project Management & Task Tracking",
+      name: "DEVS project 1",
       url: "#",
       emoji: "📊",
     },
     {
-      name: "Family Recipe Collection & Meal Planning",
+      name: "DEVS project 2",
       url: "#",
       emoji: "🍳",
     },
     {
-      name: "Fitness Tracker & Workout Routines",
+      name: "DEVS project 3",
       url: "#",
       emoji: "💪",
     },
     {
-      name: "Book Notes & Reading List",
+      name: "DEVS project 4",
       url: "#",
       emoji: "📚",
     },
     {
-      name: "Sustainable Gardening Tips & Plant Care",
+      name: "DEVS project 5",
       url: "#",
       emoji: "🌱",
     },
     {
-      name: "Language Learning Progress & Resources",
+      name: "DEVS project 6",
       url: "#",
       emoji: "🗣️",
     },
     {
-      name: "Home Renovation Ideas & Budget Tracker",
+      name: "DEVS project 7",
       url: "#",
       emoji: "🏠",
     },
     {
-      name: "Personal Finance & Investment Portfolio",
+      name: "DEVS project 8",
       url: "#",
       emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
     },
   ],
   workspaces: [
