@@ -2,14 +2,6 @@
 
 import { useState, useCallback, useEffect, useLayoutEffect } from 'react';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './components/ui/select';
-
 import { AppSidebar } from "./components/app-sidebar"
 import { NavActions } from "./components/nav-actions"
 import {
@@ -28,6 +20,12 @@ import {
 import Modal from './modal.tsx';
 
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable.tsx"
+
+import {
   ReactFlow,
   addEdge,
   Background,
@@ -39,7 +37,7 @@ import {
   Panel,
   ReactFlowProvider,
   useNodesInitialized,
-   useReactFlow,
+  useReactFlow,
   type ColorMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/base.css';
@@ -55,6 +53,8 @@ import { initialNodes, initialEdges } from './initialElements';
 import { ModeToggle } from './components/mode-toggle.tsx';
 import { ThemeProvider } from './components/theme-provider.tsx';
 import { Button } from './components/ui/button.tsx';
+import DiagramPrompt from './diagramPrompt.tsx';
+import { Toaster } from './components/ui/toaster.tsx';
 
 
 const nodeTypes = {
@@ -75,8 +75,8 @@ const NestedFlow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes as any);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges as any);
   const [colorMode, setColorMode] = useState<ColorMode>('light');
-  const [isModalOpen, setModalOpen] = useState(false); 
   const { fitView } = useReactFlow();
+  
 
   const onConnect = useCallback((connection: any) => {
     setEdges((eds) => addEdge(connection, eds));
@@ -85,6 +85,7 @@ const NestedFlow = () => {
   const updateDiagram = (diagramData: { nodes: any[]; edges: any[] }) => {
     setNodes(diagramData.nodes);
     setEdges(diagramData.edges);
+    
   };
 
   const onLayout = useCallback(
@@ -92,22 +93,22 @@ const NestedFlow = () => {
       const opts = direction;
       const ns = useInitialNodes ? initialNodes : nodes;
       const es = useInitialNodes ? initialEdges : edges;
- 
+
       getLayoutedElements(ns, es, opts).then(
         ({ nodes: layoutedNodes, edges: layoutedEdges }) => {
           setNodes(layoutedNodes);
           setEdges(layoutedEdges);
- 
+
           setTimeout(() => fitView(), 0);
         },
       );
     },
     [nodes, edges],
   );
-  
+
 
   useLayoutEffect(() => {
-    onLayout({ direction: 'RIGHT', useInitialNodes: false });
+    onLayout({ direction: 'RIGHT'});
   }, []);
 
   return (
@@ -130,43 +131,40 @@ const NestedFlow = () => {
               </Breadcrumb>
             </div>
             <div className="ml-auto px-3 flex items-center gap-2">
-              <Button
-                onClick={() => setModalOpen(true)}
-              >
-                Make a New Diagram
-              </Button>
               <NavActions />
               <ModeToggle />
             </div>
           </header>
-
-          <main id='app'>
-            {/* Modal */}
-            {isModalOpen && (
-              <Modal onGenerate={updateDiagram}>
-              </Modal>
-            )}
-
-            {/* React Flow */}
+          <main className='h-full w-full' id='app'>
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel defaultSize={40} minSize={20}>
+            <DiagramPrompt onGenerate={updateDiagram}/>
+            </ResizablePanel>
+            <ResizableHandle  />
+            <ResizablePanel defaultSize={60} minSize={20} onResize={(size) => fitView()}>
             <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              defaultEdgeOptions={defaultEdgeOptions}
-              nodeTypes={nodeTypes as any}
-              edgeTypes={edgeTypes}
-              colorMode={colorMode}
-              connectionMode={ConnectionMode.Loose}
-              fitView
-            >
-              <MiniMap zoomable pannable />
-              <Background />
-              <ZoomSlider />
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                defaultEdgeOptions={defaultEdgeOptions}
+                nodeTypes={nodeTypes as any}
+                edgeTypes={edgeTypes}
+                colorMode={colorMode}
+                connectionMode={ConnectionMode.Loose}
+                fitView
+              >
+                <MiniMap zoomable pannable />
+                <Background />
+                <ZoomSlider />
 
-            </ReactFlow>
+              </ReactFlow>
+            </ResizablePanel>
+          </ResizablePanelGroup>
           </main>
+          <Toaster/>
+
 
 
         </SidebarInset>

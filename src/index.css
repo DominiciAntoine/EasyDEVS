@@ -157,11 +157,7 @@ body {
   box-sizing: border-box;
 }
 
-#app {
-  display: grid;
-  width: 100%;
-  height: 100%;
-}
+
 
 .react-flow__edges {
   z-index: 1001 !important; /* Assigne un z-index élevé pour que le SVG des arêtes apparaisse devant */
