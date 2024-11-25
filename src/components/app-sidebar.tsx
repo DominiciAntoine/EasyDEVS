@@ -49,18 +49,19 @@ const data = {
   navMain: [
     {
       title: "Home",
-      url: "#",
+      url: "/",
       icon: Home,
-    },
-    {
-      title: "AI DEVS Generator",
-      url: "#",
-      icon: Sparkles,
       isActive: true,
     },
     {
+      title: "AI DEVS Generator",
+      url: "/devs-generator",
+      icon: Sparkles,
+      
+    },
+    {
       title: "Online DEVS Editor",
-      url: "#",
+      url: "/online-devs",
       icon: FilePenLine,
       badge: "10",
     },

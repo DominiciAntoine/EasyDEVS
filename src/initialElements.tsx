@@ -9,7 +9,7 @@ export const initialNodes = [
     type: 'resizer',
     data: {
       modelType: "atomic",
-      label: 'Atomic Model 1',
+      label: 'Generate',
       inputPorts: [{ id: '1' }, { id: '2' }],
       outputPorts: [{ id: '1' }, { id: '2' }, { id: '3' }],
     },
@@ -21,7 +21,7 @@ export const initialNodes = [
     type: 'resizer',
     data: {
       modelType: "atomic",
-      label: 'Atomic Model 2',
+      label: 'Your',
       inputPorts: [{ id: '1' }],
       outputPorts: [{ id: '1' }],
     },
@@ -33,7 +33,7 @@ export const initialNodes = [
     type: 'resizer',
     data: {
       modelType: "coupled",
-      label: 'Coupled Model',
+      label: 'Diagram',
       inputPorts: [{ id: '1' }, { id: '2' }],
       outputPorts: [{ id: '1' }, { id: '2' }],
     },

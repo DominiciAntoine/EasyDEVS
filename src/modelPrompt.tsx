@@ -21,10 +21,7 @@ import { Toaster } from './components/ui/toaster.tsx';
 
 
 const formSchema = z.object({
-    projectName: z.string().min(4, {
-        message: "The project name must be at least 4 characters long.",
-    }),
-    diagramName: z.string().min(4, {
+    modelName: z.string().min(4, {
         message: "The diagram name must be at least 4 characters long.",
     }),
     prompt: z.string().min(10, {
@@ -35,11 +32,11 @@ const formSchema = z.object({
 
 
 
-export default function DiagramPrompt({
+export default function ModelPrompt({
     onGenerate,
     stage
 }: {
-    onGenerate: (diagramData: { nodes: any[]; edges: any[] }) => void;
+    onGenerate: (modelData: { nodes: any[]; edges: any[] }) => void;
     stage: number;
 }) {
     const [loading, setLoading] = useState(false);
@@ -49,8 +46,7 @@ export default function DiagramPrompt({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            projectName: "",
-            diagramName: "",
+            modelName: "",
             prompt: "",
         },
     })
@@ -98,7 +94,7 @@ export default function DiagramPrompt({
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ diagramName: values.diagramName, userPrompt: values.prompt }),
+                body: JSON.stringify({ diagramName: values.modelName, userPrompt: values.prompt }),
             });
             const diagramData = await diagramResponse.json();
     
@@ -139,33 +135,19 @@ export default function DiagramPrompt({
         return (
             <div className='h-full w-full flex flex-col justify-center items-center' >
                 <div className='text-3xl text-foreground pb-20 font-bold'>
-                    DEVS diagram Generator
+                    DEVS model Generator
                 </div>
                 
                 <Form {...form} >
                     <form onSubmit={form.handleSubmit(onSubmit)} className="w-4/5 space-y-8">
                         <FormField
                             control={form.control}
-                            name="projectName"
+                            name="modelName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Project Name</FormLabel>
+                                    <FormLabel>Model Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Light System" {...field} />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="diagramName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Diagram Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Single light diagram" {...field} />
+                                        <Input placeholder="SwitchModel" {...field} />
                                     </FormControl>
 
                                     <FormMessage />
@@ -177,10 +159,10 @@ export default function DiagramPrompt({
                             name="prompt"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Username</FormLabel>
+                                    <FormLabel>Prompt</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="A switch connected to a light."
+                                            placeholder="A switch with alternate between on and off every 10s."
                                             className="resize-none"
                                             {...field}
                                         />

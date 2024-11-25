@@ -164,3 +164,16 @@ body {
   pointer-events: none; /* Évite que le SVG bloque les interactions, si nécessaire */
 }
 
+.cm-editor {
+  height: 100%; /* Prend toute la hauteur */
+}
+
+.cm-scroller {
+  height: 100%;
+  overflow: auto; /* Ajoute des barres de défilement si nécessaire */
+}
+
+.react-flow__attribution
+{
+  display: none !important;
+}
