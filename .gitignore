@@ -35,6 +35,7 @@ ios/DerivedData/
 .env.production.local
 .env.test.local
 .env.development
+.env.production
 
 # Build directories
 build/
@@ -66,3 +67,6 @@ Podfile.lock
 *.iml
 .gradle/
 local.properties
+
+# Custom
+.vllm-cache/

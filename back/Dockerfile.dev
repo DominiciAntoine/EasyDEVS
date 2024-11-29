@@ -1,0 +1,12 @@
+FROM node:18-alpine
+WORKDIR /app
+VOLUME [ "/app" ]
+
+# Copie uniquement les fichiers nécessaires pour l'installation
+COPY package.json package-lock.json ./
+
+# Installe les dépendances
+RUN npm install
+
+CMD ["npm run dev"]
+EXPOSE 3000
