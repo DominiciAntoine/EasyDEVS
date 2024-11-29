@@ -1,12 +1,18 @@
 FROM node:18-alpine
+
 WORKDIR /app
+
+# Déclare un volume pour le montage des fichiers locaux (optionnel, utile en dev)
 VOLUME [ "/app" ]
 
-# Copie uniquement les fichiers nécessaires pour l'installation
+# Copie uniquement les fichiers nécessaires pour l'installation des dépendances
 COPY package.json package-lock.json ./
 
 # Installe les dépendances
 RUN npm install
 
-CMD ["npm run dev"]
+# Expose le port utilisé par votre application
 EXPOSE 3000
+
+# Commande correcte pour démarrer le script "dev"
+CMD ["npm", "run", "dev"]

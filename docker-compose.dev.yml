@@ -7,6 +7,7 @@ services:
       - 5173:5173
     volumes:
       - ./front:/app # Synchronisation du code local
+      - /app/node_modules
 
   backend:
     build:
@@ -19,7 +20,8 @@ services:
     volumes:
       - ./back:/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:15-alpine
@@ -32,6 +34,11 @@ services:
       - 5432:5432
     volumes:
       - ./back/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U easydevs" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   vllm:
     runtime: nvidia
