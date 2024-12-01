@@ -2,17 +2,13 @@ services:
   frontend:
     build:
       context: ./front
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
-      - 5173:5173
-    volumes:
-      - ./front:/app # Synchronisation du code local
-      - /app/node_modules
+      - 80:80
 
   backend:
     build:
       context: ./back
-      dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
     env_file:
