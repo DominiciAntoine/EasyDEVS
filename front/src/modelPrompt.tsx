@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/form"
 import { Button } from "@/components/ui/button.tsx"
 import { useToast } from "@/hooks/use-toast"
+import { ModelData } from './types'
+import { fetchWithAuth } from './fetchWithAuth.ts';
+import useAuth from './use-auth.tsx';
 
 
 const formSchema = z.object({
@@ -32,13 +35,18 @@ const formSchema = z.object({
 
 export default function ModelPrompt({
     onGenerate,
-    stage
+    stage, 
+    model,
+    previousCodes
 }: {
-    onGenerate: (modelData: { nodes: any[]; edges: any[] }) => void;
+    onGenerate: (modelName: string, modelCode : string) => void;
     stage: number;
+    model : ModelData;
+    previousCodes?: string[];
 }) {
     const [loading, setLoading] = useState(false);
     const { toast } = useToast()
+    const { token } = useAuth();
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -52,55 +60,22 @@ export default function ModelPrompt({
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setLoading(true);
-        let token = '';
 
         try {
-            const authResponse = await fetch('http://localhost:3000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: 'admin', password: 'admin' }),
-            });
-            const authData = await authResponse.json();
-
-            if (authResponse.ok) {
-                token = authData.token;
-                toast({
-                    description: authData.message || 'Successfully got API token',
-                });
-            } else {
-                toast({
-                    description: authData.error || 'An error occurred while getting API token',
-                    variant: 'destructive',
-                });
-                setLoading(false);
-                return;
-            }
-        } catch (error) {
-            console.error(error);
-            toast({
-                description: 'Failed to reach the API during token access.',
-                variant: 'destructive',
-            });
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const diagramResponse = await fetch('http://localhost:3000/api/ai/generate-diagram', {
+            const diagramResponse = await fetchWithAuth('http://localhost:3000/api/ai/generate-model', token, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json', // Important pour que le serveur sache que les données sont en JSON
                 },
-                body: JSON.stringify({ diagramName: values.modelName, userPrompt: values.prompt }),
+                body: JSON.stringify({ modelName: values.modelName, userPrompt: values.prompt, previousModelsCode: previousCodes }),
             });
-            const diagramData = await diagramResponse.json();
+            const diagramData = await diagramResponse.json();         
 
             if (diagramResponse.ok) {
                 toast({
                     description: diagramData.message || 'Diagram generated successfully!',
                 });
-                onGenerate({ nodes: diagramData.nodes, edges: diagramData.edges });
+                onGenerate( values.modelName, diagramData.modelExample);
             } else {
                 toast({
                     description: diagramData.error || 'An error occurred while generating the diagram.',
@@ -145,7 +120,7 @@ export default function ModelPrompt({
                                 <FormItem>
                                     <FormLabel>Model Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="SwitchModel" {...field} />
+                                        <Input placeholder="SwitchModel" {...field}  />
                                     </FormControl>
 
                                     <FormMessage />
@@ -169,7 +144,7 @@ export default function ModelPrompt({
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">{stage === 0 ? "Generate" : "Regenerate"}</Button>
+                        <Button type="submit">{stage < 3 ? "Generate" : "Regenerate"}</Button>
                     </form>
                 </Form>
             </div>

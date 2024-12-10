@@ -20,8 +20,10 @@ app.use(cors({
 // Inclure les routes après le middleware JSON
 const authRoutes = require('./routes/auth');
 const aiRoutes = require('./routes/ai');
+const dataRoutes = require('./routes/data');
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/data', dataRoutes);
 
 // Connexion à la base de données
 db.connect(err => {

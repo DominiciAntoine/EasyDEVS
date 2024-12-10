@@ -12,6 +12,7 @@ export const initialNodes: Node<NodeData>[] = [
       label: 'Generate',
       inputPorts: [{ id: '1' }, { id: '2' }],
       outputPorts: [{ id: '1' }, { id: '2' }, { id: '3' }],
+      isSelected:true,
     },
     style: { width: 300, height: 300 },
     position: position,
@@ -55,7 +56,7 @@ export const initialNodes: Node<NodeData>[] = [
     extent: 'parent',
   },
   {
-    id: '5',
+    id: '7',
     type: 'resizer', // Assure-toi que ce type est enregistré dans React Flow
     position: position,
     style: { width: 100, height: 100 },
@@ -109,7 +110,7 @@ export const initialEdges: Edge[] = [
     id: 'e1-5',
     source: '3',
     sourceHandle: 'in-internal-2', // Connexion à partir du port de sortie 'out-2' du nœud 1
-    target: '5',
+    target: '7',
     targetHandle: 'in-1',  // Connexion vers le port d'entrée 'in-2' du nœud 3
     type: 'smoothstep',
   },

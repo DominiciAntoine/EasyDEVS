@@ -15,7 +15,7 @@ function ResizerNode({ data }: ResizerNodeProps) {
 
       >
         {/* En-tête avec le label */}
-        <div className='h-1/5 bg-card-foreground border-border rounded-t-lg text-primary-foreground flex justify-evenly items-center'>
+        <div className={`h-1/5 ${data.isSelected===true?"bg-blue-400":"bg-card-foreground"} border-border rounded-t-lg text-primary-foreground flex justify-evenly items-center`}>
           {data.label}
         </div>
 

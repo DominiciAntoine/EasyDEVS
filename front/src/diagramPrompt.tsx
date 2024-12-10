@@ -18,12 +18,12 @@ import { Button } from "@/components/ui/button.tsx"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithAuth } from './fetchWithAuth.ts';
 import useAuth from "./use-auth";
+import {generateDiagram} from "./api/diagramApi.ts"
+import { DiagramDataType } from './types.ts';
 
 
 const formSchema = z.object({
-    projectName: z.string().min(4, {
-        message: "The project name must be at least 4 characters long.",
-    }),
+    
     diagramName: z.string().min(4, {
         message: "The diagram name must be at least 4 characters long.",
     }),
@@ -39,7 +39,8 @@ export default function DiagramPrompt({
     onGenerate,
     stage
 }: {
-    onGenerate: (diagramData: { nodes: any[]; edges: any[] }) => void;
+    onGenerate: (diagramData: DiagramDataType
+    ) => void;
     stage: number;
 }) {
     const [loading, setLoading] = useState(false);
@@ -50,7 +51,6 @@ export default function DiagramPrompt({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            projectName: "",
             diagramName: "",
             prompt: "",
         },
@@ -58,39 +58,11 @@ export default function DiagramPrompt({
 
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log("Form Values:", values); // Vérifie les valeurs ici
         setLoading(true);
 
-        try {
-            const diagramResponse = await fetchWithAuth('http://localhost:3000/api/ai/generate-diagram', token, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', // Important pour que le serveur sache que les données sont en JSON
-                },
-                body: JSON.stringify({ diagramName: values.diagramName, userPrompt: values.prompt }),
-            });
-            const diagramData = await diagramResponse.json();
-
-            if (diagramResponse.ok) {
-                toast({
-                    description: diagramData.message || 'Diagram generated successfully!',
-                });
-                onGenerate({ nodes: diagramData.nodes, edges: diagramData.edges });
-            } else {
-                toast({
-                    description: diagramData.error || 'An error occurred while generating the diagram.',
-                    variant: 'destructive',
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            toast({
-                description: 'Failed to reach the API during diagram generation.',
-                variant: 'destructive',
-            });
-        } finally {
-            setLoading(false);
-        }
+        generateDiagram(token, {diagramName: values.diagramName, prompt: values.prompt}, onGenerate, toast);
+        setLoading(false);
+        
     };
 
     if (loading) {
@@ -115,20 +87,6 @@ export default function DiagramPrompt({
                     <form onSubmit={form.handleSubmit(onSubmit)} className="w-4/5 space-y-8">
                         <FormField
                             control={form.control}
-                            name="projectName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Project Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Light System" {...field} />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
                             name="diagramName"
                             render={({ field }) => (
                                 <FormItem>
@@ -146,7 +104,7 @@ export default function DiagramPrompt({
                             name="prompt"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Username</FormLabel>
+                                    <FormLabel>Prompt</FormLabel>
                                     <FormControl>
                                         <Textarea
                                             placeholder="A switch connected to a light."

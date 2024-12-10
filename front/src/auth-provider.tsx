@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null | undefined>(undefined); // Stocké en mémoire
   const [isLoading, setIsLoading] = useState(true);
 
+
   const navigate = useNavigate();
 
   // Rafraîchir le token via l'API
@@ -59,7 +60,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           });
 
           if (!response.ok) {
+            setToken(null);
             throw new Error("Erreur lors de la récupération des informations utilisateur.");
+            
           }
 
           const userData = await response.json();

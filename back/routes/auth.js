@@ -84,6 +84,8 @@ router.post('/register', async (req, res) => {
 
 // Récupération des informations utilisateur
 router.get('/me', authenticate, (req, res) => {
+
+
     const sql = 'SELECT id, email FROM users WHERE id = $1';
     db.query(sql, [req.user.id], (err, results) => {
         if (err || results.rows.length === 0) {
@@ -95,39 +97,48 @@ router.get('/me', authenticate, (req, res) => {
     });
 });
 
-// Rafraîchissement du token
 router.post('/refresh-token', (req, res) => {
     try {
-        const refreshToken = req.cookies.refreshToken; // Récupérer le cookie
+        const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
             return res.status(401).send({ message: "Refresh token required" });
         }
 
-        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+            if (err || !decoded.id) {
+                return res.status(403).send({ message: "Invalid refresh token" });
+            }
 
-        if (decoded) {
-            // Générer un nouveau token d'accès
-            const accessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+            const sql = 'SELECT id, email FROM users WHERE id = $1';
+            db.query(sql, [decoded.id], (err, results) => {
+                if (err || results.rows.length === 0) {
+                    return res.status(404).send({ message: "User not found" });
+                }
 
-            // Générer un nouveau refresh token
-            const newRefreshToken = jwt.sign({ id: decoded.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+                // Générer un nouveau token d'accès
+                const accessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-            // Envoyer le nouveau refreshToken dans le cookie
-            res.cookie('refreshToken', newRefreshToken, {
-                httpOnly: true,
-                secure: isProduction, // Nécessaire en production pour HTTPS
-                sameSite: isProduction ? 'none' : 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
+                // Générer un nouveau refresh token
+                const newRefreshToken = jwt.sign({ id: decoded.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+
+                // Envoyer le nouveau refreshToken dans un cookie
+                res.cookie('refreshToken', newRefreshToken, {
+                    httpOnly: true,
+                    secure: isProduction,
+                    sameSite: isProduction ? 'none' : 'lax',
+                    maxAge: 7 * 24 * 60 * 60 * 1000,
+                });
+
+                return res.status(200).send({ accessToken });
             });
-
-            return res.status(200).send({ accessToken });
-        }
-    }
-    catch (error) {
-        res.status(401).send({ message: 'Erreur du serveur', error });
+        });
+    } catch (error) {
+        console.error("Erreur lors du rafraîchissement du token :", error);
+        res.status(500).send({ message: "Server error", error });
     }
 });
+
 
 // Déconnexion
 router.post('/logout', authenticate, (req, res) => {

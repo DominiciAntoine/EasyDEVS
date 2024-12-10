@@ -5,6 +5,9 @@ const OpenAI = require("openai");
 
 const router = express.Router();
 
+const modelExample = require("../prompt/ModelExample");
+const diagramExample = require("../prompt/diagramExample")
+
 
 // Route pour générer un diagramme
 router.post('/generate-diagram', authenticateToken, async (req, res) => {
@@ -18,23 +21,22 @@ router.post('/generate-diagram', authenticateToken, async (req, res) => {
     return res.status(400).json({ error: "Le champ 'userPrompt' est requis et doit être une chaîne de caractères non vide." });
   }
 
+
+
   res.json(
-    "a mettre"
+    diagramExample.diagramExample
   );
 });
 
 // Route pour définir le comportement d'un composant du modèle
 router.post('/generate-model', authenticateToken, async (req, res) => {
-  const { modelName, modelType, previousModelsCode, userPrompt } = req.body;
+  const { modelName, previousModelsCode, userPrompt } = req.body;
 
   // Validation des champs
   if (!modelName || typeof modelName !== 'string' || modelName.trim() === '') {
     return res.status(400).json({ error: "Le champ 'modelName' est requis et doit être une chaîne de caractères non vide." });
   }
-  if (!modelType || typeof modelType !== 'string' || modelType.trim() === '') {
-    return res.status(400).json({ error: "Le champ 'modelType' est requis et doit être une chaîne de caractères non vide." });
-  }
-  if (!previousModelsCode || typeof previousModelsCode !== 'string') {
+  if (!previousModelsCode ) {
     return res.status(400).json({ error: "Le champ 'previousModelsCode' est requis et doit être une chaîne de caractères." });
   }
   if (!userPrompt || typeof userPrompt !== 'string' || userPrompt.trim() === '') {
@@ -42,7 +44,7 @@ router.post('/generate-model', authenticateToken, async (req, res) => {
   }
 
   res.json(
-    "a mettre"
+    modelExample
   );
 });
 
