@@ -71,9 +71,6 @@ Un exemple minimal illustrant ces structures :
         "label": "Coupled Model",
         "inputPorts": [{ "id": "1" }],
         "outputPorts": [{ "id": "1" }],
-        "children": [
-          { "id": "3", "modelType": "atomic" }
-        ]
       },
       "position": { "x": 200, "y": 200 }
     },
