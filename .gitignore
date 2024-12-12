@@ -57,8 +57,6 @@ coverage/
 __tests__/output/
 junit.xml
 
-# Lock file pour npm
-package-lock.json
 
 # CocoaPods generated files (macOS)
 *.xcworkspace
