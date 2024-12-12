@@ -12,6 +12,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const loginSchema = z.object({
   email: z.string().email().nonempty(),
@@ -73,6 +74,12 @@ export const LoginForm = () => {
             <Button type="submit" className="w-full">Login</Button>
           </form>
         </Form>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{" "}
+          <Link to="/register" className="underline">
+            Sign up
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );

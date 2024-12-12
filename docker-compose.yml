@@ -3,6 +3,8 @@ services:
     build:
       context: ./front
       dockerfile: Dockerfile.dev
+    env_file:
+      - ./.env.front
     ports:
       - 5173:5173
     volumes:
@@ -16,7 +18,7 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - ./back.env
+      - ./.env.back
     volumes:
       - ./back:/app
     depends_on:

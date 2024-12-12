@@ -12,7 +12,7 @@ export const initialNodes: Node<NodeData>[] = [
       label: 'Generate',
       inputPorts: [{ id: '1' }, { id: '2' }],
       outputPorts: [{ id: '1' }, { id: '2' }, { id: '3' }],
-      isSelected:true,
+      isSelected: true,
     },
     style: { width: 300, height: 300 },
     position: position,

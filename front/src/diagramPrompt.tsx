@@ -18,12 +18,12 @@ import { Button } from "@/components/ui/button.tsx"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithAuth } from './fetchWithAuth.ts';
 import useAuth from "./use-auth";
-import {generateDiagram} from "./api/diagramApi.ts"
+import { generateDiagram } from "./api/diagramApi.ts"
 import { DiagramDataType } from './types.ts';
 
 
 const formSchema = z.object({
-    
+
     diagramName: z.string().min(4, {
         message: "The diagram name must be at least 4 characters long.",
     }),
@@ -60,9 +60,9 @@ export default function DiagramPrompt({
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setLoading(true);
 
-        generateDiagram(token, {diagramName: values.diagramName, prompt: values.prompt}, onGenerate, toast);
+        await generateDiagram(token, { diagramName: values.diagramName, prompt: values.prompt }, onGenerate, toast);
         setLoading(false);
-        
+
     };
 
     if (loading) {

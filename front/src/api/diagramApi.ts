@@ -1,5 +1,5 @@
 import { fetchWithAuth } from '../fetchWithAuth';
-import {DiagramDataType} from '../types'
+import { DiagramDataType } from '../types'
 
 export interface DiagramPayload {
     diagramName: string;
@@ -24,6 +24,8 @@ export const generateDiagram = async (
 
         const diagramData = await diagramResponse.json();
 
+        console.log(diagramData);
+
         if (diagramResponse.ok) {
             toast({
                 description: diagramData.message || 'Diagram generated successfully!',
@@ -32,9 +34,9 @@ export const generateDiagram = async (
                 nodes: diagramData.nodes,
                 edges: diagramData.edges,
                 name: payload.diagramName,
-                currentModel: 0, 
-                diagramId: 0, 
-                models:[]
+                currentModel: 0,
+                diagramId: 0,
+                models: []
             });
         } else {
             toast({
@@ -54,7 +56,7 @@ export const generateDiagram = async (
 export interface ModelPayload {
     modelName: string;
     prompt: string;
-    previousCodes : String[]
+    previousCodes: String[]
 }
 
 export const generateModel = async (
@@ -71,13 +73,13 @@ export const generateModel = async (
             },
             body: JSON.stringify({ modelName: payload.modelName, userPrompt: payload.prompt, previousModelsCode: payload.previousCodes }),
         });
-        const diagramData = await diagramResponse.json();         
+        const diagramData = await diagramResponse.json();
 
         if (diagramResponse.ok) {
             toast({
                 description: diagramData.message || 'Diagram generated successfully!',
             });
-            onGenerate( values.modelName, diagramData.modelExample);
+            onGenerate(values.modelName, diagramData.modelExample);
         } else {
             toast({
                 description: diagramData.error || 'An error occurred while generating the diagram.',
@@ -91,7 +93,7 @@ export const generateModel = async (
             variant: 'destructive',
         });
     } finally {
-        
+
     }
-    
+
 };

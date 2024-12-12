@@ -1,145 +1,117 @@
 const systemDiagramPrompt = `
+### Objectif
+Créer une structure JSON représentant un diagramme DEVS valide, basée sur les schémas fournis.
 
-You are an expert in DEVS modeling.Your task is to create a structured DEVS diagram in JSON format based on the user's description. Follow these guidelines:
+### Instructions Générales
+1. La réponse doit **uniquement** contenir un JSON valide. **Aucun texte ou commentaire explicatif n'est attendu.**
+2. Les données doivent respecter les schémas suivants :
+   - **NodeSchema** pour les nœuds.
+   - **EdgeSchema** pour les connexions.
+   - **DEVSDiagramSchema** pour le diagramme complet.
 
-1. ** Output Format **: Only return the JSON structure.Do not include explanations, comments, or any additional text.
-2. ** JSON Requirements **: The JSON structure must include:
-- "nodes": Representing DEVS models(atomic or coupled) with:
-- Unique "id".
-     - "type"(e.g., "resizer").
-     - "data" containing:
-- "modelType"("atomic" or "coupled").
-       - "label"(model name).
-       - "inputPorts" and "outputPorts"(arrays of ports with unique IDs).
-- Optional children for coupled models.
-     - "position": {
-    x: <number>, y: <number>} representing coordinates.
-      - Optional "style" for dimensions.
-      - Optional "parentId" and "extent" for nested models.
-      - "edges": Representing connections with:
-      - Unique "id".
-      - "source" and "target" (node IDs).
-      - "sourceHandle" and "targetHandle" (port identifiers).
-      - "type" (e.g., "smoothstep").
+---
 
-      3. **Example Output**:
-      {
-        "nodes": [
-      {
-        id: '1',
-      type: 'resizer',
-      data: {
-        modelType: "atomic",
-      label: 'Atomic Model 1',
-      inputPorts: [{id: '1' }, {id: '2' }],
-      outputPorts: [{id: '1' }, {id: '2' }, {id: '3' }],
+### Structure des Nœuds (nodes)
+Chaque nœud doit inclure :
+- \`id\` : Identifiant unique du nœud (string).
+- \`type\` : Toujours \`resizer\`.
+- \`data\` :
+  - \`modelType\` : \`atomic\` ou \`coupled\`.
+  - \`label\` : Nom du modèle (string).
+  - \`inputPorts\` et \`outputPorts\` : Listes d’objets contenant des IDs pour les ports. ex: "inputPorts": [{ "id": "1" },{ "id": "2" }],
+- \`position\` : Coordonnées \`{ x: number, y: number }\`.
+- \`style\` (facultatif) : Dimensions \`{ width: number, height: number }\`.
+- \`parentId\` et \`extent\` :
+  - Optionel : À inclure seulemennt si le nœud est un **enfant dans un modèle couplé**. Le parent id ne sera jamais null ou none, dans ces deux cas il ne devra juste pas être renseigner.
+
+---
+
+### Structure des Connexions (edges)
+Chaque connexion doit inclure :
+- \`id\` : Identifiant unique de la connexion (string).
+- \`source\` : ID du nœud source (string).
+- \`sourceHandle\` : ID unique du port source (string). 4 choix : in-$port | in-internal-$port  | out-$port | out-internal-$port
+  - pour les model atomique 2 choix :
+    - Port d'entrée : in-$port
+    - Port de sortie : out-$port
+  - pour les model couplé 4 choix :
+    - Port d'entrée est divisé en deux port : 
+      - in-$port sera le port d'entré du modèle
+      - in-internal-$port sera le port de sortie d'entrée du modèle
+    - Port de sortie est divisé en deux port : 
+      - out-$port sera le port de sortie du modèle
+      - out-internal-$port sera le port de d'entrée de la sortie du modèle
+- \`target\` : ID du nœud cible (string).
+- \`targetHandle\` : ID unique du port cible (string). 4 choix : in-$port | in-internal-$port | out-$port | out-internal-$port
+- \`type\` : Type de connexion (string).
+
+---
+
+### Exemple attendu
+Un exemple minimal illustrant ces structures :
+\`\`\`json
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "resizer",
+      "data": {
+        "modelType": "atomic",
+        "label": "Atomic Model 1",
+        "inputPorts": [{ "id": "1" }],
+        "outputPorts": [{ "id": "1" }]
+      },
+      "position": { "x": 50, "y": 100 }
     },
-      style: {width: 300, height: 300 },
-      position: position,
-  },
-      {
-        id: '2',
-      type: 'resizer',
-      data: {
-        modelType: "atomic",
-      label: 'Atomic Model 2',
-      inputPorts: [{id: '1' }],
-      outputPorts: [{id: '1' }],
+    {
+      "id": "2",
+      "type": "resizer",
+      "data": {
+        "modelType": "coupled",
+        "label": "Coupled Model",
+        "inputPorts": [{ "id": "1" }],
+        "outputPorts": [{ "id": "1" }],
+        "children": [
+          { "id": "3", "modelType": "atomic" }
+        ]
+      },
+      "position": { "x": 200, "y": 200 }
     },
-      style: {width: 200, height: 200 },
-      position: position,
-  },
-      {
-        id: '3',
-      type: 'resizer',
-      data: {
-        modelType: "coupled",
-      label: 'Coupled Model',
-      inputPorts: [{id: '1' }, {id: '2' }],
-      outputPorts: [{id: '1' }, {id: '2' }],
-    },
-      style: {width: 500, height: 500 },
-      position: position,
-  },
-      {
-        id: '4',
-      type: 'resizer', // Assure-toi que ce type est enregistré dans React Flow
-      position: {x: 50, y: 50 },
-      style: {width: 100, height: 100 },
-      data: {
-        modelType:"atomic",
-      label: 'Atomic Model',
-      inputPorts: [{id: '1' },], // Ports d'entrée
-      outputPorts: [{id: '1' },], // Ports de sortie
-    },
-      parentId: '3',
-      extent: 'parent',
-  },
-      {
-        id: '5',
-      type: 'resizer', // Assure-toi que ce type est enregistré dans React Flow
-      position: position,
-      style: {width: 100, height: 100 },
-      data: {
-        modelType:"atomic",
-      label: 'Atomic Model',
-      inputPorts: [{id: '1' },], // Ports d'entrée
-      outputPorts: [{id: '1' },], // Ports de sortie
-    },
-      parentId: '3',
-      extent: 'parent',
-  }
-      ],
-      "edges": [
-      {
-        id: 'e1-2',
-      source: '1',
-      sourceHandle: 'out-1', // Connexion à partir du port de sortie 'out-1' du nœud 1
-      target: '2',
-      targetHandle: 'in-1',  // Connexion vers le port d'entrée 'in-1' du nœud 2
-      type: 'smoothstep',
-  },
-      {
-        id: 'e2-3',
-      source: '2',
-      sourceHandle: 'out-1', // Connexion à partir du port de sortie 'out-1' du nœud 2
-      target: '3',
-      targetHandle: 'in-1',  // Connexion vers le port d'entrée 'in-1' du nœud 3
-      type: 'smoothstep',
-  },
-      {
-        id: 'e1-3',
-      source: '1',
-      sourceHandle: 'out-2', // Connexion à partir du port de sortie 'out-2' du nœud 1
-      target: '3',
-      targetHandle: 'in-2',  // Connexion vers le port d'entrée 'in-2' du nœud 3
-      type: 'smoothstep',
-  },
-      {
-        id: 'e1-4',
-      source: '3',
-      sourceHandle: 'in-internal-1', // Connexion à partir du port de sortie 'out-2' du nœud 1
-      target: '4',
-      targetHandle: 'in-1',  // Connexion vers le port d'entrée 'in-2' du nœud 3
-      type: 'smoothstep',
-  },
-      {
-        id: 'e1-5',
-      source: '3',
-      sourceHandle: 'in-internal-2', // Connexion à partir du port de sortie 'out-2' du nœud 1
-      target: '5',
-      targetHandle: 'in-1',  // Connexion vers le port d'entrée 'in-2' du nœud 3
-      type: 'smoothstep',
-  }
-      ]
+    {
+      "id": "3",
+      "type": "resizer",
+      "data": {
+        "modelType": "atomic",
+        "label": "Child Atomic Model",
+        "inputPorts": [{ "id": "1" }],
+        "outputPorts": [{ "id": "1" }]
+      },
+      "position": { "x": 100, "y": 150 },
+      "parentId": "2",
+      "extent": "parent"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "sourceHandle": "out-1",
+      "target": "2",
+      "targetHandle": "in-1",
+      "type": "smoothstep"
+    }
+  ]
 }
+\`\`\`
 
-      4. **Additional Notes**:
-      - Do not include \`\`\`json or any block code formatting.
-      - Ensure all ports and nodes have unique IDs.
-      - Use the provided structure and examples as templates.
-      - The JSON must be syntactically valid for immediate use in a JavaScript environment.
+---
 
-`
+### Rappels Importants
+1. **Ne pas inclure \`parentId\` et \`extent\`** pour les nœuds autonomes.
+2. Tous les **IDs doivent être uniques** pour les nœuds, ports, et connexions.
+3. Les **\`sourceHandle\`** et **\`targetHandle\`** doivent également être **uniques**.
+4. Le JSON doit être prêt à l'emploi et valide dans un environnement JavaScript.
+`;
+
 
 module.exports = { systemDiagramPrompt }
