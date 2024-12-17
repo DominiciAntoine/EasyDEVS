@@ -8,22 +8,22 @@ const { z } = require("zod");
 const { zodResponseFormat } = require("openai/helpers/zod");
 const { systemDiagramPrompt } = require("../prompt/diagram_prompt");
 
+const portRegex = /^(in|out|in-internal|out-internal)-\d+$/;
+const portSchema = z.object({
+  id: z.string(),
+});
+
+const inputPorts = z.array(portSchema);
+const outputPorts = z.array(portSchema);
+
 const NodeSchema = z.object({
   id: z.string(),
   type: z.literal("resizer"),
   data: z.object({
     modelType: z.enum(["atomic", "coupled"]),
     label: z.string(),
-    inputPorts: z.array(
-      z.object({
-        id: z.string(),
-      })
-    ),
-    outputPorts: z.array(
-      z.object({
-        id: z.string(),
-      })
-    ),
+    inputPorts,
+    outputPorts
   }),
   style: z
     .object({
@@ -39,6 +39,7 @@ const NodeSchema = z.object({
   extent: z.literal("parent").optional(),
 });
 
+const portHandleRegex = /^(in|out|in-internal|out-internal)-\d+$/;
 
 const EdgeSchema = z.object({
   id: z.string(),
@@ -46,7 +47,7 @@ const EdgeSchema = z.object({
   sourceHandle: z.string(),
   target: z.string(),
   targetHandle: z.string(),
-  type: z.string(),
+  type: z.literal("smoothstep"),
 });
 
 const DEVSDiagramSchema = z.object({
@@ -76,7 +77,7 @@ router.post('/generate-diagram', authenticateToken, async (req, res) => {
 
   try {
     const completion = await openai.beta.chat.completions.parse({
-      model: 'llama-3.1-70b-instruct',
+      model: 'llama-3.1-8b-instruct',
       messages: [{ role: 'system', content: systemDiagramPrompt.trim() },
       { role: 'user', content: userPrompt },
 
