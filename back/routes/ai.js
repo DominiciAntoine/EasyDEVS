@@ -24,14 +24,6 @@ const NodeSchema = z.object({
         id: z.string(),
       })
     ),
-    children: z
-      .array(
-        z.object({
-          id: z.string(),
-          modelType: z.enum(["atomic", "coupled"]),
-        })
-      )
-      .optional(),
   }),
   style: z
     .object({

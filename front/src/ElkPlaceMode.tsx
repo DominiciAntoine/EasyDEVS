@@ -32,6 +32,7 @@ const buildHierarchy = (nodes: Node<NodeData>[], _isHorizontal: boolean) => {
   nodes.forEach((node) => {
     if (node.parentId && nodeMap[node.parentId]) {
       nodeMap[node.parentId].children?.push(nodeMap[node.id]);
+      
     } else {
       rootNodes.push(nodeMap[node.id]);
     }
@@ -84,6 +85,8 @@ export const getLayoutedElements = async (nodes: Node<NodeData>[], edges: Edge[]
   return {
     nodes: layoutedFlatNodes.map((node) => ({
       ...nodes.find((n) => n.id === node.id)!,
+      width: node.width,
+      height: node.height,
       position: node.position,
     })),
     edges,
