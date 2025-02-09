@@ -1,55 +1,65 @@
+# Projet EasyDEVS
 
-# EasyDEVS
+Ce projet utilise Docker, Node.js, React et TailwindCSS pour créer un environnement de développement complet pour des systèmes DEVS.
 
-EasyDEVS is a tool that allows you to easily generate DEVS models using AI and an interactive interface.
+## Prérequis
 
-## Key Features
+Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur votre machine :
 
-- Create and manipulate atomic and coupled DEVS models.
-- Use AI to simplify the generation of models.
-- Intuitive interface based on React Flow and ELK.js to manage graphs.
+- Docker et Docker Compose ou Docker Desktop (qui inclut Docker et Docker Compose)
+- Node.js version > 20
 
 ## Installation
 
-### Prerequisites
+1. Clonez le projet :
 
-- Node.js (version 16 or higher recommended)
-- npm (comes with Node.js)
-
-### Steps
-
-1. Clone this repository:
    ```bash
-   git clone https://github.com/DominiciAntoine/EasyDEVS.git
-   cd EasyDEVS
+   git clone <URL_DE_VOTRE_PROJET>
+   cd <NOM_DU_REPERTOIRE_CLONÉ>
    ```
 
-2. Install dependencies:
+2. Copiez les fichiers `.env.back.dist` et `.env.front.dist` :
+
    ```bash
-   npm install
+   cp .env.back.dist .env.back
+   cp .env.front.dist .env.front
    ```
 
-3. Start the development server:
+3. Supprimez le suffixe `.dist` des fichiers `.env` :
+
    ```bash
-   npm run dev
+   mv .env.front.dist .env.front
+   mv .env.back.dist .env.back
    ```
 
-## Usage
+4. Ouvrez les fichiers `.env` et remplissez-les avec les valeurs demandées.
 
-1. Open your browser at the address displayed in the console (default: `http://localhost:5173`).
-2. Use the interface to create, edit, and visualize DEVS models.
-3. Connect nodes (atomic and coupled models) using ports to structure your models.
+## Fonctionnement de l'API
 
-## Project Structure
+L'API fonctionne avec tout modèle LLM (Large Language Model) utilisant le OpenAI SDK.
 
-- **src/**: Contains the main source code, including React components and interface logic.
-- **public/**: Contains static files accessible directly.
-- **package.json**: Lists the dependencies and npm scripts.
+## Lancer le projet
 
-## Contributions
+Le projet est configuré pour se lancer en mode développement par défaut.
 
-Contributions are welcome! If you'd like to add features or report issues, please open an issue or submit a pull request.
+### Pour démarrer le projet :
 
-## License
+```bash
+docker compose up --build
+```
 
-This project is licensed under the MIT License. See the `LICENSE` file for more information.
+### Si le projet a déjà été build :
+
+```bash
+docker compose up
+```
+
+### Pour arrêter le projet :
+
+```bash
+docker compose down
+```
+
+## Conclusion
+
+Une fois le projet démarré, vous pouvez commencer à interagir avec l'API et les composants React du frontend.

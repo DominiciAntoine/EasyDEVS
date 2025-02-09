@@ -77,12 +77,15 @@ router.post('/generate-diagram', authenticateToken, async (req, res) => {
 
   try {
     const completion = await openai.beta.chat.completions.parse({
-      model: 'llama-3.1-8b-instruct',
+      model: 'deepseek-r1-distill-llama-70b',
       messages: [{ role: 'system', content: systemDiagramPrompt.trim() },
       { role: 'user', content: userPrompt },
 
       ],
       response_format: zodResponseFormat(DEVSDiagramSchema, "DEVSDiagramSchema"),
+      max_token: 4000,
+      temperature: 0.9,
+      top_p: 0.7
     });
 
     const rawContent = completion.choices[0].message.parsed;
