@@ -88,7 +88,13 @@ router.post('/generate-diagram', authenticateToken, async (req, res) => {
       top_p: 0.7
     });
 
+
+
     const rawContent = completion.choices[0].message.parsed;
+
+
+    
+
     res.json(rawContent);
   } catch (error) {
     console.error('Erreur lors de l’appel à vLLM :', error);
