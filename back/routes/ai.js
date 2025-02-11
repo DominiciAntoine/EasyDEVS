@@ -58,6 +58,16 @@ function splitConnection(conn, diagram) {
     // Vérifier si le modèle source a un parent et créer des connexions intermédiaires
     while (findParent(intermediate, diagram)) {
         let parent = findParent(intermediate, diagram);
+
+        let parentModel = diagram.models.find(model => model.id === parent);
+
+        if (parentModel) {
+            if (!Array.isArray(parentModel.port)) {
+                parentModel.port = [];
+            }
+            //dans ce push faire un association de string entre la source et le parent plus le port de la source 
+            parentModel.port.push();
+        }
         connections.push({ from: { model: intermediate, port: conn.from.port }, to: { model: parent, port: "" } });
         intermediate = parent;
     }
@@ -139,6 +149,24 @@ function convertDevsToReactFlow(diagram) {
     diagram.connections.forEach(conn => {
         tEdge.push(...splitConnection(conn, diagram));
     });
+
+    //traitement des edges duplicate 
+    // Suppression des doublons dans tEdge
+    const uniqueEdges = [];
+    const seenEdges = new Set();
+
+    tEdge.forEach(conn => {
+        const key = `${conn.from.model}-${conn.from.port || "1"}-${conn.to.model}-${conn.to.port || "1"}`;
+        
+        if (!seenEdges.has(key)) {
+            seenEdges.add(key);
+            uniqueEdges.push(conn);
+        }
+    });
+
+    // Remplace tEdge par la version filtrée
+    tEdge = uniqueEdges;
+
 
     // Génération des edges pour React Flow
     tEdge.forEach(conn => {
