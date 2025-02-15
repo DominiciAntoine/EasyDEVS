@@ -20,7 +20,7 @@ services:
     env_file:
       - ./.env.back
     volumes:
-      - ./back:/app
+      - ./back/src:/app/src
     depends_on:
       db:
         condition: service_healthy
