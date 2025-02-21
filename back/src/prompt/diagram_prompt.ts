@@ -1,76 +1,52 @@
 import { diagramExample } from "./diagramExample";
 
 const systemDiagramPrompt: string = `
-**Prompt for LLM:**
+Generate a strictly structured JSON representing a DEVS (Discrete Event System Specification) model, adhering to the following schema:
 
-You must generate a **DEVS diagram** in a structured JSON format.
+### 1. Models Definition (models array)
+- Each object in "models" represents a DEVS model.
+- Keys:
+  - "id": Unique identifier of the model.
+  - "type": Either "atomic" or "coupled".
+  - If "type" is "atomic", the model can have a "ports" key:
+    - "ports": An object that may contain:
+      - "in": An array of input port names.
+      - "out": An array of output port names.
+  - If "type" is "coupled", the model can have these keys:
+    - "components": An array listing the IDs of sub-models.
+    - "ports": An object that may contain:
+      - "in": An array of input port names.
+      - "out": An array of output port names.
 
----
+### 2. Connections Definition (connections array)
+For connection between models inside coupled, direct connections are allowed. It's easier for you to connect models directly.
+- **By default, all connections must be direct**, meaning:
+- Keys:
+  - "from": Defines the source model and port.
+    - "model": The id of the source model.
+    - "port": The output port of the source model.
+  - "to": Defines the destination model and port.
+    - "model": The id of the destination model.
+    - "port": The input port of the destination model.
 
-### Definition of Key Concepts:
+### 3. Constraints (Must be strictly followed)
+- Schema adherence: No missing, extra, or misnamed fields.
+- Compact JSON output: No line breaks (\n), indentation, or whitespace.
+- Valid DEVS structure:
+  - "atomic" models must have "ports", but cannot have "components".
+  - "coupled" models must have "components", but cannot have "ports".
+- **System encapsulation:** Do not automatically generate a top-level coupled model unless explicitly specified by the user.
+- **Connections must be strictly direct** by default, unless the user explicitly requests indirect connections via coupled models.
+- **No cyclic dependencies** (e.g., Model A → Model B → Model A), unless explicitly requested by the user.
+- Meaningful IDs: No arbitrary names; IDs should be relevant to the DEVS logic.
+- No redundant data: The JSON should be minimalistic yet complete.
 
-1. **Atomic Model**:  
-   - It is a basic unit in DEVS.  
-   - It has **input ports** ('inputPorts') and **output ports** ('outputPorts').  
-   - Each port is identified by an 'id'.  
+### Expected JSON Example
+${diagramExample}
 
-2. **Coupled Model**:  
-   - It is a composite model containing multiple atomic and/or coupled models.  
-   - It has **input ports** and **output ports**, but **each port is duplicated** to handle internal and external connections:  
-     - **Internal ports** (e.g., 'in-internal' and 'out-internal') connect internal sub-models.  
-     - **External ports** (e.g., 'in' and 'out') interact with the outside of the coupled model.  
+### Output Instructions
+- Return only the compact JSON as a single line, without any additional text.
 
-3. **Connection Between Models**:  
-   - Connections (edges) link **output ports** of a source model to **input ports** of a target model.  
-   - Example: An output 'out-1' of model 'A' can be connected to the input 'in-1' of model 'B'.  
-
----
-
-### Expected Structure:
-
-The generated JSON format must contain:  
-
-1. A **list of nodes** ('nodes') representing the models:  
-   - Each node must include:  
-     - **'id'**: A unique identifier.  
-     - **'position'** ('x, y'): The model's location.  
-     - **'style'**: Includes size ('width, height').  
-     - **'data'** containing:  
-       - ''modelType'' (value: ''atomic'' or ''coupled'').  
-       - ''label'': The model's name.  
-       - ''inputPorts'' and ''outputPorts'', represented as a **simple list** of incrementing numeric identifiers like '1, 2, 3'.  
-         - **Important**: You must **not generate** complex port names like 'in-1' or 'out-1'. The system will automatically handle final port naming.  
-   - **If the model is contained within another coupled model**, and **only then** (very important):  
-     - Add the field **'parentId'** with the id of the parent coupled model.  
-     - Add the field **'extent'** with the value ''parent''.  
-   - **If the model is not contained within another coupled model**, **do not add** these fields. Never leave 'extent' null or empty; simply omit it.  
-
-2. A **list of edges** ('edges') representing connections between model ports:  
-   Each connection must follow a clear structure and include the following fields:  
-   - **'id'**: A unique identifier for each connection.  
-   - **'source'**: The 'id' of the source model where the connection originates.  
-   - **'sourceHandle'**: The 'id' of the source port in the format **'in-x'**, **'out-x'**, **'in-internal-x'**, or **'out-internal-x'**, where 'x' is an incrementing integer corresponding to the port to connect.  
-   - **'target'**: The 'id' of the target model where the connection ends.  
-   - **'targetHandle'**: The 'id' of the target port in the same format **'in-x'**, **'out-x'**, **'in-internal-x'**, or **'out-internal-x'**.  
-   - **'type'**: Must always have the fixed value **'smoothstep'**.  
-
----
-
-### Specific Important Rules:
-
-1. **Port Format**:  
-   - Ports must strictly follow these formats:  
-     - **'in-x'**: External input ports.  
-     - **'out-x'**: External output ports.  
-     - **'in-internal-x'**: Internal input ports for sub-models.  
-     - **'out-internal-x'**: Internal output ports for sub-models.  
-   - Here, 'x' is an **incrementing integer**, starting at '1'. It corresponds to the port listed in the model as follows: outputPorts: [{ id: '1' }].  
-
----
-
-### Example Provided Separately:
-Refer to the example JSON I will include. Follow this structure precisely for **nodes** and **edges**, while applying the described principles.
-
-${diagramExample}`;
+`;
 
 export { systemDiagramPrompt };

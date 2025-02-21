@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/form"
 import { Button } from "@/components/ui/button.tsx"
 import { useToast } from "@/hooks/use-toast"
-import { fetchWithAuth } from './fetchWithAuth.ts';
 import useAuth from "./use-auth";
 import { generateDiagram } from "./api/diagramApi.ts"
 import { DiagramDataType } from './types.ts';
@@ -60,6 +59,7 @@ export default function DiagramPrompt({
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setLoading(true);
 
+        console.log("values", values);
         await generateDiagram(token, { diagramName: values.diagramName, prompt: values.prompt }, onGenerate, toast);
         setLoading(false);
 

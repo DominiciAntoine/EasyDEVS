@@ -16,6 +16,7 @@ import { ThemeProvider } from './components/theme-provider.tsx';
 
 import { Toaster } from './components/ui/toaster.tsx';
 import DiagramGenerator from './diagramGenerator.tsx';
+import Diagrams from './diagrams.tsx';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from './login.tsx';
 import { Register } from './register.tsx';
@@ -55,6 +56,7 @@ const Main = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/online-devs" element={<OnlineDEVSEditor />} />
         <Route path="/devs-generator" element={<DiagramGenerator />} />
+        <Route path="/diagrams" element={<Diagrams />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </DefaultLayout>

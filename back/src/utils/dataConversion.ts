@@ -58,8 +58,19 @@ function createConnections(
 		const parent = findParent(parentModel.id, diagram);
 
 		if (parent) {
+			arrayOfConnections.push(interConn);
+
+			const nextGeneratedPortNameFrom = generateInterPort(
+				parentModel.id,
+				parent.id,
+			);
+			const nextConn: typeof conn = {
+				from: { model: parentModel.id, port: generatedPortNameFrom },
+				to: { model: parent.id, port: nextGeneratedPortNameFrom },
+			};
+
 			arrayOfConnections.push(
-				...createConnections(interConn, parent, diagram, type),
+				...createConnections(nextConn, parent, diagram, type),
 			);
 		} else {
 			arrayOfConnections.push(interConn);
@@ -83,8 +94,19 @@ function createConnections(
 	const parent = findParent(parentModel.id, diagram);
 
 	if (parent) {
+		arrayOfConnections.push(interConn);
+
+		const nextGeneratedPortNameTo = generateInterPort(
+			parent.id,
+			parentModel.id,
+		);
+		const nextConn: typeof conn = {
+			from: { model: parent.id, port: nextGeneratedPortNameTo },
+			to: { model: parentModel.id, port: generatedPortNameTo },
+		};
+
 		arrayOfConnections.push(
-			...createConnections(interConn, parent, diagram, type),
+			...createConnections(nextConn, parent, diagram, type),
 		);
 	} else {
 		arrayOfConnections.push(interConn);
@@ -105,8 +127,13 @@ function splitConnection(
 
 	let finalSource = connection.from;
 	const parentFrom = findParent(connection.from.model, diagram);
+	const parentTo = findParent(connection.to.model, diagram);
 
-	if (parentFrom) {
+	if (
+		parentFrom &&
+		parentFrom.id !== connection.to.model &&
+		parentFrom.id !== parentTo?.id
+	) {
 		connections.push(
 			...createConnections(connection, parentFrom, diagram, "from"),
 		);
@@ -119,8 +146,11 @@ function splitConnection(
 	//si pas de parent  = conection.from
 	let finalTarget = connection.to;
 
-	const parentTo = findParent(connection.to.model, diagram);
-	if (parentTo) {
+	if (
+		parentTo &&
+		parentTo.id !== connection.from.model &&
+		parentFrom?.id !== parentTo.id
+	) {
 		connections.push(...createConnections(connection, parentTo, diagram, "to"));
 		const aConnection = connections[connections.length - 1];
 		if (aConnection) {
@@ -184,6 +214,7 @@ export function convertDevsToReactFlow(diagram: LLMResponse) {
 	);
 	//ca ne vas pas pour le history
 
+	console.log(JSON.stringify(diagram.connections));
 	//création des ports manquants
 
 	diagram.connections = diagram.connections.flatMap((conn) => {

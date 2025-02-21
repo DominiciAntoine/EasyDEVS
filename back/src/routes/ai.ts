@@ -2,11 +2,13 @@ import "dotenv/config";
 import express, { type Request, type Response } from "express";
 import type jwt from "jsonwebtoken";
 import OpenAI from "openai";
+import { LengthFinishReasonError } from "openai/error.mjs";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import authenticateToken from "../middlewares/auth";
-import { diagramExample } from "../prompt/diagramExample";
+import { modelPrompt } from "../prompt/ModelPrompt";
 import { systemDiagramPrompt } from "../prompt/diagram_prompt";
+import { diagramExample1 } from "../prompt/test";
 import { convertDevsToReactFlow } from "../utils/dataConversion";
 
 const router = express.Router();
@@ -37,6 +39,10 @@ const ConnectionSchema = z.object({
 const DevsSchema = z.object({
 	models: z.array(ModelSchema),
 	connections: z.array(ConnectionSchema),
+});
+
+const DevsModelSchema = z.object({
+	code: z.string(),
 });
 
 // ✅ Vérifier que l'API OpenAI est bien configurée
@@ -79,56 +85,71 @@ router.post(
 	async (req: GenerateDiagramRequest, res: Response): Promise<void> => {
 		const { diagramName, userPrompt } = req.body;
 
-		console.log("tqsdqsd");
 		if (!diagramName || diagramName.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'diagramName' est requis et doit être une chaîne non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'diagramName' est requis et doit être une chaîne non vide.",
+			});
 			return;
 		}
 		if (!userPrompt || userPrompt.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'userPrompt' est requis et doit être une chaîne non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'userPrompt' est requis et doit être une chaîne non vide.",
+			});
 			return;
 		}
 		try {
-			/*const completion = await openai.beta.chat.completions.parse({
-      model: 'deepseek-r1-distill-llama-70b',
-      messages: [{ role: 'system', content: systemDiagramPrompt.trim() },
-      { role: 'user', content: userPrompt },
+			const debug = true;
+			if (!debug) {
+				const completion = await openai.beta.chat.completions.parse({
+					model: "llama-3.3-70b-instruct",
+					messages: [
+						{ role: "system", content: systemDiagramPrompt.trim() },
+						{ role: "user", content: userPrompt },
+					],
+					response_format: zodResponseFormat(DevsSchema, "DEVSSchema"),
+					max_token: 4000,
+					temperature: 0.9,
+					top_p: 0.7,
+				});
 
-      ],
-      response_format: zodResponseFormat(DevsSchema, "DEVSSchema"),
-      max_token: 4000,
-      temperature: 0.9,
-      top_p: 0.7
-    });
+				const rawContent = completion.choices[0]?.message?.parsed;
+				console.log(JSON.stringify(rawContent));
+				if (!rawContent) {
+					res.status(500).json({
+						error: "Erreur lors de la génération du diagramme avec l’IA.",
+					});
+					return;
+				}
 
-    const rawContent = completion.choices[0].message.parsed;
-    
-    if (!rawContent || !rawContent.models || !rawContent.connections) {
-      res.status(500).json({ error: 'Erreur lors de la génération du diagramme avec l’IA.' });
-      return;
-    }*/
+				if (!rawContent || !rawContent.models || !rawContent.connections) {
+					res.status(500).json({
+						error: "Erreur lors de la génération du diagramme avec l’IA.",
+					});
+					return;
+				}
 
-			const postTreatment = convertDevsToReactFlow(diagramExample);
+				const postTreatment = convertDevsToReactFlow(
+					structuredClone(rawContent),
+				);
 
+				console.log(JSON.stringify(postTreatment));
+
+				res.json(postTreatment);
+				return;
+			}
+			const postTreatment = convertDevsToReactFlow(
+				structuredClone(diagramExample1),
+			);
 			res.json(postTreatment);
+			console.log(JSON.stringify(postTreatment));
 			return;
 		} catch (error) {
 			console.error("Erreur lors de l’appel à vLLM :", error);
-			res
-				.status(500)
-				.json({
-					error: "Erreur lors de la génération du diagramme avec l’IA.",
-				});
+			res.status(500).json({
+				error: "Erreur lors de la génération du diagramme avec l’IA.",
+			});
 			return;
 		}
 	},
@@ -142,67 +163,73 @@ router.post(
 		const { modelName, modelType, previousModelsCode, userPrompt } = req.body;
 
 		if (!modelName || modelName.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'modelName' est requis et doit être une chaîne non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'modelName' est requis et doit être une chaîne non vide.",
+			});
 			return;
 		}
 		if (!modelType || modelType.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'modelType' est requis et doit être une chaîne non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'modelType' est requis et doit être une chaîne non vide.",
+			});
 			return;
 		}
 		if (!previousModelsCode) {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'previousModelsCode' est requis et doit être une chaîne.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'previousModelsCode' est requis et doit être une chaîne.",
+			});
 			return;
 		}
 		if (!userPrompt || userPrompt.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'userPrompt' est requis et doit être une chaîne non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'userPrompt' est requis et doit être une chaîne non vide.",
+			});
 			return;
 		}
 
 		const fullPrompt = `
-You are an expert in DEVS modeling. Define the behavior of a specific model in a DEVS diagram based on the user's description.
+		Model Name: ${modelName}
+		Model Type: ${modelType}
 
-Model Name: ${modelName}
-Model Type: ${modelType}
+		Previous Models Code:
+		${previousModelsCode}
 
-Previous Models Code:
-${previousModelsCode.trim()}
-
-User Description: ${userPrompt.trim()}
-`;
+		User Description: ${userPrompt.trim()}
+		`;
 
 		try {
-			/*const completion = await openai.chat.completions.create({
-      model: 'qwen2.5-coder',
-      messages: [{ role: 'user', content: fullPrompt }],
-    });
+			const completion = await openai.chat.completions.create({
+				model: "llama-3.3-70b-instruct",
+				messages: [
+					{ role: "system", content: modelPrompt.trim() },
+					{ role: "user", content: fullPrompt },
+				],
+				max_tokens: 1000,
+				temperature: 0.9,
+				top_p: 0.7,
+			});
 
+			const rawContent = completion.choices[0]?.message?.content;
 
-    if (!completion !==undefined || completion.choices) {
-      res.status(500).json({ error: 'Erreur lors de la génération du modèle avec l’IA.' });
-      return;
-    }
-    res.json((completion.choices[0] as never).message);*/
-			res.json({ id: "123", code: "model code" });
+			if (!rawContent) {
+				res.status(500).json({
+					error: "Erreur lors de la génération du diagramme avec l’IA.",
+				});
+				return;
+			}
+
+			if (!rawContent || !rawContent) {
+				res.status(500).json({
+					error: "Erreur lors de la génération du diagramme avec l’IA.",
+				});
+				return;
+			}
+
+			res.json(rawContent);
 			return;
 		} catch (error) {
 			console.error("Erreur lors de l’appel à vLLM :", error);

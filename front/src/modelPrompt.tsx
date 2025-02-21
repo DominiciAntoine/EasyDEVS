@@ -19,10 +19,11 @@ import { useToast } from "@/hooks/use-toast"
 import { ModelData } from './types'
 import { fetchWithAuth } from './fetchWithAuth.ts';
 import useAuth from './use-auth.tsx';
+import {generateModel } from './api/diagramApi.ts';
 
 
 const formSchema = z.object({
-    modelName: z.string().min(4, {
+    modelName: z.string().min(2, {
         message: "The diagram name must be at least 4 characters long.",
     }),
     prompt: z.string().min(10, {
@@ -42,7 +43,7 @@ export default function ModelPrompt({
     onGenerate: (modelName: string, modelCode : string) => void;
     stage: number;
     model : ModelData;
-    previousCodes?: string[];
+    previousCodes: string[];
 }) {
     const [loading, setLoading] = useState(false);
     const { toast } = useToast()
@@ -52,7 +53,7 @@ export default function ModelPrompt({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            modelName: "",
+            modelName: model.name,
             prompt: "",
         },
     })
@@ -61,36 +62,10 @@ export default function ModelPrompt({
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setLoading(true);
 
-        try {
-            const diagramResponse = await fetchWithAuth('http://localhost:3000/api/ai/generate-model', token, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', // Important pour que le serveur sache que les données sont en JSON
-                },
-                body: JSON.stringify({ modelName: values.modelName, userPrompt: values.prompt, previousModelsCode: previousCodes }),
-            });
-            const diagramData = await diagramResponse.json();         
-
-            if (diagramResponse.ok) {
-                toast({
-                    description: diagramData.message || 'Diagram generated successfully!',
-                });
-                onGenerate( values.modelName, diagramData.modelExample);
-            } else {
-                toast({
-                    description: diagramData.error || 'An error occurred while generating the diagram.',
-                    variant: 'destructive',
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            toast({
-                description: 'Failed to reach the API during diagram generation.',
-                variant: 'destructive',
-            });
-        } finally {
-            setLoading(false);
-        }
+        await generateModel(token, { modelName: values.modelName, prompt: values.prompt, previousCodes: previousCodes, modelType: model.type }, onGenerate, toast);
+        
+        setLoading(false);
+        
     };
 
     if (loading) {
@@ -120,7 +95,7 @@ export default function ModelPrompt({
                                 <FormItem>
                                     <FormLabel>Model Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="SwitchModel" {...field}  />
+                                        <Input placeholder="Model Name" {...field}  />
                                     </FormControl>
 
                                     <FormMessage />

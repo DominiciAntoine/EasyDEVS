@@ -14,6 +14,7 @@ export type ModelData =
     name: string
     code: string
     dependencies?: string[]
+    type: "atomic" | "coupled"
 
 }
 

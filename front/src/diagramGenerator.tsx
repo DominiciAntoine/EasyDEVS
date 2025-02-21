@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useLayoutEffect, ComponentProps, useEffect } from 'react';
+import { useState, useCallback, useLayoutEffect, ComponentProps, useEffect, useRef } from 'react';
 
 import {
     ResizableHandle,
@@ -34,14 +34,14 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from './co
 import { NavActions } from './components/nav-actions.tsx';
 import { ModeToggle } from './components/mode-toggle.tsx';
 import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from '@codemirror/lang-javascript';
+import { python } from "@codemirror/lang-python"; 
 import ModelPrompt from './modelPrompt.tsx';
 import { githubLight, githubDark } from '@uiw/codemirror-theme-github';
 import { ModelData, DiagramDataType, NodeData } from './types'
 import { useTheme } from "./components/theme-provider"; // Assure-toi que ce hook existe
 import StepShower from './components/stepShower.tsx';
 import { Edge, Node, EdgeChange, NodeChange } from '@xyflow/react';
-import {saveDiagram, getAllDiagrams, getDiagramById} from './diagramAcess.tsx'
+import {saveDiagram} from './api/diagramApi.ts';
 import useAuth from './use-auth.tsx';
 
 const nodeTypes: ComponentProps<typeof ReactFlow>['nodeTypes'] = {
@@ -59,6 +59,8 @@ const edgeTypes = {
 };
 
 const DiagramGenerator = () => {
+    const lastSavedDiagram = useRef<DiagramDataType | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
     const { theme } = useTheme();
     const [stage, setStage] = useState(0);
     const { fitView } = useReactFlow();
@@ -100,8 +102,8 @@ const DiagramGenerator = () => {
     const createModelDataStructure = () => {
 
         // 2. Construire le graphe des dépendances
-        let inDegree: Record<string, number> = {}; // Compte le nombre d'arêtes entrant dans chaque modèle
-        let graph: Record<string, string[]> = {}; // Liste d'adjacence des dépendances
+        const inDegree: Record<string, number> = {}; // Compte le nombre d'arêtes entrant dans chaque modèle
+        const graph: Record<string, string[]> = {}; // Liste d'adjacence des dépendances
 
         // Initialiser le graphe et les degrés entrants (in-degrees)
         diagramData.nodes.forEach(model => {
@@ -116,8 +118,8 @@ const DiagramGenerator = () => {
         });
 
         // 3. Algorithme de tri topologique (Kahn's algorithm)
-        let queue: string[] = [];
-        let result: string[] = [];
+        const queue: string[] = [];
+        const result: string[] = [];
 
         // Ajouter les nœuds avec un degré entrant de 0 (pas de dépendances)
         Object.keys(inDegree).forEach(id => {
@@ -128,7 +130,7 @@ const DiagramGenerator = () => {
 
         // Processus de tri topologique
         while (queue.length > 0) {
-            let currentNode: string | undefined = queue.shift(); // Prendre un nœud sans dépendance
+            const currentNode: string | undefined = queue.shift(); // Prendre un nœud sans dépendance
 
             if (currentNode) {
                 result.push(currentNode); // Ajouter le nœud au résultat
@@ -151,11 +153,12 @@ const DiagramGenerator = () => {
         }
 
         // 5. Récupérer les codes des modèles dans l'ordre de tri topologique
-        let orderedModels: ModelData[] = result.map(id => ({
+        const orderedModels: ModelData[] = result.map(id => ({
             id: id,
-            name: diagramData.nodes.find(node => node.id === id)?.data.label,
+            name: diagramData.nodes.find(node => node.id === id)?.data.label || "Unnamed",
             code: "",
-            dependencies: diagramData.edges.filter(edge => edge.target === id).map(edge => edge.source) // Les sources des dépendances
+            dependencies: diagramData.edges.filter(edge => edge.target === id).map(edge => edge.source), // Les sources des dépendances
+            type: diagramData.nodes.find(node => node.id === id)?.data.modelType || "atomic",
         }));
 
 
@@ -177,14 +180,16 @@ const DiagramGenerator = () => {
             ...prev,
             nodes: diagramData.nodes,
             edges: diagramData.edges,
+            name: diagramData.name
         }));
+        
         setStage(1);
 
     };
 
     const updateModelCode = (modelName: string, modelCode: string) => {
         setCode(modelCode);
-        let temp = diagramData;
+        const temp = diagramData;
         if (temp) {
             temp.models[temp.currentModel].name = modelName;
             temp.models[temp.currentModel].code = modelCode;
@@ -284,7 +289,9 @@ const DiagramGenerator = () => {
     );
 
     useEffect(() => {
-        if (diagramData && diagramData.models.length > 0) {
+        if (!diagramData.diagramId && diagramData.models.length > 0 && !isSaving) {
+            setIsSaving(true); // Empêche un deuxième appel
+            
             const currentModelId = diagramData.models[diagramData.currentModel]?.id;
             const isAlreadyHighlighted = diagramData.nodes.some(
                 (node) => node.id === currentModelId && node.data.isSelected
@@ -294,8 +301,21 @@ const DiagramGenerator = () => {
                 changeHiglightedModel();
                 console.log("changing selected");
             }
-
-            saveDiagram(diagramData, token)
+    
+            if (JSON.stringify(lastSavedDiagram.current) !== JSON.stringify(diagramData)) {
+                saveDiagram(diagramData, token).then((diagramId) => {
+                    if (diagramId !== -1) {
+                        setDiagramData((prev) => ({
+                            ...prev,
+                            diagramId: diagramId
+                        }));
+                        lastSavedDiagram.current = { ...diagramData, diagramId };
+                    }
+                    setIsSaving(false); // Réactive la possibilité de sauvegarder
+                }).catch(() => setIsSaving(false)); // Évite un blocage en cas d’erreur
+            } else {
+                setIsSaving(false);
+            }
         }
     }, [diagramData]);
 
@@ -407,7 +427,7 @@ const DiagramGenerator = () => {
                                             className="h-full"
                                             onChange={(value) => setCode(value)}
                                             theme={theme === "dark" ? githubDark : githubLight}
-                                            extensions={[javascript()]}
+                                            extensions={[python()]}
                                         />
                                         
                                         <Button className="absolute bottom-0 left-1/2 transform -translate-x-1/2 mb-4 w-auto px-4 py-2 bg-foreground text-background rounded" onClick={onValidateModel}>Validate model</Button>
@@ -428,3 +448,5 @@ const DiagramGenerator = () => {
 };
 
 export default DiagramGenerator;
+
+

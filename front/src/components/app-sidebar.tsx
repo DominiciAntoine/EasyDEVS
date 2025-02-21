@@ -63,6 +63,12 @@ const data = {
       icon: FilePenLine,
       badge: "10",
     },
+    {
+      title: "My projects",
+      url: "/diagrams",
+      icon: Blocks,
+      badge: "10",
+    },
   ],
   navSecondary: [
     {
@@ -117,21 +123,7 @@ const data = {
       url: "#",
       emoji: "🌱",
     },
-    {
-      name: "DEVS project 6",
-      url: "#",
-      emoji: "🗣️",
-    },
-    {
-      name: "DEVS project 7",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "DEVS project 8",
-      url: "#",
-      emoji: "💰",
-    },
+
   ],
   workspaces: [
     {
