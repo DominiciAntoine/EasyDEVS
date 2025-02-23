@@ -57,6 +57,7 @@ const Main = () => {
         <Route path="/online-devs" element={<OnlineDEVSEditor />} />
         <Route path="/devs-generator" element={<DiagramGenerator />} />
         <Route path="/diagrams" element={<Diagrams />} />
+        
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </DefaultLayout>
