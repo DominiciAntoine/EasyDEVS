@@ -5,37 +5,37 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL
 );
 
--- Création de la table pour les diagrammes
-CREATE TABLE diagrams (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    current_model INTEGER,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE -- Relation avec la table users
-);
 
--- Création de la table pour les nodes
-CREATE TABLE nodes (
+-- Création de la table pour les librairies
+CREATE TABLE library (
     id SERIAL PRIMARY KEY,
-    content TEXT,
-    diagram_id INTEGER REFERENCES diagrams(id) ON DELETE CASCADE -- Relation avec la table diagrams
-);
-
--- Création de la table pour les edges
-CREATE TABLE edges (
-    id SERIAL PRIMARY KEY,
-    content TEXT,
-    diagram_id INTEGER REFERENCES diagrams(id) ON DELETE CASCADE -- Relation avec la table diagrams
+    label VARCHAR(255) NOT NULL,
+    description TEXT
 );
 
 -- Création de la table pour les models
 CREATE TABLE models (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    code TEXT NOT NULL,
-    dependencies JSONB DEFAULT '[]',
-    diagram_id INTEGER REFERENCES diagrams(id) ON DELETE CASCADE -- Relation avec la table diagrams
+    code_id INTEGER NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    lib_id INTEGER REFERENCES library(id) ON DELETE CASCADE,
+    metadata_json JSONB DEFAULT '{}',
+    components_json JSONB DEFAULT '[]',
+    connections_json JSONB DEFAULT '[]',
+    port_in_json JSONB DEFAULT '[]',
+    port_out_json JSONB DEFAULT '[]',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE -- Relation avec la table users
+);
+
+-- Création de la table pour les codes
+CREATE TABLE code (
+    id SERIAL PRIMARY KEY,
+    model_id INTEGER REFERENCES models(id) ON DELETE CASCADE,
+    language VARCHAR(20) NOT NULL,
+    code TEXT NOT NULL
 );
 
 -- Gestion des privilèges

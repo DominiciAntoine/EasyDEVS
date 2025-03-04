@@ -17,9 +17,8 @@ import {
 import { Button } from "@/components/ui/button.tsx"
 import { useToast } from "@/hooks/use-toast"
 import { ModelData } from './types'
-import { fetchWithAuth } from './fetchWithAuth.ts';
-import useAuth from './use-auth.tsx';
 import {generateModel } from './api/diagramApi.ts';
+import {useAuth} from '@/providers/AuthProvider'
 
 
 const formSchema = z.object({

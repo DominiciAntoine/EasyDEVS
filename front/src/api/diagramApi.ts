@@ -1,5 +1,5 @@
-import { fetchWithAuth } from '../fetchWithAuth';
-import { DiagramDataType } from '../types'
+import { fetchWithAuth } from './fetchWithAuth';
+import { DiagramDataType } from '@/types'
 
 export interface DiagramPayload {
     diagramName: string;
