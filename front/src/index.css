@@ -5,6 +5,7 @@
 /* ... */
 
 @layer base {
+  @import 'codemirror/lib/codemirror.css';
   :root {
 
     --background: 0 0% 100%;
@@ -176,4 +177,15 @@ body {
 .react-flow__attribution
 {
   display: none !important;
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

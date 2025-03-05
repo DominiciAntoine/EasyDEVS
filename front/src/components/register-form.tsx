@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useAuth from "../use-auth";
+import {useAuth} from "@/providers/AuthProvider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl } from "@/components/ui/form";
@@ -32,7 +32,7 @@ export const RegisterForm = () => {
   const handleRegister = async (values: z.infer<typeof registerSchema>) => {
     try {
       await register(values.email, values.password);
-    } catch (error) {
+    } catch {
       form.setError("email", { message: "Registration failed" });
     }
   };

@@ -63,3 +63,11 @@ docker compose down
 ## Conclusion
 
 Une fois le projet démarré, vous pouvez commencer à interagir avec l'API et les composants React du frontend.
+
+
+
+## Forcer le commit en cas d'erreur pre-commit
+
+- `git commit -m "fix: toto" --no-verify`
+
+## Installer extension Biome si bous servez de VScode

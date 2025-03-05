@@ -1,5 +1,5 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { NavActions } from "@/components/nav-actions"
+import { AppSidebar } from "@/components/nav/app-sidebar"
+import { NavActions } from "@/components/nav/nav-actions"
 import {
   Breadcrumb,
   BreadcrumbItem,
