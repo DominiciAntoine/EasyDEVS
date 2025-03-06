@@ -1,12 +1,16 @@
-FROM node:22-alpine
+FROM golang:1.24@sha256:c5adecdb7b3f8c5ca3c88648a861882849cc8b02fed68ece31e25de88ad13418
 
-WORKDIR /app
+# Enviroment variable
+WORKDIR /usr/src/some-api
 
-COPY package*.json ./
-RUN npm install
+RUN go install github.com/air-verse/air@latest
 
+#Copying files to work directory
+COPY go.mod ./
+RUN go mod download && go mod verify
 COPY . .
 
-CMD ["npm", "start"]
-
+# Run and expose the server on port 3000
 EXPOSE 3000
+
+# CMD [ "nodemon", "build/app.js" ]

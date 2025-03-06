@@ -10,20 +10,34 @@ services:
     volumes:
       - ./front:/app # Synchronisation du code local
       - /app/node_modules
-
+    
   backend:
     build:
       context: ./back
       dockerfile: Dockerfile.dev
-    ports:
-      - 3000:3000
     env_file:
       - ./.env.back
+    ports:
+      - 3000:3000
     volumes:
-      - ./back/src:/app/src
+      - .:/usr/src/some-api
+    command: air cmd/main.go -b 0.0.0.0
     depends_on:
       db:
         condition: service_healthy
+  db:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:
 
   db:
     image: postgres:15-alpine

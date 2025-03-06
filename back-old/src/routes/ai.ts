@@ -1,9 +1,9 @@
 import "dotenv/config";
 import express, { type Request, type Response } from "express";
 import type jwt from "jsonwebtoken";
-import OpenAI from "openai";
 import { LengthFinishReasonError } from "openai/error.mjs";
-import { zodResponseFormat } from "openai/helpers/zod";
+import { zodResponseFormat } from "openai/helpers/zod.mjs";
+import OpenAI from "openai/index.mjs";
 import { z } from "zod";
 import authenticateToken from "../middlewares/auth";
 import { modelPrompt } from "../prompt/ModelPrompt";

@@ -1,0 +1,22 @@
+package model
+
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
+// Library struct
+type Diagram struct {
+	ID string `gorm:"primaryKey;<-:false;default:uuid_generate_v4()"`
+
+	Name        string `gorm:"not null;size:50;" validate:"required,min=3,max=50" json:"name"`
+	Description string `gorm:"not null" json:"description"`
+	ModelID     string `gorm:"not null" json:"modelId"`
+	WorkspaceID string `gorm:"not null" json:"workspaceId"`
+	UserID      string `gorm:"not null" json:"userId"`
+
+	CreatedAt time.Time      `gorm:"type:timestamp;default:now()" json:"createdAt"`
+	UpdatedAt time.Time      `gorm:"type:timestamp;default:now()" json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt"`
+}

@@ -1,148 +1,95 @@
-# EasyDEVS API
+---
+title: Auth + Docker + Postgres + JWT
+keywords: [auth, docker, postgres, jwt]
+description: Authentication with Docker, Postgres, and JWT.
+---
 
-Une API REST construite avec **Express.js** et **MySQL** avec les fonctionnalités suivantes :
-- CORS
-- Authentification par token JWT
-- Hachage des mots de passe
-- Base de données MySQL
+# Auth Docker Postgres JWT Example
 
-## Prérequis
+[![Github](https://img.shields.io/static/v1?label=&message=Github&color=2ea44f&style=for-the-badge&logo=github)](https://github.com/gofiber/recipes/tree/master/auth-docker-postgres-jwt) [![StackBlitz](https://img.shields.io/static/v1?label=&message=StackBlitz&color=2ea44f&style=for-the-badge&logo=StackBlitz)](https://stackblitz.com/github/gofiber/recipes/tree/master/auth-docker-postgres-jwt)
 
-Avant de lancer le projet, assurez-vous d'avoir installé les éléments suivants :
-- [Node.js](https://nodejs.org/) (version 14 ou plus)
-- [MySQL](https://www.mysql.com/)
+This example demonstrates a boilerplate setup for a Go Fiber application that uses Docker, PostgreSQL, and JWT for authentication.
 
-## Installation
+## Description
 
-1. **Cloner le dépôt** :
+This project provides a starting point for building a web application with user authentication using JWT. It leverages Docker for containerization and PostgreSQL as the database.
 
-   ```bash
-   git clone https://github.com/votre-utilisateur/easydevs-api.git
-   cd easydevs-api
-   ```
+## Requirements
 
-2. **Installer les dépendances** :
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Go](https://golang.org/dl/) 1.18 or higher
 
-   ```bash
-   npm install
-   ```
+## Setup
 
-3. **Configurer les variables d'environnement** :
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/gofiber/recipes.git
+    cd recipes/auth-docker-postgres-jwt
+    ```
 
-   Créez un fichier `.env` à la racine du projet avec le contenu suivant :
+2. Set the environment variables in a `.env` file:
+    ```env
+    DB_PORT=5432
+    DB_USER=example_user
+    DB_PASSWORD=example_password
+    DB_NAME=example_db
+    SECRET=example_secret
+    ```
 
-   ```plaintext
-   PORT=3000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_password
-   DB_NAME=EASYDEVS
-   JWT_SECRET=your_jwt_secret
-   ```
+3. Build and start the Docker containers:
+    ```bash
+    docker-compose build
+    docker-compose up
+    ```
 
-   Remplacez `your_password` par le mot de passe de votre base de données MySQL et `your_jwt_secret` par une clé secrète pour le token JWT.
+The API and the database should now be running.
 
-4. **Configurer la base de données MySQL** :
+## Database Management
 
-   Connectez-vous à MySQL et exécutez les commandes suivantes pour créer la base de données et la table utilisateur :
-
-   ```sql
-   CREATE DATABASE EASYDEVS;
-
-   USE EASYDEVS;
-
-   CREATE TABLE users (
-       id INT PRIMARY KEY AUTO_INCREMENT,
-       username VARCHAR(255) UNIQUE NOT NULL,
-       password VARCHAR(255) NOT NULL
-   );
-   ```
-
-## Démarrer le serveur
-
-Pour démarrer le serveur, utilisez la commande suivante :
-
+You can manage the database via `psql` with the following command:
 ```bash
-npm start
+docker-compose exec db psql -U <DB_USER>
 ```
 
-Si vous avez installé **nodemon**, vous pouvez aussi exécuter :
+Replace `<DB_USER>` with the value from your `.env` file.
 
-```bash
-nodemon
-```
+## API Endpoints
 
-Le serveur devrait démarrer sur le port défini dans le fichier `.env` (par défaut, `3000`). Vous verrez un message confirmant la connexion à la base de données MySQL.
+The following endpoints are available in the API:
 
-## Utilisation de l'API
+- **POST /api/auth/register**: Register a new user.
+- **POST /api/auth/login**: Authenticate a user and return a JWT.
+- **GET /api/user/:id**: Get a user (requires a valid JWT).
+- **PATCH /api/user/:id**: Update a user (requires a valid JWT).
+- **DELETE /api/user/:id**: Delete a user (requires a valid JWT).
 
-### Endpoints disponibles
+## Example Usage
 
-- **POST /api/auth/register** : Inscription d'un utilisateur
-   - Corps de la requête (JSON) :
-     ```
-     {
-       "username": "votreNom",
-       "password": "votreMotDePasse"
-     }
-     ```
+1. Register a new user:
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/register -d '{"username":"testuser", "password":"testpassword"}' -H "Content-Type: application/json"
+    ```
 
-- **POST /api/auth/login** : Connexion de l'utilisateur
-   - Corps de la requête (JSON) :
-     ```
-     {
-       "username": "votreNom",
-       "password": "votreMotDePasse"
-     }
-     ```
-   - Réponse :
-     ```
-     {
-       "message": "Connexion réussie",
-       "token": "jwt_token"
-     }
-     ```
+2. Login to get a JWT:
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/login -d '{"username":"testuser", "password":"testpassword"}' -H "Content-Type: application/json"
+    ```
 
-- **GET /api/auth/profile** : Obtenir le profil de l'utilisateur connecté (protégé par JWT)
-   - Headers :
-     - Authorization: Bearer `jwt_token`
-   
-### Exemple de requêtes avec Postman
+3. Access a protected route:
+    ```bash
+    curl -H "Authorization: Bearer <JWT>" http://localhost:3000/api/user/1
+    ```
 
-1. **Inscription d'un utilisateur** :
-   - URL : `http://localhost:3000/api/auth/register`
-   - Méthode : `POST`
-   - Corps (JSON) :
-     ```
-     {
-       "username": "nouvelUtilisateur",
-       "password": "motDePasse"
-     }
-     ```
+Replace `<JWT>` with the token received from the login endpoint.
 
-2. **Connexion de l'utilisateur** :
-   - URL : `http://localhost:3000/api/auth/login`
-   - Méthode : `POST`
-   - Corps (JSON) :
-     ```
-     {
-       "username": "nouvelUtilisateur",
-       "password": "motDePasse"
-     }
-     ```
-   - Réponse : Le token JWT sera fourni dans la réponse pour les requêtes futures.
+## Conclusion
 
-3. **Accéder au profil de l'utilisateur** :
-   - URL : `http://localhost:3000/api/auth/profile`
-   - Méthode : `GET`
-   - Headers :
-     - Authorization: Bearer `jwt_token` (remplacez `jwt_token` par le token reçu lors de la connexion)
+This example provides a basic setup for a Go Fiber application with Docker, PostgreSQL, and JWT authentication. It can be extended and customized further to fit the needs of more complex applications.
 
-## Dépannage
+## References
 
-- **Erreur de connexion à la base de données** : Assurez-vous que vos informations MySQL dans le fichier `.env` sont correctes.
-- **Erreur `req.body is undefined`** : Vérifiez que `app.use(express.json())` est bien placé avant les routes dans `index.js`.
-
-## License
-
-Ce projet est sous licence MIT. Vous êtes libre de l'utiliser, le modifier et le distribuer.
+- [Fiber Documentation](https://docs.gofiber.io)
+- [Docker Documentation](https://docs.docker.com)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [JWT Documentation](https://jwt.io/introduction/)

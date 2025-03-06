@@ -30,21 +30,17 @@ router.post(
 		const { diagramName, userPrompt } = req.body;
 
 		if (!diagramName || diagramName.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'diagramName' est requis et doit être une chaîne de caractères non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'diagramName' est requis et doit être une chaîne de caractères non vide.",
+			});
 			return;
 		}
 		if (!userPrompt || userPrompt.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'userPrompt' est requis et doit être une chaîne de caractères non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'userPrompt' est requis et doit être une chaîne de caractères non vide.",
+			});
 			return;
 		}
 
@@ -60,30 +56,24 @@ router.post(
 		const { modelName, previousModelsCode, userPrompt } = req.body;
 
 		if (!modelName || modelName.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'modelName' est requis et doit être une chaîne de caractères non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'modelName' est requis et doit être une chaîne de caractères non vide.",
+			});
 			return;
 		}
 		if (!previousModelsCode) {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'previousModelsCode' est requis et doit être une chaîne de caractères.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'previousModelsCode' est requis et doit être une chaîne de caractères.",
+			});
 			return;
 		}
 		if (!userPrompt || userPrompt.trim() === "") {
-			res
-				.status(400)
-				.json({
-					error:
-						"Le champ 'userPrompt' est requis et doit être une chaîne de caractères non vide.",
-				});
+			res.status(400).json({
+				error:
+					"Le champ 'userPrompt' est requis et doit être une chaîne de caractères non vide.",
+			});
 			return;
 		}
 
