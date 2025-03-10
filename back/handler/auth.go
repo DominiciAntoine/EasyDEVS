@@ -17,6 +17,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func SetupAuthRoutes(app *fiber.App) {
+	group := app.Group("/auth")
+	group.Post("/login", login)
+}
+
 // CheckPasswordHash compare password with hash
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
@@ -54,13 +59,13 @@ func valid(email string) bool {
 }
 
 // Login get user and password
-func Login(c *fiber.Ctx) error {
+func login(c *fiber.Ctx) error {
 	type LoginInput struct {
 		Identity string `json:"identity"`
 		Password string `json:"password"`
 	}
 	type UserData struct {
-		ID       uint   `json:"id"`
+		ID       string `json:"id"`
 		Username string `json:"username"`
 		Email    string `json:"email"`
 		Password string `json:"password"`

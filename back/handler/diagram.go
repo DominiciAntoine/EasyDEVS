@@ -2,52 +2,63 @@ package handler
 
 import (
 	"app/database"
+	"app/middleware"
 	"app/model"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+func SetupDiagramRoutes(app *fiber.App) {
+	group := app.Group("/diagram", middleware.Protected())
+
+	group.Get("/", getAllDiagrams)
+	group.Get("/:id", getDiagram)
+
+	group.Post("/", createDiagram)
+	group.Delete("/:id", deleteDiagram)
+}
+
 // GetAllDiagrams query all Diagrams
-func GetAllDiagrams(c *fiber.Ctx) error {
+func getAllDiagrams(c *fiber.Ctx) error {
 	db := database.DB
 	var Diagrams []model.Diagram
 	db.Find(&Diagrams)
 	return c.JSON(fiber.Map{"status": "success", "message": "All Diagrams", "data": Diagrams})
 }
 
-// GetDiagram query library
-func GetDiagram(c *fiber.Ctx) error {
+// GetDiagram query diagram
+func getDiagram(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
-	var library model.Diagram
-	db.Find(&library, id)
-	if library.Title == "" {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No library found with ID", "data": nil})
+	var diagram model.Diagram
+	db.Find(&diagram, id)
+	if diagram.Name == "" {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No diagram found with ID", "data": nil})
 	}
-	return c.JSON(fiber.Map{"status": "success", "message": "Diagram found", "data": library})
+	return c.JSON(fiber.Map{"status": "success", "message": "Diagram found", "data": diagram})
 }
 
-// CreateDiagram new library
-func CreateDiagram(c *fiber.Ctx) error {
+// CreateDiagram new diagram
+func createDiagram(c *fiber.Ctx) error {
 	db := database.DB
-	library := new(model.Diagram)
-	if err := c.BodyParser(library); err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create library", "data": err})
+	diagram := new(model.Diagram)
+	if err := c.BodyParser(diagram); err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create diagram", "data": err})
 	}
-	db.Create(&library)
-	return c.JSON(fiber.Map{"status": "success", "message": "Created library", "data": library})
+	db.Create(&diagram)
+	return c.JSON(fiber.Map{"status": "success", "message": "Created diagram", "data": diagram})
 }
 
-// DeleteDiagram delete library
-func DeleteDiagram(c *fiber.Ctx) error {
+// DeleteDiagram delete diagram
+func deleteDiagram(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
 
-	var library model.Diagram
-	db.First(&library, id)
-	if library.Title == "" {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No library found with ID", "data": nil})
+	var diagram model.Diagram
+	db.First(&diagram, id)
+	if diagram.Name == "" {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No diagram found with ID", "data": nil})
 	}
-	db.Delete(&library)
+	db.Delete(&diagram)
 	return c.JSON(fiber.Map{"status": "success", "message": "Diagram successfully deleted", "data": nil})
 }

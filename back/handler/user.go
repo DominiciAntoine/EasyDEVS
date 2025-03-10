@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"app/database"
+	"app/middleware"
 	"app/model"
 
 	"github.com/go-playground/validator/v10"
@@ -11,6 +12,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func SetupUserRoutes(app *fiber.App) {
+	group := app.Group("/users", middleware.Protected())
+
+	group.Get("/", getAllUsers)
+	group.Post("/", createUser)
+	group.Get("/:id", getUser)
+	group.Delete("/:id", deleteUser)
+	group.Patch("/:id", patchUser)
+}
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -42,8 +53,26 @@ func validUser(id string, p string) bool {
 	return true
 }
 
+// GetAllUsers récupère tous les utilisateurs
+func getAllUsers(c *fiber.Ctx) error {
+	db := database.DB
+	var users []model.User
+
+	// Récupération de tous les utilisateurs
+	if err := db.Find(&users).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Error retrieving users", "data": err.Error()})
+	}
+
+	// Vérification si la liste est vide
+	if len(users) == 0 {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No users found", "data": nil})
+	}
+
+	return c.JSON(fiber.Map{"status": "success", "message": "Users retrieved", "data": users})
+}
+
 // GetUser get a user
-func GetUser(c *fiber.Ctx) error {
+func getUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
 	var user model.User
@@ -55,7 +84,7 @@ func GetUser(c *fiber.Ctx) error {
 }
 
 // CreateUser new user
-func CreateUser(c *fiber.Ctx) error {
+func createUser(c *fiber.Ctx) error {
 	type NewUser struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
@@ -91,7 +120,7 @@ func CreateUser(c *fiber.Ctx) error {
 }
 
 // UpdateUser update user
-func UpdateUser(c *fiber.Ctx) error {
+func patchUser(c *fiber.Ctx) error {
 	type UpdateUserInput struct {
 		Names string `json:"names"`
 	}
@@ -110,14 +139,14 @@ func UpdateUser(c *fiber.Ctx) error {
 	var user model.User
 
 	db.First(&user, id)
-	user.Names = uui.Names
+	user.Fullname = uui.Names
 	db.Save(&user)
 
 	return c.JSON(fiber.Map{"status": "success", "message": "User successfully updated", "data": user})
 }
 
 // DeleteUser delete user
-func DeleteUser(c *fiber.Ctx) error {
+func deleteUser(c *fiber.Ctx) error {
 	type PasswordInput struct {
 		Password string `json:"password"`
 	}

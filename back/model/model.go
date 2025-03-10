@@ -8,12 +8,13 @@ import (
 )
 
 type Model struct {
-	ID              uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	UserID          uuid.UUID      `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"userId"`
-	CodeID          uuid.UUID      `gorm:"type:uuid;not null" json:"codeId"`
-	LibID           *uuid.UUID     `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"libId"`
+	ID     uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	UserID uuid.UUID  `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"userId"`
+	LibID  *uuid.UUID `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"libId"`
+
 	Name            string         `gorm:"type:varchar(255);not null" json:"name"`
 	Type            string         `gorm:"type:enum('atomic','coupled');not null" json:"type"`
+	Code            string         `gorm:"type:text;not null" json:"code"`
 	MetadataJSON    string         `gorm:"type:jsonb;default:'{}'" json:"metadataJson"`
 	ComponentsJSON  string         `gorm:"type:jsonb;default:'[]'" json:"componentsJson"`
 	ConnectionsJSON string         `gorm:"type:jsonb;default:'[]'" json:"connectionsJson"`
