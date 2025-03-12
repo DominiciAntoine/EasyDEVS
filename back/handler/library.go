@@ -8,8 +8,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupLibraryRoutes(app *fiber.App) {
-	group := app.Group("/library", middleware.Protected())
+// SetupLibraryRoutes configures library-related routes
+func SetupLibraryRoutes(router fiber.Router) {
+	group := router.Group("/library", middleware.Protected())
 
 	group.Get("/", getAllLibraries)
 	group.Get("/:id", getLibrary)
@@ -18,7 +19,16 @@ func SetupLibraryRoutes(app *fiber.App) {
 	group.Patch("/:id", patchLibrary)
 }
 
-// GetAllLibraries query all Libraries
+// Get all libraries
+// @Summary Get all libraries
+// @Description Retrieves a list of all libraries
+// @Tags Library
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "List of all libraries"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /library [get]
 func getAllLibraries(c *fiber.Ctx) error {
 	db := database.DB
 	var Libraries []model.Library
@@ -26,7 +36,17 @@ func getAllLibraries(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "All Libraries", "data": Libraries})
 }
 
-// GetLibrary query library
+// Get a single library by ID
+// @Summary Get a library
+// @Description Retrieves a single library by its ID
+// @Tags Library
+// @Accept json
+// @Produce json
+// @Param id path string true "Library ID"
+// @Success 200 {object} map[string]interface{} "Library details"
+// @Failure 404 {object} map[string]interface{} "Library not found"
+// @Security BearerAuth
+// @Router /library/{id} [get]
 func getLibrary(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -38,7 +58,17 @@ func getLibrary(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Library found", "data": library})
 }
 
-// CreateLibrary new library
+// Create a new library
+// @Summary Create a library
+// @Description Creates a new library and stores it in the database
+// @Tags Library
+// @Accept json
+// @Produce json
+// @Param body body model.Library true "Library details"
+// @Success 201 {object} map[string]interface{} "Library created successfully"
+// @Failure 500 {object} map[string]interface{} "Failed to create library"
+// @Security BearerAuth
+// @Router /library [post]
 func createLibrary(c *fiber.Ctx) error {
 	db := database.DB
 	library := new(model.Library)
@@ -49,7 +79,17 @@ func createLibrary(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Created library", "data": library})
 }
 
-// DeleteLibrary delete library
+// Delete a library by ID
+// @Summary Delete a library
+// @Description Deletes a library based on its ID
+// @Tags Library
+// @Accept json
+// @Produce json
+// @Param id path string true "Library ID"
+// @Success 200 {object} map[string]interface{} "Library deleted successfully"
+// @Failure 404 {object} map[string]interface{} "Library not found"
+// @Security BearerAuth
+// @Router /library/{id} [delete]
 func deleteLibrary(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -63,7 +103,19 @@ func deleteLibrary(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Library successfully deleted", "data": nil})
 }
 
-// PatchLibrary met à jour un library existant
+// Update a library
+// @Summary Update a library
+// @Description Updates an existing library
+// @Tags Library
+// @Accept json
+// @Produce json
+// @Param id path string true "Library ID"
+// @Param body body map[string]interface{} true "Library fields to update"
+// @Success 200 {object} map[string]interface{} "Library updated successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 404 {object} map[string]interface{} "Library not found"
+// @Security BearerAuth
+// @Router /library/{id} [patch]
 func patchLibrary(c *fiber.Ctx) error {
 	db := database.DB
 	id := c.Params("id")

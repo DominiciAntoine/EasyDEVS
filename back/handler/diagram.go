@@ -17,7 +17,16 @@ func SetupDiagramRoutes(app *fiber.App) {
 	group.Delete("/:id", deleteDiagram)
 }
 
-// GetAllDiagrams query all Diagrams
+// Get all diagrams
+// @Summary Get all diagrams
+// @Description Retrieves a list of all diagrams
+// @Tags Diagram
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "List of all diagrams"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /diagram [get]
 func getAllDiagrams(c *fiber.Ctx) error {
 	db := database.DB
 	var Diagrams []model.Diagram
@@ -25,7 +34,17 @@ func getAllDiagrams(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "All Diagrams", "data": Diagrams})
 }
 
-// GetDiagram query diagram
+// Get a single diagram by ID
+// @Summary Get a diagram
+// @Description Retrieves a single diagram by its ID
+// @Tags Diagram
+// @Accept json
+// @Produce json
+// @Param id path string true "Diagram ID"
+// @Success 200 {object} map[string]interface{} "Diagram details"
+// @Failure 404 {object} map[string]interface{} "Diagram not found"
+// @Security BearerAuth
+// @Router /diagram/{id} [get]
 func getDiagram(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -37,7 +56,17 @@ func getDiagram(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Diagram found", "data": diagram})
 }
 
-// CreateDiagram new diagram
+// Create a new diagram
+// @Summary Create a diagram
+// @Description Creates a new diagram and stores it in the database
+// @Tags Diagram
+// @Accept json
+// @Produce json
+// @Param body body model.Diagram true "Diagram details"
+// @Success 201 {object} map[string]interface{} "Diagram created successfully"
+// @Failure 500 {object} map[string]interface{} "Failed to create diagram"
+// @Security BearerAuth
+// @Router /diagram [post]
 func createDiagram(c *fiber.Ctx) error {
 	db := database.DB
 	diagram := new(model.Diagram)
@@ -48,7 +77,17 @@ func createDiagram(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Created diagram", "data": diagram})
 }
 
-// DeleteDiagram delete diagram
+// Delete a diagram by ID
+// @Summary Delete a diagram
+// @Description Deletes a diagram based on its ID
+// @Tags Diagram
+// @Accept json
+// @Produce json
+// @Param id path string true "Diagram ID"
+// @Success 200 {object} map[string]interface{} "Diagram deleted successfully"
+// @Failure 404 {object} map[string]interface{} "Diagram not found"
+// @Security BearerAuth
+// @Router /diagram/{id} [delete]
 func deleteDiagram(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB

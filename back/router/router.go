@@ -8,6 +8,7 @@ import (
 
 // SetupRoutes setup router api
 func SetupRoutes(app *fiber.App) {
+
 	// Health
 	handler.SetupHealthRoutes(app)
 
@@ -26,6 +27,6 @@ func SetupRoutes(app *fiber.App) {
 	// Model
 	handler.SetupModelRoutes(app)
 
-	// Ai
+	// AI
 	handler.SetupAiRoutes(app)
 }

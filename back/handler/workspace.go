@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// SetupWorkspaceRoutes configures workspace-related routes
 func SetupWorkspaceRoutes(app *fiber.App) {
 	group := app.Group("/workspaces", middleware.Protected())
 
@@ -18,7 +19,16 @@ func SetupWorkspaceRoutes(app *fiber.App) {
 	group.Patch("/:id", patchWorkspace)
 }
 
-// GetAllWorkspaces query all Workspaces
+// Get all workspaces
+// @Summary Get all workspaces
+// @Description Retrieves a list of all workspaces
+// @Tags Workspace
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "List of all workspaces"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /workspaces [get]
 func getAllWorkspaces(c *fiber.Ctx) error {
 	db := database.DB
 	var Workspaces []model.Workspace
@@ -26,7 +36,17 @@ func getAllWorkspaces(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "All Workspaces", "data": Workspaces})
 }
 
-// GetWorkspace query workspace
+// Get a single workspace by ID
+// @Summary Get a workspace
+// @Description Retrieves a single workspace by its ID
+// @Tags Workspace
+// @Accept json
+// @Produce json
+// @Param id path string true "Workspace ID"
+// @Success 200 {object} map[string]interface{} "Workspace details"
+// @Failure 404 {object} map[string]interface{} "Workspace not found"
+// @Security BearerAuth
+// @Router /workspaces/{id} [get]
 func getWorkspace(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -38,7 +58,17 @@ func getWorkspace(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Workspace found", "data": workspace})
 }
 
-// CreateWorkspace new workspace
+// Create a new workspace
+// @Summary Create a workspace
+// @Description Creates a new workspace and stores it in the database
+// @Tags Workspace
+// @Accept json
+// @Produce json
+// @Param body body model.Workspace true "Workspace details"
+// @Success 201 {object} map[string]interface{} "Workspace created successfully"
+// @Failure 500 {object} map[string]interface{} "Failed to create workspace"
+// @Security BearerAuth
+// @Router /workspaces [post]
 func createWorkspace(c *fiber.Ctx) error {
 	db := database.DB
 	workspace := new(model.Workspace)
@@ -49,7 +79,17 @@ func createWorkspace(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Created workspace", "data": workspace})
 }
 
-// DeleteWorkspace delete workspace
+// Delete a workspace by ID
+// @Summary Delete a workspace
+// @Description Deletes a workspace based on its ID
+// @Tags Workspace
+// @Accept json
+// @Produce json
+// @Param id path string true "Workspace ID"
+// @Success 200 {object} map[string]interface{} "Workspace deleted successfully"
+// @Failure 404 {object} map[string]interface{} "Workspace not found"
+// @Security BearerAuth
+// @Router /workspaces/{id} [delete]
 func deleteWorkspace(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -63,7 +103,19 @@ func deleteWorkspace(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Workspace successfully deleted", "data": nil})
 }
 
-// PatchWorkspace met à jour un workspace existant
+// Update a workspace
+// @Summary Update a workspace
+// @Description Updates an existing workspace
+// @Tags Workspace
+// @Accept json
+// @Produce json
+// @Param id path string true "Workspace ID"
+// @Param body body map[string]interface{} true "Workspace fields to update"
+// @Success 200 {object} map[string]interface{} "Workspace updated successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 404 {object} map[string]interface{} "Workspace not found"
+// @Security BearerAuth
+// @Router /workspaces/{id} [patch]
 func patchWorkspace(c *fiber.Ctx) error {
 	db := database.DB
 	id := c.Params("id")

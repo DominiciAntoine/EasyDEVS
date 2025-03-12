@@ -7,25 +7,18 @@ import (
 	"app/middleware"
 	"app/model"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 )
 
+// SetupUserRoutes configures user-related routes
 func SetupUserRoutes(app *fiber.App) {
 	group := app.Group("/users", middleware.Protected())
 
 	group.Get("/", getAllUsers)
-	group.Post("/", createUser)
 	group.Get("/:id", getUser)
 	group.Delete("/:id", deleteUser)
 	group.Patch("/:id", patchUser)
-}
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
 }
 
 func validToken(t *jwt.Token, id string) bool {
@@ -53,17 +46,26 @@ func validUser(id string, p string) bool {
 	return true
 }
 
-// GetAllUsers récupère tous les utilisateurs
+// Get all users
+// @Summary Get all users
+// @Description Retrieves a list of all users
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "List of all users"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /users [get]
 func getAllUsers(c *fiber.Ctx) error {
 	db := database.DB
 	var users []model.User
 
-	// Récupération de tous les utilisateurs
+	// Retrieve all users
 	if err := db.Find(&users).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Error retrieving users", "data": err.Error()})
 	}
 
-	// Vérification si la liste est vide
+	// Check if the list is empty
 	if len(users) == 0 {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No users found", "data": nil})
 	}
@@ -71,7 +73,17 @@ func getAllUsers(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Users retrieved", "data": users})
 }
 
-// GetUser get a user
+// Get a single user by ID
+// @Summary Get a user
+// @Description Retrieves a single user by their ID
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} map[string]interface{} "User details"
+// @Failure 404 {object} map[string]interface{} "User not found"
+// @Security BearerAuth
+// @Router /users/{id} [get]
 func getUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -83,43 +95,19 @@ func getUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "User found", "data": user})
 }
 
-// CreateUser new user
-func createUser(c *fiber.Ctx) error {
-	type NewUser struct {
-		Username string `json:"username"`
-		Email    string `json:"email"`
-	}
-
-	db := database.DB
-	user := new(model.User)
-	if err := c.BodyParser(user); err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "errors": err.Error()})
-	}
-
-	validate := validator.New()
-	if err := validate.Struct(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid request body", "errors": err.Error()})
-	}
-
-	hash, err := hashPassword(user.Password)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "errors": err.Error()})
-	}
-
-	user.Password = hash
-	if err := db.Create(&user).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create user", "errors": err.Error()})
-	}
-
-	newUser := NewUser{
-		Email:    user.Email,
-		Username: user.Username,
-	}
-
-	return c.JSON(fiber.Map{"status": "success", "message": "Created user", "data": newUser})
-}
-
-// UpdateUser update user
+// Update a user
+// @Summary Update user
+// @Description Updates an existing user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param body body UpdateUserInput true "User fields to update"
+// @Success 200 {object} map[string]interface{} "User updated successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /users/{id} [patch]
 func patchUser(c *fiber.Ctx) error {
 	type UpdateUserInput struct {
 		Names string `json:"names"`
@@ -145,7 +133,19 @@ func patchUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "User successfully updated", "data": user})
 }
 
-// DeleteUser delete user
+// Delete a user
+// @Summary Delete user
+// @Description Deletes a user account
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param body body PasswordInput true "User password for validation"
+// @Success 200 {object} map[string]interface{} "User deleted successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /users/{id} [delete]
 func deleteUser(c *fiber.Ctx) error {
 	type PasswordInput struct {
 		Password string `json:"password"`
