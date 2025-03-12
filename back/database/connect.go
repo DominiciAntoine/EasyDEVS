@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"app/config"
@@ -13,26 +14,28 @@ import (
 
 // ConnectDB connect to db
 func ConnectDB() {
+	// Charger .env.back UNE SEULE FOIS
+	config.LoadEnv()
+
 	var err error
-	p := config.Config("DB_PORT")
+	p := os.Getenv("DB_PORT") // On utilise os.Getenv() directement
 	port, err := strconv.ParseUint(p, 10, 32)
 	if err != nil {
 		panic("failed to parse database port")
 	}
 
 	dsn := fmt.Sprintf(
-		"host=db port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
 		port,
-		config.Config("DB_USER"),
-		config.Config("DB_PASSWORD"),
-		config.Config("DB_NAME"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
 	)
+
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
-
-	fmt.Println("Connection Opened to Database")
-	DB.AutoMigrate(&model.Library{}, &model.Diagram{}, &model.User{})
-	fmt.Println("Database Migrated")
+	DB.AutoMigrate(&model.Library{}, &model.Diagram{}, &model.User{}, &model.Workspace{}, &model.Model{})
 }

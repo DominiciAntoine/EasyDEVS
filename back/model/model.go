@@ -3,6 +3,8 @@ package model
 import (
 	"time"
 
+	"app/enum"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -13,7 +15,7 @@ type Model struct {
 	LibID  *uuid.UUID `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"libId"`
 
 	Name            string         `gorm:"type:varchar(255);not null" json:"name"`
-	Type            string         `gorm:"type:enum('atomic','coupled');not null" json:"type"`
+	Type            enum.ModelType `gorm:"type:model_type;not null" json:"type"`
 	Code            string         `gorm:"type:text;not null" json:"code"`
 	MetadataJSON    string         `gorm:"type:jsonb;default:'{}'" json:"metadataJson"`
 	ComponentsJSON  string         `gorm:"type:jsonb;default:'[]'" json:"componentsJson"`

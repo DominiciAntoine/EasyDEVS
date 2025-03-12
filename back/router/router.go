@@ -22,4 +22,10 @@ func SetupRoutes(app *fiber.App) {
 
 	// Diagram
 	handler.SetupDiagramRoutes(app)
+
+	// Model
+	handler.SetupModelRoutes(app)
+
+	// Ai
+	handler.SetupAiRoutes(app)
 }

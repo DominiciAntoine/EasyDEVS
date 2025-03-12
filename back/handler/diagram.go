@@ -13,7 +13,6 @@ func SetupDiagramRoutes(app *fiber.App) {
 
 	group.Get("/", getAllDiagrams)
 	group.Get("/:id", getDiagram)
-
 	group.Post("/", createDiagram)
 	group.Delete("/:id", deleteDiagram)
 }

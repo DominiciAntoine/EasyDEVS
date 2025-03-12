@@ -63,14 +63,14 @@ func deleteLibrary(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "success", "message": "Library successfully deleted", "data": nil})
 }
 
-// PatchWorkspace met à jour un workspace existant
+// PatchLibrary met à jour un library existant
 func patchLibrary(c *fiber.Ctx) error {
 	db := database.DB
 	id := c.Params("id")
 
-	var workspace model.Workspace
-	if err := db.First(&workspace, "id = ?", id).Error; err != nil {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Workspace not found"})
+	var library model.Library
+	if err := db.First(&library, "id = ?", id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Library not found"})
 	}
 
 	updateData := make(map[string]interface{})
@@ -78,7 +78,7 @@ func patchLibrary(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Invalid input", "data": err.Error()})
 	}
 
-	db.Model(&workspace).Updates(updateData)
+	db.Model(&library).Updates(updateData)
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Workspace updated", "data": workspace})
+	return c.JSON(fiber.Map{"status": "success", "message": "Library updated", "data": library})
 }

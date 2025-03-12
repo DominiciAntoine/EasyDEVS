@@ -33,6 +33,21 @@ type GenerateModelRequest struct {
 	UserPrompt         string `json:"userPrompt"`
 }
 
+// Vérification des variables d'environnement
+func getOpenAIClient() (*openai.Client, error) {
+	apiKey := os.Getenv("AI_API_KEY")
+	apiURL := os.Getenv("AI_API_URL")
+
+	if apiKey == "" || apiURL == "" {
+		return nil, fmt.Errorf("clé API ou URL OpenAI non définie")
+	}
+
+	config := openai.DefaultConfig(apiKey)
+	config.BaseURL = apiURL // 🔹 Ajout de l'URL personnalisée
+
+	return openai.NewClientWithConfig(config), nil
+}
+
 // Fonction pour générer un diagramme via l'IA
 func generateDiagram(c *fiber.Ctx) error {
 	var request GenerateDiagramRequest
@@ -52,12 +67,18 @@ func generateDiagram(c *fiber.Ctx) error {
 		User Description: %s
 	`, request.DiagramName, request.UserPrompt)
 
-	// 🔹 Appel au LLM OpenAI
-	client := openai.NewClient(os.Getenv("AI_API_KEY"))
+	// 🔹 Initialisation du client OpenAI avec l'URL personnalisée
+	client, err := getOpenAIClient()
+	if err != nil {
+		log.Println("Erreur OpenAI:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// 🔹 Appel à l'API OpenAI
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: "gpt-4",
+			Model: os.Getenv("AI_MODEL"),
 			Messages: []openai.ChatCompletionMessage{
 				{Role: "system", Content: prompt.DiagramPrompt},
 				{Role: "user", Content: fullPrompt},
@@ -106,12 +127,18 @@ func generateModel(c *fiber.Ctx) error {
 		User Description: %s
 	`, request.ModelName, request.ModelType, request.PreviousModelsCode, request.UserPrompt)
 
-	// 🔹 Appel au LLM OpenAI
-	client := openai.NewClient(os.Getenv("AI_API_KEY"))
+	// 🔹 Initialisation du client OpenAI avec l'URL personnalisée
+	client, err := getOpenAIClient()
+	if err != nil {
+		log.Println("Erreur OpenAI:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// 🔹 Appel à l'API OpenAI
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: "gpt-4",
+			Model: os.Getenv("AI_MODEL"),
 			Messages: []openai.ChatCompletionMessage{
 				{Role: "system", Content: prompt.ModelPrompt},
 				{Role: "user", Content: fullPrompt},
