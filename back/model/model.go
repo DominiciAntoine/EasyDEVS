@@ -24,7 +24,7 @@ type Model struct {
 	PortOutJSON     string         `gorm:"type:jsonb;default:'[]'" json:"portOutJson"`
 	CreatedAt       time.Time      `gorm:"type:timestamp;default:now()" json:"createdAt"`
 	UpdatedAt       time.Time      `gorm:"type:timestamp;default:now()" json:"updatedAt"`
-	DeletedAt       gorm.DeletedAt `gorm:"index" json:"deletedAt"`
+	DeletedAt       time.Time      `gorm:"index" json:"deletedAt"`
 }
 
 func (m *Model) BeforeCreate(tx *gorm.DB) (err error) {

@@ -12,9 +12,9 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-// SetupAiRoutes configures AI-related routes
-func SetupAiRoutes(router fiber.Router) {
-	group := router.Group("/ai", middleware.Protected())
+// SetupAiRoutes configures AI-related routes.
+func SetupAiRoutes(app *fiber.App) {
+	group := app.Group("/ai", middleware.Protected())
 
 	group.Post("/generate-diagram", generateDiagram)
 	group.Post("/generate-model", generateModel)
@@ -33,7 +33,7 @@ type GenerateModelRequest struct {
 	UserPrompt         string `json:"userPrompt" example:"Generate a model based on the previous code"`
 }
 
-// Retrieves the OpenAI API client
+// Retrieves the OpenAI API client.
 func getOpenAIClient() (*openai.Client, error) {
 	apiKey := os.Getenv("AI_API_KEY")
 	apiURL := os.Getenv("AI_API_URL")
@@ -48,9 +48,9 @@ func getOpenAIClient() (*openai.Client, error) {
 	return openai.NewClientWithConfig(config), nil
 }
 
-// GenerateDiagram generates a diagram using OpenAI
+// GenerateDiagram godoc
 // @Summary Generate a diagram
-// @Description Sends a prompt to OpenAI to generate a diagram
+// @Description Sends a prompt to OpenAI to generate a diagram.
 // @Tags AI
 // @Accept json
 // @Produce json
@@ -114,9 +114,9 @@ func generateDiagram(c *fiber.Ctx) error {
 	})
 }
 
-// GenerateModel generates a model using OpenAI
+// GenerateModel godoc
 // @Summary Generate a model
-// @Description Sends a prompt to OpenAI to generate a DEVS model
+// @Description Sends a prompt to OpenAI to generate a DEVS model.
 // @Tags AI
 // @Accept json
 // @Produce json

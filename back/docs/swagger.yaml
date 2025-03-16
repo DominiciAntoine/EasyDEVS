@@ -1,9 +1,607 @@
 basePath: /
+definitions:
+  enum.ModelType:
+    enum:
+    - atomic
+    - coupled
+    type: string
+    x-enum-varnames:
+    - Atomic
+    - Coupled
+  handler.GenerateModelRequest:
+    properties:
+      modelName:
+        example: MyModel
+        type: string
+      modelType:
+        example: DEVS
+        type: string
+      previousModelsCode:
+        example: Existing model code
+        type: string
+      userPrompt:
+        example: Generate a model based on the previous code
+        type: string
+    type: object
+  model.Library:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  model.Model:
+    properties:
+      code:
+        type: string
+      componentsJson:
+        type: string
+      connectionsJson:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: string
+      libId:
+        type: string
+      metadataJson:
+        type: string
+      name:
+        type: string
+      portInJson:
+        type: string
+      portOutJson:
+        type: string
+      type:
+        $ref: '#/definitions/enum.ModelType'
+      updatedAt:
+        type: string
+      userId:
+        type: string
+    type: object
+  request.LoginRequest:
+    properties:
+      identity:
+        type: string
+      password:
+        type: string
+    type: object
+  request.LogoutRequest:
+    properties:
+      refreshToken:
+        type: string
+    type: object
+  request.RefreshRequest:
+    properties:
+      refreshToken:
+        type: string
+    type: object
+  request.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        maxLength: 50
+        minLength: 6
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  response.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  response.RefreshResponse:
+    properties:
+      accessToken:
+        type: string
+    type: object
+  response.RegisterResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+      user:
+        $ref: '#/definitions/response.UserResponse'
+    type: object
+  response.UserResponse:
+    properties:
+      email:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact: {}
   description: This is the API documentation for Easy DEVS.
   title: Easy DEVS API
   version: "1.0"
-paths: {}
+paths:
+  /ai/generate-model:
+    post:
+      consumes:
+      - application/json
+      description: Sends a prompt to OpenAI to generate a DEVS model
+      parameters:
+      - description: Data required to generate a model
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.GenerateModelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Generated model
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: AI processing error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generate a model
+      tags:
+      - AI
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user with the provided identity (email or username) and
+        password.
+      parameters:
+      - description: Login Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Log in a user
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logs out a user by invalidating the refresh token.
+      parameters:
+      - description: Logout Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Log out a user
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access token using a valid refresh token.
+      parameters:
+      - description: Refresh Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.RefreshResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Refresh access token
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the provided username, email, and password.
+      parameters:
+      - description: Register Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - Auth
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Returns the status of the API to confirm it is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API is running
+          schema:
+            additionalProperties: true
+            type: object
+      summary: API health check
+      tags:
+      - Health
+  /library:
+    get:
+      description: Retrieve a list of all libraries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Library'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all libraries
+      tags:
+      - libraries
+    post:
+      consumes:
+      - application/json
+      description: Create a new library entry
+      parameters:
+      - description: Library data
+        in: body
+        name: library
+        required: true
+        schema:
+          $ref: '#/definitions/model.Library'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Library'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a library
+      tags:
+      - libraries
+  /library/{id}:
+    delete:
+      description: Delete a library by its ID
+      parameters:
+      - description: Library ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a library
+      tags:
+      - libraries
+    get:
+      description: Retrieve a single library by its ID
+      parameters:
+      - description: Library ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Library'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a library by ID
+      tags:
+      - libraries
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing library with partial data
+      parameters:
+      - description: Library ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: updateData
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Library'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a library
+      tags:
+      - libraries
+  /model:
+    get:
+      description: Retrieve a list of all models
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Model'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all models
+      tags:
+      - models
+    post:
+      consumes:
+      - application/json
+      description: Create a new model entry
+      parameters:
+      - description: Model data
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/model.Model'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Model'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a model
+      tags:
+      - models
+  /model/{id}:
+    delete:
+      description: Delete a model by its ID
+      parameters:
+      - description: Model ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a model
+      tags:
+      - models
+    get:
+      description: Retrieve a single model by its ID
+      parameters:
+      - description: Model ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Model'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a model by ID
+      tags:
+      - models
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing model with partial data
+      parameters:
+      - description: Model ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: updateData
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Model'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a model
+      tags:
+      - models
 swagger: "2.0"

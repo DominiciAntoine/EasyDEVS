@@ -29,10 +29,10 @@ func main() {
 	})
 	// app.Use(cors.New())
 
-	app.Get("/swagger/*", swagger.HandlerDefault)
-
 	database.ConnectDB()
 
 	router.SetupRoutes(app)
+	app.Get("/swagger/*", swagger.HandlerDefault)
+
 	log.Fatal(app.Listen(":3000"))
 }

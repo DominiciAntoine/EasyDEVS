@@ -9,8 +9,8 @@ import (
 )
 
 // SetupLibraryRoutes configures library-related routes
-func SetupLibraryRoutes(router fiber.Router) {
-	group := router.Group("/library", middleware.Protected())
+func SetupLibraryRoutes(app *fiber.App) {
+	group := app.Group("/library", middleware.Protected())
 
 	group.Get("/", getAllLibraries)
 	group.Get("/:id", getLibrary)
@@ -19,33 +19,29 @@ func SetupLibraryRoutes(router fiber.Router) {
 	group.Patch("/:id", patchLibrary)
 }
 
-// Get all libraries
+// getAllLibraries retrieves all libraries
 // @Summary Get all libraries
-// @Description Retrieves a list of all libraries
-// @Tags Library
-// @Accept json
+// @Description Retrieve a list of all libraries
+// @Tags libraries
 // @Produce json
-// @Success 200 {object} map[string]interface{} "List of all libraries"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Security BearerAuth
+// @Success 200 {array} model.Library
+// @Failure 500 {object} map[string]interface{}
 // @Router /library [get]
 func getAllLibraries(c *fiber.Ctx) error {
 	db := database.DB
 	var Libraries []model.Library
 	db.Find(&Libraries)
-	return c.JSON(fiber.Map{"status": "success", "message": "All Libraries", "data": Libraries})
+	return c.JSON(Libraries)
 }
 
-// Get a single library by ID
-// @Summary Get a library
-// @Description Retrieves a single library by its ID
-// @Tags Library
-// @Accept json
+// getLibrary retrieves a library by ID
+// @Summary Get a library by ID
+// @Description Retrieve a single library by its ID
+// @Tags libraries
 // @Produce json
 // @Param id path string true "Library ID"
-// @Success 200 {object} map[string]interface{} "Library details"
-// @Failure 404 {object} map[string]interface{} "Library not found"
-// @Security BearerAuth
+// @Success 200 {object} model.Library
+// @Failure 404 {object} map[string]interface{}
 // @Router /library/{id} [get]
 func getLibrary(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -55,19 +51,19 @@ func getLibrary(c *fiber.Ctx) error {
 	if library.Title == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No library found with ID", "data": nil})
 	}
-	return c.JSON(fiber.Map{"status": "success", "message": "Library found", "data": library})
+	return c.JSON(library)
 }
 
-// Create a new library
+// createLibrary creates a new library
 // @Summary Create a library
-// @Description Creates a new library and stores it in the database
-// @Tags Library
+// @Description Create a new library entry
+// @Tags libraries
 // @Accept json
 // @Produce json
-// @Param body body model.Library true "Library details"
-// @Success 201 {object} map[string]interface{} "Library created successfully"
-// @Failure 500 {object} map[string]interface{} "Failed to create library"
-// @Security BearerAuth
+// @Param library body model.Library true "Library data"
+// @Success 201 {object} model.Library
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
 // @Router /library [post]
 func createLibrary(c *fiber.Ctx) error {
 	db := database.DB
@@ -76,19 +72,16 @@ func createLibrary(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create library", "data": err})
 	}
 	db.Create(&library)
-	return c.JSON(fiber.Map{"status": "success", "message": "Created library", "data": library})
+	return c.JSON(library)
 }
 
-// Delete a library by ID
+// deleteLibrary deletes a library by ID
 // @Summary Delete a library
-// @Description Deletes a library based on its ID
-// @Tags Library
-// @Accept json
-// @Produce json
+// @Description Delete a library by its ID
+// @Tags libraries
 // @Param id path string true "Library ID"
-// @Success 200 {object} map[string]interface{} "Library deleted successfully"
-// @Failure 404 {object} map[string]interface{} "Library not found"
-// @Security BearerAuth
+// @Success 204 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
 // @Router /library/{id} [delete]
 func deleteLibrary(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -100,21 +93,20 @@ func deleteLibrary(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No library found with ID", "data": nil})
 	}
 	db.Delete(&library)
-	return c.JSON(fiber.Map{"status": "success", "message": "Library successfully deleted", "data": nil})
+	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Library successfully deleted", "data": nil})
 }
 
-// Update a library
+// patchLibrary updates an existing library by ID
 // @Summary Update a library
-// @Description Updates an existing library
-// @Tags Library
+// @Description Update an existing library with partial data
+// @Tags libraries
 // @Accept json
 // @Produce json
 // @Param id path string true "Library ID"
-// @Param body body map[string]interface{} true "Library fields to update"
-// @Success 200 {object} map[string]interface{} "Library updated successfully"
-// @Failure 400 {object} map[string]interface{} "Invalid input"
-// @Failure 404 {object} map[string]interface{} "Library not found"
-// @Security BearerAuth
+// @Param updateData body map[string]interface{} true "Fields to update"
+// @Success 200 {object} model.Library
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
 // @Router /library/{id} [patch]
 func patchLibrary(c *fiber.Ctx) error {
 	db := database.DB
@@ -132,5 +124,5 @@ func patchLibrary(c *fiber.Ctx) error {
 
 	db.Model(&library).Updates(updateData)
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Library updated", "data": library})
+	return c.JSON(library)
 }

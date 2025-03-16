@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // Library struct
@@ -16,7 +14,7 @@ type Diagram struct {
 	WorkspaceID string `gorm:"not null" json:"workspaceId"`
 	UserID      string `gorm:"not null" json:"userId"`
 
-	CreatedAt time.Time      `gorm:"type:timestamp;default:now()" json:"createdAt"`
-	UpdatedAt time.Time      `gorm:"type:timestamp;default:now()" json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt"`
+	CreatedAt time.Time `gorm:"type:timestamp;default:now()" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"type:timestamp;default:now()" json:"updatedAt"`
+	DeletedAt time.Time `gorm:"index" json:"deletedAt"`
 }

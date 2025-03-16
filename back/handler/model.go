@@ -19,33 +19,29 @@ func SetupModelRoutes(app *fiber.App) {
 	group.Patch("/:id", patchModel)
 }
 
-// Get all models
+// getAllModels retrieves a list of all models
 // @Summary Get all models
-// @Description Retrieves a list of all models
-// @Tags Model
-// @Accept json
+// @Description Retrieve a list of all models
+// @Tags models
 // @Produce json
-// @Success 200 {object} map[string]interface{} "List of all models"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Security BearerAuth
+// @Success 200 {array} model.Model
+// @Failure 500 {object} map[string]interface{}
 // @Router /model [get]
 func getAllModels(c *fiber.Ctx) error {
 	db := database.DB
 	var Models []model.Model
 	db.Find(&Models)
-	return c.JSON(fiber.Map{"status": "success", "message": "All Models", "data": Models})
+	return c.JSON(Models)
 }
 
-// Get a single model by ID
-// @Summary Get a model
-// @Description Retrieves a single model by its ID
-// @Tags Model
-// @Accept json
+// getModel retrieves a single model by ID
+// @Summary Get a model by ID
+// @Description Retrieve a single model by its ID
+// @Tags models
 // @Produce json
 // @Param id path string true "Model ID"
-// @Success 200 {object} map[string]interface{} "Model details"
-// @Failure 404 {object} map[string]interface{} "Model not found"
-// @Security BearerAuth
+// @Success 200 {object} model.Model
+// @Failure 404 {object} map[string]interface{}
 // @Router /model/{id} [get]
 func getModel(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -55,19 +51,19 @@ func getModel(c *fiber.Ctx) error {
 	if model.Name == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
 	}
-	return c.JSON(fiber.Map{"status": "success", "message": "Model found", "data": model})
+	return c.JSON(model)
 }
 
-// Create a new model
+// createModel creates a new model
 // @Summary Create a model
-// @Description Creates a new model and stores it in the database
-// @Tags Model
+// @Description Create a new model entry
+// @Tags models
 // @Accept json
 // @Produce json
-// @Param body body model.Model true "Model details"
-// @Success 201 {object} map[string]interface{} "Model created successfully"
-// @Failure 500 {object} map[string]interface{} "Failed to create model"
-// @Security BearerAuth
+// @Param model body model.Model true "Model data"
+// @Success 201 {object} model.Model
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
 // @Router /model [post]
 func createModel(c *fiber.Ctx) error {
 	db := database.DB
@@ -76,19 +72,16 @@ func createModel(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create model", "data": err})
 	}
 	db.Create(&model)
-	return c.JSON(fiber.Map{"status": "success", "message": "Created model", "data": model})
+	return c.JSON(model)
 }
 
-// Delete a model by ID
+// deleteModel deletes a model by its ID
 // @Summary Delete a model
-// @Description Deletes a model based on its ID
-// @Tags Model
-// @Accept json
-// @Produce json
+// @Description Delete a model by its ID
+// @Tags models
 // @Param id path string true "Model ID"
-// @Success 200 {object} map[string]interface{} "Model deleted successfully"
-// @Failure 404 {object} map[string]interface{} "Model not found"
-// @Security BearerAuth
+// @Success 204 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
 // @Router /model/{id} [delete]
 func deleteModel(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -100,21 +93,20 @@ func deleteModel(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
 	}
 	db.Delete(&model)
-	return c.JSON(fiber.Map{"status": "success", "message": "Model successfully deleted", "data": nil})
+	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{"status": "success", "message": "Model successfully deleted", "data": nil})
 }
 
-// Update a model
+// patchModel updates an existing model by its ID
 // @Summary Update a model
-// @Description Updates an existing model
-// @Tags Model
+// @Description Update an existing model with partial data
+// @Tags models
 // @Accept json
 // @Produce json
 // @Param id path string true "Model ID"
-// @Param body body map[string]interface{} true "Model fields to update"
-// @Success 200 {object} map[string]interface{} "Model updated successfully"
-// @Failure 400 {object} map[string]interface{} "Invalid input"
-// @Failure 404 {object} map[string]interface{} "Model not found"
-// @Security BearerAuth
+// @Param updateData body map[string]interface{} true "Fields to update"
+// @Success 200 {object} model.Model
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
 // @Router /model/{id} [patch]
 func patchModel(c *fiber.Ctx) error {
 	db := database.DB
@@ -132,5 +124,5 @@ func patchModel(c *fiber.Ctx) error {
 
 	db.Model(&model).Updates(updateData)
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Model updated", "data": model})
+	return c.JSON(model)
 }

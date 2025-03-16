@@ -38,6 +38,7 @@ const modelExample: string = `
             ''' DEVS Time Advance function '''
             return self.getSigma()
     "
+}
 `;
 
 export { modelExample };
