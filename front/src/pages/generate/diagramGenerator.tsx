@@ -48,13 +48,13 @@ import { NavActions } from "../../components/nav/nav-actions.tsx";
 import { ModeToggle } from "../../components/mode-toggle.tsx";
 import CodeMirror from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
-import ModelPrompt from "../../modelPrompt.tsx";
+import ModelPrompt from "./modelPrompt.tsx";
 import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 import { ModelData, DiagramDataType, NodeData } from "@/types";
 import { useTheme } from "../../components/theme-provider.tsx"; // Assure-toi que ce hook existe
 import StepShower from "../../components/stepShower.tsx";
 import { Edge, Node, EdgeChange, NodeChange } from "@xyflow/react";
-import { saveDiagram } from "../../api/diagramApi.ts";
+import { saveDiagram } from "../../api/old/diagramApi.ts";
 import { useAuth } from "@/providers/AuthProvider.tsx";
 
 const nodeTypes: ComponentProps<typeof ReactFlow>["nodeTypes"] = {

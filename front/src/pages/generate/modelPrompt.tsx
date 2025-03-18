@@ -16,16 +16,13 @@ import {
 } from "@/components/ui/form"
 import { Button } from "@/components/ui/button.tsx"
 import { useToast } from "@/hooks/use-toast"
-import {useAuth} from "@/providers/AuthProvider";
-import { generateDiagram } from "@/api/old/diagramApi.ts"
-import { DiagramDataType } from '@/types';
+import { ModelData } from '../../types/index.ts'
+import {generateModel } from '../../api/old/diagramApi.ts';
+import {useAuth} from '@/providers/AuthProvider'
 
-import {client} from "@/api/client";
-import { convertDevsToReactFlow } from '@/lib/generationToReactFlow.ts';
 
 const formSchema = z.object({
-
-    diagramName: z.string().min(4, {
+    modelName: z.string().min(2, {
         message: "The diagram name must be at least 4 characters long.",
     }),
     prompt: z.string().min(10, {
@@ -36,13 +33,16 @@ const formSchema = z.object({
 
 
 
-export default function DiagramPrompt({
+export default function ModelPrompt({
     onGenerate,
-    stage
+    stage, 
+    model,
+    previousCodes
 }: {
-    onGenerate: (diagramData: DiagramDataType
-    ) => void;
+    onGenerate: (modelName: string, modelCode : string) => void;
     stage: number;
+    model : ModelData;
+    previousCodes: string[];
 }) {
     const [loading, setLoading] = useState(false);
     const { toast } = useToast()
@@ -52,7 +52,7 @@ export default function DiagramPrompt({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            diagramName: "",
+            modelName: model.name,
             prompt: "",
         },
     })
@@ -60,31 +60,11 @@ export default function DiagramPrompt({
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setLoading(true);
-        try {
-            const response = await client.POST("/ai/generate-diagram", {
-                body: {
-                    prompt: values.prompt,
-                    diagramName: values.diagramName,
-                },
-            });
-    
-            if (!response.data) {
-                throw new Error("No data received from API");
-            }
-            convertDevsToReactFlow(response.data)
-            onGenerate();
-            toast({
-                title: "Diagram generated successfully!",
-            });
-        } catch (error) {
-            toast({
-                title: "Error generating diagram",
-                description: (error as Error).message,
-                variant: "destructive",
-            });
-        } finally {
-            setLoading(false);
-        }
+
+        await generateModel(token, { modelName: values.modelName, prompt: values.prompt, previousCodes: previousCodes, modelType: model.type }, onGenerate, toast);
+        
+        setLoading(false);
+        
     };
 
     if (loading) {
@@ -102,19 +82,19 @@ export default function DiagramPrompt({
         return (
             <div className='h-full w-full flex flex-col justify-center items-center' >
                 <div className='text-3xl text-foreground pb-20 font-bold'>
-                    DEVS diagram Generator
+                    DEVS model Generator
                 </div>
 
                 <Form {...form} >
                     <form onSubmit={form.handleSubmit(onSubmit)} className="w-4/5 space-y-8">
                         <FormField
                             control={form.control}
-                            name="diagramName"
+                            name="modelName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Diagram Name</FormLabel>
+                                    <FormLabel>Model Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Single light diagram" {...field} />
+                                        <Input placeholder="Model Name" {...field}  />
                                     </FormControl>
 
                                     <FormMessage />
@@ -129,7 +109,7 @@ export default function DiagramPrompt({
                                     <FormLabel>Prompt</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="A switch connected to a light."
+                                            placeholder="A switch with alternate between on and off every 10s."
                                             className="resize-none"
                                             {...field}
                                         />
@@ -138,7 +118,7 @@ export default function DiagramPrompt({
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">{stage === 0 ? "Generate" : "Regenerate"}</Button>
+                        <Button type="submit">{stage < 3 ? "Generate" : "Regenerate"}</Button>
                     </form>
                 </Form>
             </div>

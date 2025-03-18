@@ -1,4 +1,4 @@
-import {fetchWithAuth} from '@/api/fetchWithAuth'
+import {fetchWithAuth} from '@/api/old/fetchWithAuth'
 
 export const getAllDiagrams = async (
     token: string | null | undefined

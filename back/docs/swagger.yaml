@@ -8,6 +8,15 @@ definitions:
     x-enum-varnames:
     - Atomic
     - Coupled
+  handler.GenerateDiagramRequest:
+    properties:
+      diagramName:
+        example: MyDiagram
+        type: string
+      userPrompt:
+        example: Create a software architecture diagram
+        type: string
+    type: object
   handler.GenerateModelRequest:
     properties:
       modelName:
@@ -22,6 +31,31 @@ definitions:
       userPrompt:
         example: Generate a model based on the previous code
         type: string
+    type: object
+  model.Diagram:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      modelId:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      updatedAt:
+        type: string
+      userId:
+        type: string
+      workspaceId:
+        type: string
+    required:
+    - name
     type: object
   model.Library:
     properties:
@@ -69,6 +103,50 @@ definitions:
       userId:
         type: string
     type: object
+  model.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
+      id:
+        type: string
+      password:
+        maxLength: 50
+        minLength: 6
+        type: string
+      refresh_token:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.Workspace:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   request.LoginRequest:
     properties:
       identity:
@@ -79,6 +157,11 @@ definitions:
   request.LogoutRequest:
     properties:
       refreshToken:
+        type: string
+    type: object
+  request.PasswordRequest:
+    properties:
+      password:
         type: string
     type: object
   request.RefreshRequest:
@@ -103,12 +186,97 @@ definitions:
     - password
     - username
     type: object
+  request.UpdateUserRequest:
+    properties:
+      names:
+        type: string
+    type: object
+  response.Connection:
+    properties:
+      from:
+        allOf:
+        - $ref: '#/definitions/response.Endpoint'
+        description: obligatoire
+      to:
+        allOf:
+        - $ref: '#/definitions/response.Endpoint'
+        description: obligatoire
+    type: object
+  response.DiagramResponse:
+    properties:
+      connections:
+        description: obligatoire
+        items:
+          $ref: '#/definitions/response.Connection'
+        type: array
+      models:
+        description: obligatoire
+        items:
+          $ref: '#/definitions/response.Model'
+        type: array
+    type: object
+  response.Endpoint:
+    properties:
+      model:
+        description: obligatoire
+        type: string
+      port:
+        description: obligatoire
+        type: string
+    type: object
+  response.GeneratedModelResponse:
+    properties:
+      code:
+        type: string
+    type: object
   response.LoginResponse:
     properties:
       accessToken:
         type: string
+      email:
+        type: string
       refreshToken:
         type: string
+      username:
+        type: string
+    type: object
+  response.Model:
+    properties:
+      components:
+        description: optionnel
+        items:
+          type: string
+        type: array
+      id:
+        description: obligatoire
+        type: string
+      ports:
+        allOf:
+        - $ref: '#/definitions/response.Ports'
+        description: optionnel
+      type:
+        allOf:
+        - $ref: '#/definitions/response.ModelType'
+        description: enum obligatoire
+    type: object
+  response.ModelType:
+    enum:
+    - atomic
+    - coupled
+    type: string
+    x-enum-varnames:
+    - ModelTypeAtomic
+    - ModelTypeCoupled
+  response.Ports:
+    properties:
+      in:
+        items:
+          type: string
+        type: array
+      out:
+        items:
+          type: string
+        type: array
     type: object
   response.RefreshResponse:
     properties:
@@ -138,11 +306,48 @@ info:
   title: Easy DEVS API
   version: "1.0"
 paths:
+  /ai/generate-diagram:
+    post:
+      consumes:
+      - application/json
+      description: Sends a prompt to OpenAI to generate a diagram in JSON format based
+        on a strict schema.
+      parameters:
+      - description: Data required to generate a diagram
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.GenerateDiagramRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Generated diagram
+          schema:
+            $ref: '#/definitions/response.DiagramResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: AI processing error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generate a diagram
+      tags:
+      - AI
   /ai/generate-model:
     post:
       consumes:
       - application/json
-      description: Sends a prompt to OpenAI to generate a DEVS model
+      description: Sends a prompt to OpenAI to generate a DEVS model code.
       parameters:
       - description: Data required to generate a model
         in: body
@@ -154,10 +359,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: Generated model
+          description: Generated model code
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/response.GeneratedModelResponse'
         "400":
           description: Invalid request
           schema:
@@ -246,6 +450,32 @@ paths:
       summary: Log out a user
       tags:
       - Auth
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Returns the authenticated user's information based on the access
+        token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get current user
+      tags:
+      - Auth
   /auth/refresh:
     post:
       consumes:
@@ -320,6 +550,140 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /diagram:
+    get:
+      description: Retrieve a list of all diagrams
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Diagram'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all diagrams
+      tags:
+      - diagrams
+    post:
+      consumes:
+      - application/json
+      description: Create a new diagram entry
+      parameters:
+      - description: Diagram data
+        in: body
+        name: diagram
+        required: true
+        schema:
+          $ref: '#/definitions/model.Diagram'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Diagram'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a diagram
+      tags:
+      - diagrams
+  /diagram/{id}:
+    delete:
+      description: Delete a diagram by its ID
+      parameters:
+      - description: Diagram ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a diagram
+      tags:
+      - diagrams
+    get:
+      description: Retrieve a single diagram by its ID
+      parameters:
+      - description: Diagram ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Diagram'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a diagram by ID
+      tags:
+      - diagrams
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing diagram with partial data
+      parameters:
+      - description: Diagram ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: updateData
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Diagram'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a diagram
+      tags:
+      - diagrams
   /health:
     get:
       consumes:
@@ -604,4 +968,255 @@ paths:
       summary: Update a model
       tags:
       - models
+  /user:
+    get:
+      description: Retrieve a list of all user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all user
+      tags:
+      - user
+  /user/{id}:
+    delete:
+      description: Delete an existing user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User password confirmation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.PasswordRequest'
+      responses:
+        "204":
+          description: No Content
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a user by ID
+      tags:
+      - user
+    get:
+      description: Retrieve a single user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a user by ID
+      tags:
+      - user
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing user with partial data
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Partial user update
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a user
+      tags:
+      - user
+  /workspace:
+    get:
+      description: Retrieve a list of all workspace
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Workspace'
+            type: array
+      summary: Get all workspace
+      tags:
+      - workspace
+    post:
+      consumes:
+      - application/json
+      description: Create a new workspace and store it in the database
+      parameters:
+      - description: Workspace object
+        in: body
+        name: workspace
+        required: true
+        schema:
+          $ref: '#/definitions/model.Workspace'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Workspace'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new workspace
+      tags:
+      - workspace
+  /workspace/{id}:
+    delete:
+      description: Delete an existing workspace by its ID
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a workspace by ID
+      tags:
+      - workspace
+    get:
+      description: Retrieve a single workspace by its ID
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Workspace'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a workspace by ID
+      tags:
+      - workspace
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing workspace with partial data
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Partial workspace update
+        in: body
+        name: workspace
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Workspace'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a workspace
+      tags:
+      - workspace
 swagger: "2.0"

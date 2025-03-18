@@ -23,11 +23,10 @@ const HomePage = () => <div>Page d'accueil</div>;
 const OnlineDEVSEditor = () => <div>Contact</div>;
 
 const Main = () => {
+  
   const { isAuthenticated, isInitialized } = useAuth()
 
-  if (!isInitialized) {
-    return null
-  }
+
 
 
 
@@ -48,6 +47,7 @@ const Main = () => {
     <DefaultLayout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/diagrams/:id" element={<HomePage />} />
         <Route path="/online-devs" element={<OnlineDEVSEditor />} />
         <Route path="/devs-generator" element={<DiagramGenerator />} />
         <Route path="/model-code-editor" element={<DiagramDetailPage />} />

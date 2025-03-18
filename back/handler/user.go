@@ -14,7 +14,7 @@ import (
 
 // SetupUserRoutes configures user-related routes
 func SetupUserRoutes(app *fiber.App) {
-	group := app.Group("/users", middleware.Protected())
+	group := app.Group("/user", middleware.Protected())
 
 	group.Get("/", getAllUsers)
 	group.Get("/:id", getUser)
@@ -49,41 +49,41 @@ func validUser(id string, p string) bool {
 	return true
 }
 
-// getAllUsers retrieves a list of all users
-// @Summary Get all users
-// @Description Retrieve a list of all users
-// @Tags users
+// getAllUsers retrieves a list of all user
+// @Summary Get all user
+// @Description Retrieve a list of all user
+// @Tags user
 // @Produce json
 // @Success 200 {array} model.User
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /users [get]
+// @Router /user [get]
 func getAllUsers(c *fiber.Ctx) error {
 	db := database.DB
-	var users []model.User
+	var user []model.User
 
-	// Retrieve all users
-	if err := db.Find(&users).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Error retrieving users", "data": err.Error()})
+	// Retrieve all user
+	if err := db.Find(&user).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Error retrieving user", "data": err.Error()})
 	}
 
 	// Check if the list is empty
-	if len(users) == 0 {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No users found", "data": nil})
+	if len(user) == 0 {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No user found", "data": nil})
 	}
 
-	return c.JSON(users)
+	return c.JSON(user)
 }
 
 // getUser retrieves a single user by ID
 // @Summary Get a user by ID
 // @Description Retrieve a single user by their ID
-// @Tags users
+// @Tags user
 // @Produce json
 // @Param id path string true "User ID"
 // @Success 200 {object} model.User
 // @Failure 404 {object} map[string]interface{}
-// @Router /users/{id} [get]
+// @Router /user/{id} [get]
 func getUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -98,7 +98,7 @@ func getUser(c *fiber.Ctx) error {
 // patchUser updates an existing user by their ID
 // @Summary Update a user
 // @Description Update an existing user with partial data
-// @Tags users
+// @Tags user
 // @Accept json
 // @Produce json
 // @Param id path string true "User ID"
@@ -107,7 +107,7 @@ func getUser(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /users/{id} [patch]
+// @Router /user/{id} [patch]
 func patchUser(c *fiber.Ctx) error {
 	var uui request.UpdateUserRequest
 	if err := c.BodyParser(&uui); err != nil {
@@ -133,14 +133,14 @@ func patchUser(c *fiber.Ctx) error {
 // deleteUser deletes a user by their ID
 // @Summary Delete a user by ID
 // @Description Delete an existing user by their ID
-// @Tags users
+// @Tags user
 // @Param id path string true "User ID"
 // @Param user body request.PasswordRequest true "User password confirmation"
 // @Success 204 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /users/{id} [delete]
+// @Router /user/{id} [delete]
 func deleteUser(c *fiber.Ctx) error {
 	var pi request.PasswordRequest
 	if err := c.BodyParser(&pi); err != nil {

@@ -1,4 +1,4 @@
-import {fetchWithAuth} from '@/api/fetchWithAuth'
+import {fetchWithAuth} from '@/api/old/fetchWithAuth'
 import type { DiagramDataType } from '@/types'
 
 export const getDiagramById = async (

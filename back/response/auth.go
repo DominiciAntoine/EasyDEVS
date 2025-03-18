@@ -9,6 +9,8 @@ type RegisterResponse struct {
 type LoginResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
 }
 
 type RefreshResponse struct {

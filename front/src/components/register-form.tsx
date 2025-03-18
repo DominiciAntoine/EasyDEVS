@@ -18,15 +18,18 @@ const registerSchema = z
     email: z.string().email().nonempty("Email is required"),
     password: z.string().min(5, "Password must be at least 5 characters long"),
     confirmPassword: z.string().min(5, "Confirm Password must be at least 5 characters long"),
+    username : z.string().min(5, "Pseudo must be at least 5 characters long"),
+    fullname : z.string().min(5, "Fullname must be at least 5 characters long"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
   });
+
 export const RegisterForm = () => {
   const { register } = useAuth();
   const form = useForm({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    defaultValues: { email: "admin@gmail.com", password: "Admin123", confirmPassword: "Admin123", username: "Admin", fullname: "John Doe" },
   });
 
   const handleRegister = async (values: z.infer<typeof registerSchema>) => {
@@ -56,6 +59,32 @@ export const RegisterForm = () => {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="example@email.com" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="username"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Username" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="fullname"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Full Name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

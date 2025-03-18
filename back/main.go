@@ -15,8 +15,8 @@ import (
 	_ "app/docs"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/swagger"
-	// "github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 		ServerHeader:  "Fiber",
 		AppName:       "Easy DEVS",
 	})
-	// app.Use(cors.New())
+	app.Use(cors.New())
 
 	database.ConnectDB()
 

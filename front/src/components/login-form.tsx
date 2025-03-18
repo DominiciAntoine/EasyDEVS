@@ -23,7 +23,7 @@ export const LoginForm = () => {
   const { login } = useAuth();
   const form = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "admin@gmail.com", password: "Admin123" },
   });
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {

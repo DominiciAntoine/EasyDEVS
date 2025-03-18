@@ -27,6 +27,7 @@ import { examplePythonCode } from "@/staticModel/examplePythonCode.tsx";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb.tsx";
 import { SidebarTrigger } from "@/components/ui/sidebar.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
+//import { getAllDiagrams } from "@/queries/diagram/GetDiagrams";
 
 const nodeTypes = {
   resizer: ResizerNode,
@@ -34,6 +35,8 @@ const nodeTypes = {
 
 export function DiagramDetailPage() {
   const { theme } = useTheme();
+  //const {id} = useParams()
+  //const {data, isLoading} = getAllDiagrams({params: {path: {id}}})
   const [modelName] = useState("Model");
   const [inputPorts, setInputPorts] = useState<string[]>([]);
   const [outputPorts, setOutputPorts] = useState<string[]>([]);
