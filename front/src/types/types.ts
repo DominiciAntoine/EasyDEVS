@@ -33,27 +33,7 @@ export type User = {
     email: string, 
 }
 
-export type LLMResponse = {
-	models: {
-		id: string;
-		type: "atomic" | "coupled";
-		ports?: {
-			out?: string[];
-			in?: string[];
-		};
-		components?: string[];
-	}[];
-	connections: {
-		from: {
-			model: string;
-			port: string;
-		};
-		to: {
-			model: string;
-			port: string;
-		};
-	}[];
-};
+
 
 export type ReactFlowInput = {
 	id: string;

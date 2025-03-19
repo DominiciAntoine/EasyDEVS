@@ -20,12 +20,17 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./back:/usr/src/some-api
-      - .env.back:/usr/src/some-api/.env.back
+      - ./back:/app
+      - .env.back:/app/.env.back
     command: air
     depends_on:
       db:
         condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./back
+          target: /app
   db:
     image: postgres:alpine
     env_file:

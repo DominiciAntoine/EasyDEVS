@@ -4,13 +4,15 @@ import { NodeData } from '../../../types';
 import { Label } from '../../ui/label';
 import { Input } from '../../ui/input';
 import { Badge } from "../../ui/badge";
+import { Minus, Plus } from 'lucide-react';
+
 
 type ResizerNodeProps = {
   data: NodeData
 }
 
 function ResizerNode({ data, selected }: ResizerNodeProps) {
-  let visible = selected ? true : false;
+  const visible = selected ? true : false;
   return (
     <>
 
@@ -102,8 +104,7 @@ function ResizerNode({ data, selected }: ResizerNodeProps) {
 
       >
         {/* En-tête avec le label */}
-        < div className={`h-10 ${data.isSelected === true ? "bg-blue-400" : "bg-card-foreground"} border-border rounded-t-lg text-primary-foreground flex justify-evenly items-center`
-        }>
+        < div className={`h-10 ${data.isSelected === true ? "bg-blue-400" : "bg-card-foreground"} border-border rounded-t-lg text-primary-foreground flex justify-center items-center`}>
           {data.label}
         </div >
 
@@ -113,7 +114,7 @@ function ResizerNode({ data, selected }: ResizerNodeProps) {
           < div className='flex flex-col justify-evenly relative -left-2 text-primary '
           >
             {
-              data.inputPorts?.map((port: { id: any; }, index: any) => (
+              data.inputPorts?.map((port: { id: string; }, index: number) => (
                 <div key={`in-group-${index}`} className='flex flex-row justify-start'>
                   <Handle
                     className='relative h-5 w-2 secondary-foreground transform-none top-0'
@@ -140,7 +141,7 @@ function ResizerNode({ data, selected }: ResizerNodeProps) {
           {/* Ports de sortie (aligné à droite) */}
           < div className='flex flex-col justify-evenly  relative text-primary -right-2' >
             {
-              data.outputPorts?.map((port: { id: any; }, index: any) => (
+              data.outputPorts?.map((port: { id: string; }, index: number) => (
                 <div key={`out-group-${index}`} className='flex flex-row justify-start'>
                   {data.modelType === 'coupled' && (
                     <Handle

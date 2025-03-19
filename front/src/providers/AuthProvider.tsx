@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast"
 // Définition du contexte d'authentification
 interface AuthContextProps {
   user: components["schemas"]["response.UserResponse"] | null;
-  token: string | null;
+  token: string | null | undefined;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -27,7 +27,7 @@ const apiClient = createClient<paths>({
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<components["schemas"]["response.UserResponse"] | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast()
@@ -65,10 +65,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const initializeAuth = async () => {
       try {
         const storedToken = localStorage.getItem("accessToken");
+       
         if (!storedToken) {
           setIsLoading(false);
+          setToken(null);
           return;
         }
+        console.log("coucou")
 
         setToken(storedToken);
 
@@ -90,10 +93,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         console.error("Erreur d'initialisation de l'authentification :", error);
       } finally {
+        
         setIsLoading(false);
       }
     };
 
+    
     initializeAuth();
   }, []);
 
@@ -169,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         user,
         token,
-        isInitialized: token !== null,
+        isInitialized: token !== undefined,
         isAuthenticated: !!token,
         isLoading,
         login,

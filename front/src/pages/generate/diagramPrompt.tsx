@@ -21,7 +21,7 @@ import { generateDiagram } from "@/api/old/diagramApi.ts"
 import { DiagramDataType } from '@/types';
 
 import {client} from "@/api/client";
-import { convertDevsToReactFlow } from '@/lib/generationToReactFlow.ts';
+import { convertDevsToReactFlow } from '@/lib/convertDevsToReactFlow.ts';
 
 const formSchema = z.object({
 
@@ -56,6 +56,7 @@ export default function DiagramPrompt({
             prompt: "",
         },
     })
+    
 
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -71,8 +72,9 @@ export default function DiagramPrompt({
             if (!response.data) {
                 throw new Error("No data received from API");
             }
-            convertDevsToReactFlow(response.data)
-            onGenerate();
+            const diagramData = response.data;
+            const convertedData = convertDevsToReactFlow(diagramData);
+            //onGenerate(convertedData);
             toast({
                 title: "Diagram generated successfully!",
             });

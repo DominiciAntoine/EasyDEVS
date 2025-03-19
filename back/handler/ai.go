@@ -46,7 +46,7 @@ func getOpenAIClient() (*openai.Client, error) {
 	}
 
 	config := openai.DefaultConfig(apiKey)
-	config.BaseURL = apiURL // Set custom OpenAI API URL
+	config.BaseURL = apiURL // Set custom OpenAI API UR
 
 	return openai.NewClientWithConfig(config), nil
 }
@@ -61,7 +61,6 @@ func getOpenAIClient() (*openai.Client, error) {
 // @Success 200 {object} response.DiagramResponse "Generated diagram"
 // @Failure 400 {object} map[string]string "Invalid request"
 // @Failure 500 {object} map[string]string "AI processing error"
-// @Security BearerAuth
 // @Router /ai/generate-diagram [post]
 func generateDiagram(c *fiber.Ctx) error {
 	var request GenerateDiagramRequest
@@ -142,7 +141,6 @@ func generateDiagram(c *fiber.Ctx) error {
 // @Success 200 {object} response.GeneratedModelResponse "Generated model code"
 // @Failure 400 {object} map[string]string "Invalid request"
 // @Failure 500 {object} map[string]string "AI processing error"
-// @Security BearerAuth
 // @Router /ai/generate-model [post]
 func generateModel(c *fiber.Ctx) error {
 	var request GenerateModelRequest

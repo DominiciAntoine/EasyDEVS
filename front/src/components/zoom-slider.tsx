@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Maximize, Minus, Plus } from "lucide-react";
+import { Maximize, Minus, Plus, ReplaceAll } from "lucide-react";
 import {
   Panel,
   useViewport,
@@ -14,8 +14,12 @@ import { Slider } from "../components/ui/slider";
 import { Button } from "./ui/button";
 import { cn } from "../lib/utils";
 
-const ZoomSlider = React.forwardRef<HTMLDivElement, Omit<PanelProps, "children">>(
-  ({ className, ...props }, _ref) => {
+type ZoomSliderProps = Omit<PanelProps, "children"> & {
+  onOrganizeClick?: () => void
+}
+
+const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
+  ({ className, onOrganizeClick, ...props }) => {
     const { zoom } = useViewport();
     const { zoomTo, zoomIn, zoomOut, fitView } = useReactFlow();
 
@@ -68,6 +72,16 @@ const ZoomSlider = React.forwardRef<HTMLDivElement, Omit<PanelProps, "children">
         >
           <Maximize className="h-4 w-4" />
         </Button>
+        {onOrganizeClick && (
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onOrganizeClick}
+      >
+        <ReplaceAll className="h-4 w-4" />
+      </Button>
+    )}
+        
       </Panel>
     );
   },

@@ -201,6 +201,9 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.Endpoint'
         description: obligatoire
+    required:
+    - from
+    - to
     type: object
   response.DiagramResponse:
     properties:
@@ -214,6 +217,9 @@ definitions:
         items:
           $ref: '#/definitions/response.Model'
         type: array
+    required:
+    - connections
+    - models
     type: object
   response.Endpoint:
     properties:
@@ -223,6 +229,9 @@ definitions:
       port:
         description: obligatoire
         type: string
+    required:
+    - model
+    - port
     type: object
   response.GeneratedModelResponse:
     properties:
@@ -258,6 +267,9 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.ModelType'
         description: enum obligatoire
+    required:
+    - id
+    - type
     type: object
   response.ModelType:
     enum:
@@ -338,8 +350,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       summary: Generate a diagram
       tags:
       - AI
@@ -374,8 +384,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       summary: Generate a model
       tags:
       - AI

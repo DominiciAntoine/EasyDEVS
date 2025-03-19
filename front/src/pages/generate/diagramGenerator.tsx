@@ -416,9 +416,9 @@ const DiagramGenerator = () => {
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 defaultEdgeOptions={defaultEdgeOptions}
+                connectionMode={ConnectionMode.Loose}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
-                connectionMode={ConnectionMode.Loose}
                 fitView
                 minZoom={0.1}
               >

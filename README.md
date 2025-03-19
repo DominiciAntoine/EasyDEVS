@@ -71,3 +71,11 @@ Une fois le projet démarré, vous pouvez commencer à interagir avec l'API et l
 - `git commit -m "fix: toto" --no-verify`
 
 ## Installer extension Biome si bous servez de VScode
+
+
+## Expert mode
+
+**Use 2 seperated terminal to run both commands**
+
+- Start front using : `npm run start:front` it will run the project locally using your OS
+- Start back using : `npm run start:back` it will run a docker-compose.yml located in `back/docker-compose.yml`

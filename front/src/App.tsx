@@ -18,6 +18,8 @@ import { MinimalLayout } from "@/layouts/minimalLayout";
 import { DefaultLayout } from "@/layouts/defaultLayout";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { DiagramDetailPage} from '@/pages/diagrams/detail';
+import Test from "./pages/test";
+import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
 
 const HomePage = () => <div>Page d'accueil</div>;
 const OnlineDEVSEditor = () => <div>Contact</div>;
@@ -26,9 +28,7 @@ const Main = () => {
   
   const { isAuthenticated, isInitialized } = useAuth()
 
-
-
-
+  if(!isInitialized) return null;
 
   return !isAuthenticated ? (
     <MinimalLayout>
@@ -51,6 +51,8 @@ const Main = () => {
         <Route path="/online-devs" element={<OnlineDEVSEditor />} />
         <Route path="/devs-generator" element={<DiagramGenerator />} />
         <Route path="/model-code-editor" element={<DiagramDetailPage />} />
+        <Route path="/test" element={<Test />} />
+        <Route path="/test2" element={<ModelCodeEditor />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </DefaultLayout>

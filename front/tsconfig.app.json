@@ -8,8 +8,7 @@
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
-      "components/*": ["components/*"]
+      "@/*": ["src/*"]
     },
 
     /* Bundler mode */
@@ -27,5 +26,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "src/components/ui/button.tsx", "src/components/ui/card.tsx", "src/components/ui/input.tsx", "src/components/ui/label.tsx", "src/components/login-form.tsx"]
+  "include": ["src"]
 }

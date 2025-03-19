@@ -7,11 +7,10 @@ import (
 
 	"app/config"
 	"app/database"
+	"app/middleware"
 	"app/model"
 	"app/request"
 	"app/response"
-
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -30,7 +29,7 @@ func SetupAuthRoutes(app *fiber.App) {
 	group.Post("/refresh", refreshToken)
 	group.Post("/logout", logout)
 	group.Post("/register", register)
-	group.Post("/auth/me", getCurrentUser)
+	group.Get("/me", middleware.Protected(), getCurrentUser)
 }
 
 // @Summary Register a new user
@@ -303,41 +302,13 @@ func logout(c *fiber.Ctx) error {
 func getCurrentUser(c *fiber.Ctx) error {
 	db := database.DB
 
-	// Récupérer le token du header Authorization
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Missing token"})
-	}
-
-	// Extraire le token en supprimant "Bearer "
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-	if tokenString == authHeader { // Si le token n'a pas changé après TrimPrefix, alors il était absent
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid token format"})
-	}
-
-	// Vérifier et décoder le token JWT
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
-
-	if err != nil || !token.Valid {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid or expired token"})
-	}
-
-	// Extraire l'ID utilisateur du token JWT
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid token claims"})
-	}
-
-	userID := claims["user_id"]
-	if userID == nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid token payload"})
-	}
+	jwt_user := c.Locals("user").(*jwt.Token)
+	claims := jwt_user.Claims.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
 
 	// Récupérer l'utilisateur en base de données
 	var user model.User
-	if err := db.First(&user, "id = ?", userID).Error; err != nil {
+	if err := db.First(&user, "id = ?", user_id).Error; err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "User not found"})
 	}
 

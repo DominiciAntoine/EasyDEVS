@@ -10,12 +10,13 @@ export const initialNodes: Node<NodeData>[] = [
     data: {
       modelType: "atomic",
       label: 'Model',
-      inputPorts: [],
+      inputPorts: [{id:"test"}],
       outputPorts: [],
     },
     style: { width: 300, height: 300 },
     position: position,
   },
+  
 
 
 ];

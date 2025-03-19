@@ -1,9 +1,10 @@
 import { Edge } from "@xyflow/react";
-import type { LLMResponse, ReactFlowInput } from "../types";
+import type { ReactFlowInput } from "../types";
+import type { components } from "@/api/v1";
 
 function findParent(
-	nodeid: LLMResponse["models"][number]["id"],
-	diagram: LLMResponse,
+	nodeid: components["schemas"]["response.DiagramResponse"]["models"][number]["id"],
+	diagram: components["schemas"]["response.DiagramResponse"],
 ) {
 	return diagram.models.find(
 		({ type, components }) =>
@@ -16,8 +17,8 @@ function generateInterPort(from: string, to: string) {
 }
 
 function existingConnection(
-	newconn: LLMResponse["connections"][number],
-	history: LLMResponse["connections"],
+	newconn: components["schemas"]["response.DiagramResponse"]["connections"][number],
+	history: components["schemas"]["response.DiagramResponse"]["connections"],
 ) {
 	return history.find(
 		(aConn) =>
@@ -37,12 +38,12 @@ function existingConnection(
 }
 
 function createConnections(
-	conn: LLMResponse["connections"][number],
-	parentModel: LLMResponse["models"][number],
-	diagram: LLMResponse,
-	type: keyof LLMResponse["connections"][number],
+	conn: components["schemas"]["response.DiagramResponse"]["connections"][number],
+	parentModel: components["schemas"]["response.DiagramResponse"]["models"][number],
+	diagram: components["schemas"]["response.DiagramResponse"],
+	type: keyof components["schemas"]["response.DiagramResponse"]["connections"][number],
 ) {
-	const arrayOfConnections: LLMResponse["connections"] = [];
+	const arrayOfConnections: components["schemas"]["response.DiagramResponse"]["connections"] = [];
 	if (type === "from") {
 		const generatedPortNameFrom = generateInterPort(
 			conn.from.model,
@@ -116,11 +117,11 @@ function createConnections(
 }
 
 function splitConnection(
-	connection: LLMResponse["connections"][number],
-	diagram: LLMResponse,
-	history: LLMResponse["connections"],
-): LLMResponse["connections"] {
-	const connections: LLMResponse["connections"] = [];
+	connection: components["schemas"]["response.DiagramResponse"]["connections"][number],
+	diagram: components["schemas"]["response.DiagramResponse"],
+	history: components["schemas"]["response.DiagramResponse"]["connections"],
+): components["schemas"]["response.DiagramResponse"]["connections"] {
+	const connections: components["schemas"]["response.DiagramResponse"]["connections"] = [];
 
 	if (!connection) {
 		return history;
@@ -181,7 +182,7 @@ function splitConnection(
 }
 
 function addPortToModel(
-	model: LLMResponse["models"][number],
+	model: components["schemas"]["response.DiagramResponse"]["models"][number],
 	port: string,
 	type: "in" | "out",
 ) {
@@ -206,8 +207,8 @@ function addPortToModel(
 	}
 }
 
-export function convertDevsToReactFlow(diagram: LLMResponse) {
-	diagram.connections = diagram.connections.reduce<LLMResponse["connections"]>(
+export function convertDevsToReactFlow(diagram: components["schemas"]["response.DiagramResponse"]) {
+	diagram.connections = diagram.connections.reduce<components["schemas"]["response.DiagramResponse"]["connections"]>(
 		(actualConnections, conn) => [
 			...splitConnection(conn, diagram, actualConnections),
 		],

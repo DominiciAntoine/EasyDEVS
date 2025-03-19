@@ -17,11 +17,6 @@ const docTemplate = `{
     "paths": {
         "/ai/generate-diagram": {
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Sends a prompt to OpenAI to generate a diagram in JSON format based on a strict schema.",
                 "consumes": [
                     "application/json"
@@ -74,11 +69,6 @@ const docTemplate = `{
         },
         "/ai/generate-model": {
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Sends a prompt to OpenAI to generate a DEVS model code.",
                 "consumes": [
                     "application/json"
@@ -1655,6 +1645,10 @@ const docTemplate = `{
         },
         "response.Connection": {
             "type": "object",
+            "required": [
+                "from",
+                "to"
+            ],
             "properties": {
                 "from": {
                     "description": "obligatoire",
@@ -1676,6 +1670,10 @@ const docTemplate = `{
         },
         "response.DiagramResponse": {
             "type": "object",
+            "required": [
+                "connections",
+                "models"
+            ],
             "properties": {
                 "connections": {
                     "description": "obligatoire",
@@ -1695,6 +1693,10 @@ const docTemplate = `{
         },
         "response.Endpoint": {
             "type": "object",
+            "required": [
+                "model",
+                "port"
+            ],
             "properties": {
                 "model": {
                     "description": "obligatoire",
@@ -1733,6 +1735,10 @@ const docTemplate = `{
         },
         "response.Model": {
             "type": "object",
+            "required": [
+                "id",
+                "type"
+            ],
             "properties": {
                 "components": {
                     "description": "optionnel",

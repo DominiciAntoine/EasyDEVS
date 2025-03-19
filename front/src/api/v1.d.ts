@@ -1823,21 +1823,21 @@ export interface components {
         };
         "response.Connection": {
             /** @description obligatoire */
-            from?: components["schemas"]["response.Endpoint"];
+            from: components["schemas"]["response.Endpoint"];
             /** @description obligatoire */
-            to?: components["schemas"]["response.Endpoint"];
+            to: components["schemas"]["response.Endpoint"];
         };
         "response.DiagramResponse": {
             /** @description obligatoire */
-            connections?: components["schemas"]["response.Connection"][];
+            connections: components["schemas"]["response.Connection"][];
             /** @description obligatoire */
-            models?: components["schemas"]["response.Model"][];
+            models: components["schemas"]["response.Model"][];
         };
         "response.Endpoint": {
             /** @description obligatoire */
-            model?: string;
+            model: string;
             /** @description obligatoire */
-            port?: string;
+            port: string;
         };
         "response.GeneratedModelResponse": {
             code?: string;
@@ -1852,11 +1852,11 @@ export interface components {
             /** @description optionnel */
             components?: string[];
             /** @description obligatoire */
-            id?: string;
+            id: string;
             /** @description optionnel */
             ports?: components["schemas"]["response.Ports"];
             /** @description enum obligatoire */
-            type?: components["schemas"]["response.ModelType"];
+            type: components["schemas"]["response.ModelType"];
         };
         /** @enum {string} */
         "response.ModelType": "atomic" | "coupled";
