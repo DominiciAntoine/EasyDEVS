@@ -33,7 +33,7 @@ function ModelExtraInfo({ data }: ModelNodeProps) {
       position={data.toolbarPosition}
     >
       <h3 className="text-lg font-semibold text-primary mb-2 border-b pb-2">Model Information</h3>
-      {Object.entries(data).map(([key, value], index) => {
+      {Object.entries(data).map(([key, value]) => {
         if (["toolbarVisible", "toolbarPosition"].includes(key)) return null;
 
         const formattedKey = key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
