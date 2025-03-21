@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.GenerateDiagramRequest"
+                            "$ref": "#/definitions/request.GenerateDiagramRequest"
                         }
                     }
                 ],
@@ -87,7 +87,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.GenerateModelRequest"
+                            "$ref": "#/definitions/request.GenerateModelRequest"
                         }
                     }
                 ],
@@ -1372,40 +1372,6 @@ const docTemplate = `{
                 "Coupled"
             ]
         },
-        "handler.GenerateDiagramRequest": {
-            "type": "object",
-            "properties": {
-                "diagramName": {
-                    "type": "string",
-                    "example": "MyDiagram"
-                },
-                "userPrompt": {
-                    "type": "string",
-                    "example": "Create a software architecture diagram"
-                }
-            }
-        },
-        "handler.GenerateModelRequest": {
-            "type": "object",
-            "properties": {
-                "modelName": {
-                    "type": "string",
-                    "example": "MyModel"
-                },
-                "modelType": {
-                    "type": "string",
-                    "example": "DEVS"
-                },
-                "previousModelsCode": {
-                    "type": "string",
-                    "example": "Existing model code"
-                },
-                "userPrompt": {
-                    "type": "string",
-                    "example": "Generate a model based on the previous code"
-                }
-            }
-        },
         "model.Diagram": {
             "type": "object",
             "required": [
@@ -1577,6 +1543,30 @@ const docTemplate = `{
                 }
             }
         },
+        "request.GenerateDiagramRequest": {
+            "type": "object"
+        },
+        "request.GenerateModelRequest": {
+            "type": "object",
+            "properties": {
+                "modelName": {
+                    "type": "string",
+                    "example": "MyModel"
+                },
+                "modelType": {
+                    "type": "string",
+                    "example": "DEVS"
+                },
+                "previousModelsCode": {
+                    "type": "string",
+                    "example": "Existing model code"
+                },
+                "userPrompt": {
+                    "type": "string",
+                    "example": "Generate a model based on the previous code"
+                }
+            }
+        },
         "request.LoginRequest": {
             "type": "object",
             "properties": {
@@ -1600,6 +1590,21 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.PastMessages": {
+            "type": "object",
+            "required": [
+                "content",
+                "role"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 }
             }

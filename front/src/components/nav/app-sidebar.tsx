@@ -10,7 +10,7 @@ import {
   Square,
   BrainCircuit,
   House,
-  FilePenLine
+  FilePenLine,
 } from "lucide-react"
 
 import { NavLibrary } from "./nav-library"
@@ -33,7 +33,7 @@ const data = {
     email: "dominici.antoine.p@gmail.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  navMain: [
+  library: [
     {
       title: "Smart-Parking",
       url: "#",
@@ -95,7 +95,7 @@ const data = {
     },
 
   ],
-  projects: [
+  diagrams: [
     {
       name: "Design Engineering",
       url: "#",
@@ -139,8 +139,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain mains={data.mains} />
-        <NavLibrary items={data.navMain} />
-        <NavDiagrams projects={data.projects} />
+        <NavLibrary />
+        <NavDiagrams />
       </SidebarContent>
       <SidebarFooter>
         

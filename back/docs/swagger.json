@@ -23,7 +23,7 @@
 						"in": "body",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/handler.GenerateDiagramRequest"
+							"$ref": "#/definitions/request.GenerateDiagramRequest"
 						}
 					}
 				],
@@ -69,7 +69,7 @@
 						"in": "body",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/handler.GenerateModelRequest"
+							"$ref": "#/definitions/request.GenerateModelRequest"
 						}
 					}
 				],
@@ -1208,40 +1208,6 @@
 			"enum": ["atomic", "coupled"],
 			"x-enum-varnames": ["Atomic", "Coupled"]
 		},
-		"handler.GenerateDiagramRequest": {
-			"type": "object",
-			"properties": {
-				"diagramName": {
-					"type": "string",
-					"example": "MyDiagram"
-				},
-				"userPrompt": {
-					"type": "string",
-					"example": "Create a software architecture diagram"
-				}
-			}
-		},
-		"handler.GenerateModelRequest": {
-			"type": "object",
-			"properties": {
-				"modelName": {
-					"type": "string",
-					"example": "MyModel"
-				},
-				"modelType": {
-					"type": "string",
-					"example": "DEVS"
-				},
-				"previousModelsCode": {
-					"type": "string",
-					"example": "Existing model code"
-				},
-				"userPrompt": {
-					"type": "string",
-					"example": "Generate a model based on the previous code"
-				}
-			}
-		},
 		"model.Diagram": {
 			"type": "object",
 			"required": ["name"],
@@ -1407,6 +1373,30 @@
 				}
 			}
 		},
+		"request.GenerateDiagramRequest": {
+			"type": "object"
+		},
+		"request.GenerateModelRequest": {
+			"type": "object",
+			"properties": {
+				"modelName": {
+					"type": "string",
+					"example": "MyModel"
+				},
+				"modelType": {
+					"type": "string",
+					"example": "DEVS"
+				},
+				"previousModelsCode": {
+					"type": "string",
+					"example": "Existing model code"
+				},
+				"userPrompt": {
+					"type": "string",
+					"example": "Generate a model based on the previous code"
+				}
+			}
+		},
 		"request.LoginRequest": {
 			"type": "object",
 			"properties": {
@@ -1430,6 +1420,18 @@
 			"type": "object",
 			"properties": {
 				"password": {
+					"type": "string"
+				}
+			}
+		},
+		"request.PastMessages": {
+			"type": "object",
+			"required": ["content", "role"],
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"role": {
 					"type": "string"
 				}
 			}

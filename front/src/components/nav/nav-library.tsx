@@ -2,7 +2,6 @@
 
 import {
   ChevronRight,
-  type LucideIcon,
   PlusIcon,
 } from "lucide-react";
 
@@ -33,21 +32,21 @@ import {
 } from "../ui/context-menu";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
+import { useGetLibraries } from "@/queries/library/useGetLibraries";
+import { useGetModels } from "@/queries/model/useGetModels";
+import { librairiesToFront } from "@/lib/Parser/librairiesToFront";
 
-export function NavLibrary({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    isActive?: boolean;
-    items?: {
-      icon?: LucideIcon;
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+export function NavLibrary() 
+{
+
+  //a voir avec dorian si on met ca dans ce composant ou le composant parent
+  const libraries = useGetLibraries();
+  const models = useGetModels();
+
+  const navLibraries = librairiesToFront(libraries.data ?? [], models.data ?? []);
+
+  console.log("Libraries transformed:", libraries);
+
   return (
     <SidebarGroup>
         <ContextMenu>
@@ -56,7 +55,7 @@ export function NavLibrary({
             <span>Library</span>
 
             <Button asChild variant={"ghost"} size={"sm"} className="h-6 w-6">
-              <Link to={"#add_library"}>
+              <Link to={"/library/new"}>
                 <PlusIcon />
               </Link>
             </Button>
@@ -64,14 +63,14 @@ export function NavLibrary({
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem>
-              <a href="#new_lib">New library</a>
+            <Link to={"/library/new"}>New library</Link>
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
 
 
       <SidebarMenu>
-        {items.map((item) => (
+        {navLibraries.map((item) => (
           <Collapsible
             key={item.title}
             asChild
@@ -93,7 +92,7 @@ export function NavLibrary({
                     <a href={"#new_model_in_lib_" + item.title}>New model...</a>
                   </ContextMenuItem>
                   <ContextMenuItem>
-                    <a href={"#delete_lib_" + item.title}>Delete</a>
+                  <Link to={`/library/${item.id}/delete`}>Delete</Link>
                   </ContextMenuItem>
                   <ContextMenuSeparator />
                   <ContextMenuItem>

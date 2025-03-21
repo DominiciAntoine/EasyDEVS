@@ -12,9 +12,9 @@ import (
 func SetupDiagramRoutes(app *fiber.App) {
 	group := app.Group("/diagram", middleware.Protected())
 
-	group.Get("/", getAllDiagrams)
+	group.Get("", getAllDiagrams)
 	group.Get("/:id", getDiagram)
-	group.Post("/", createDiagram)
+	group.Post("", createDiagram)
 	group.Patch("/:id", patchDiagram)
 	group.Delete("/:id", deleteDiagram)
 }

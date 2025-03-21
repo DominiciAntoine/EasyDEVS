@@ -12,9 +12,9 @@ import (
 func SetupLibraryRoutes(app *fiber.App) {
 	group := app.Group("/library", middleware.Protected())
 
-	group.Get("/", getAllLibraries)
+	group.Get("", getAllLibraries)
 	group.Get("/:id", getLibrary)
-	group.Post("/", createLibrary)
+	group.Post("", createLibrary)
 	group.Delete("/:id", deleteLibrary)
 	group.Patch("/:id", patchLibrary)
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { type LucideIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -19,16 +19,13 @@ import {
 import { Button } from "../ui/button";
 
 import { Link } from "react-router-dom";
+import { useGetDiagrams } from "@/queries/diagram/useGetDiagrams";
+import { diagramsToFront } from "@/lib/Parser/diagramsToFront";
 
-export function NavDiagrams({
-  projects,
-}: {
-  projects: {
-    name: string;
-    url: string;
-    icon: LucideIcon;
-  }[];
-}) {
+export function NavDiagrams() {
+
+  const diagramsData = useGetDiagrams();
+  const navDiagrams = diagramsToFront(diagramsData.data ?? []);
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <ContextMenu>
@@ -50,7 +47,7 @@ export function NavDiagrams({
         </ContextMenuContent>
       </ContextMenu>
       <SidebarMenu>
-        {projects.map((item) => (
+        {navDiagrams.map((item) => (
           <ContextMenu key={item.name}>
             <ContextMenuTrigger>
               <SidebarMenuItem >

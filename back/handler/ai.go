@@ -3,6 +3,7 @@ package handler
 import (
 	"app/middleware"
 	"app/prompt"
+	"app/request"
 	"app/response"
 	"context"
 	"encoding/json"
@@ -11,8 +12,9 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	openai "github.com/sashabaranov/go-openai"
-	"github.com/sashabaranov/go-openai/jsonschema"
+	"github.com/invopop/jsonschema"
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/option"
 )
 
 // SetupAiRoutes configures AI-related routes.
@@ -24,17 +26,6 @@ func SetupAiRoutes(app *fiber.App) {
 }
 
 // Request structures
-type GenerateDiagramRequest struct {
-	DiagramName string `json:"diagramName" example:"MyDiagram"`
-	UserPrompt  string `json:"userPrompt" example:"Create a software architecture diagram"`
-}
-
-type GenerateModelRequest struct {
-	ModelName          string `json:"modelName" example:"MyModel"`
-	ModelType          string `json:"modelType" example:"DEVS"`
-	PreviousModelsCode string `json:"previousModelsCode" example:"Existing model code"`
-	UserPrompt         string `json:"userPrompt" example:"Generate a model based on the previous code"`
-}
 
 // Retrieves the OpenAI API client.
 func getOpenAIClient() (*openai.Client, error) {
@@ -45,10 +36,22 @@ func getOpenAIClient() (*openai.Client, error) {
 		return nil, fmt.Errorf("OpenAI API key or URL is not set")
 	}
 
-	config := openai.DefaultConfig(apiKey)
-	config.BaseURL = apiURL // Set custom OpenAI API UR
+	client := openai.NewClient(
+		option.WithAPIKey(apiKey), // defaults to os.LookupEnv("OPENAI_API_KEY")
+		option.WithBaseURL(apiURL),
+	)
 
-	return openai.NewClientWithConfig(config), nil
+	return client, nil
+}
+
+func GenerateSchema[T any]() interface{} {
+	reflector := jsonschema.Reflector{
+		AllowAdditionalProperties: false,
+		DoNotReference:            true,
+	}
+	var v T
+	schema := reflector.Reflect(v)
+	return schema
 }
 
 // GenerateDiagram godoc
@@ -57,13 +60,13 @@ func getOpenAIClient() (*openai.Client, error) {
 // @Tags AI
 // @Accept json
 // @Produce json
-// @Param body body GenerateDiagramRequest true "Data required to generate a diagram"
+// @Param body body request.GenerateDiagramRequest true "Data required to generate a diagram"
 // @Success 200 {object} response.DiagramResponse "Generated diagram"
 // @Failure 400 {object} map[string]string "Invalid request"
 // @Failure 500 {object} map[string]string "AI processing error"
 // @Router /ai/generate-diagram [post]
 func generateDiagram(c *fiber.Ctx) error {
-	var request GenerateDiagramRequest
+	var request request.GenerateDiagramRequest
 
 	if err := c.BodyParser(&request); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
@@ -86,49 +89,45 @@ func generateDiagram(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	// Générer le schema JSON depuis la structure DiagramResponse
-	var diagramSchema response.DiagramResponse
-	schema, err := jsonschema.GenerateSchemaForType(diagramSchema)
-	if err != nil {
-		log.Println("Schema generation error:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Schema generation error"})
+	schemaParam := openai.ResponseFormatJSONSchemaJSONSchemaParam{
+		Name:        openai.F("Diagram"),
+		Description: openai.F("Diagram strutural plan"),
+		Schema:      openai.F(GenerateSchema[response.DiagramResponse]()),
+		Strict:      openai.Bool(true),
 	}
 
-	// Appel OpenAI avec le schema JSON strict
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: os.Getenv("AI_MODEL"),
-			Messages: []openai.ChatCompletionMessage{
-				{Role: "system", Content: prompt.DiagramPrompt},
-				{Role: "user", Content: fullPrompt},
+	Messages := []openai.ChatCompletionMessageParamUnion{
+		openai.SystemMessage(prompt.DiagramPrompt),
+	}
+	for _, message := range request.PastResponses {
+		if message.Role == "user" {
+			Messages = append(Messages, openai.UserMessage(message.Content))
+		}
+		if message.Role == "assistant" {
+			Messages = append(Messages, openai.AssistantMessage(message.Content))
+		}
+	}
+	Messages = append(Messages, openai.UserMessage(fullPrompt))
+
+	chat, _ := client.Chat.Completions.New(context.Background(), openai.ChatCompletionNewParams{
+		Messages:    openai.F(Messages),
+		MaxTokens:   openai.Int(4000),
+		TopP:        openai.Float(0.7),
+		Temperature: openai.Float(0.9),
+		ResponseFormat: openai.F[openai.ChatCompletionNewParamsResponseFormatUnion](
+			openai.ResponseFormatJSONSchemaParam{
+				Type:       openai.F(openai.ResponseFormatJSONSchemaTypeJSONSchema),
+				JSONSchema: openai.F(schemaParam),
 			},
-			ResponseFormat: &openai.ChatCompletionResponseFormat{
-				Type: openai.ChatCompletionResponseFormatTypeJSONSchema,
-				JSONSchema: &openai.ChatCompletionResponseFormatJSONSchema{
-					Name:   "diagram",
-					Schema: schema,
-					Strict: true,
-				},
-			},
-			MaxTokens:   1500,
-			Temperature: 0.7,
-		},
-	)
-	if err != nil {
-		log.Println("OpenAI API error:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "AI processing error"})
-	}
+		),
+		// only certain models can perform structured outputs
+		Model: openai.F(os.Getenv("AI_MODEL")),
+	})
 
-	// Parse la réponse directement dans la structure
-	var diagramResponse response.DiagramResponse
-	err = json.Unmarshal([]byte(resp.Choices[0].Message.Content), &diagramResponse)
-	if err != nil {
-		log.Println("Unmarshal error:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Invalid AI response format"})
-	}
+	response := response.DiagramResponse{}
+	_ = json.Unmarshal([]byte(chat.Choices[0].Message.Content), &response)
 
-	return c.JSON(diagramResponse)
+	return c.JSON(response)
 }
 
 // GenerateModel godoc
@@ -137,13 +136,13 @@ func generateDiagram(c *fiber.Ctx) error {
 // @Tags AI
 // @Accept json
 // @Produce json
-// @Param body body GenerateModelRequest true "Data required to generate a model"
+// @Param body body request.GenerateModelRequest true "Data required to generate a model"
 // @Success 200 {object} response.GeneratedModelResponse "Generated model code"
 // @Failure 400 {object} map[string]string "Invalid request"
 // @Failure 500 {object} map[string]string "AI processing error"
 // @Router /ai/generate-model [post]
 func generateModel(c *fiber.Ctx) error {
-	var request GenerateModelRequest
+	var request request.GenerateModelRequest
 
 	if err := c.BodyParser(&request); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
@@ -171,31 +170,32 @@ func generateModel(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	// Appel OpenAI avec demande de format JSON
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: os.Getenv("AI_MODEL"),
-			Messages: []openai.ChatCompletionMessage{
-				{Role: "system", Content: prompt.ModelPrompt},
-				{Role: "user", Content: fullPrompt},
+	schemaParam := openai.ResponseFormatJSONSchemaJSONSchemaParam{
+		Name:        openai.F("Model"),
+		Description: openai.F("Model code"),
+		Schema:      openai.F(GenerateSchema[response.GeneratedModelResponse]()),
+		Strict:      openai.Bool(true),
+	}
+
+	chat, _ := client.Chat.Completions.New(context.Background(), openai.ChatCompletionNewParams{
+		Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
+			openai.SystemMessage(prompt.ModelPrompt),
+			openai.UserMessage(fullPrompt),
+		}),
+		MaxTokens:   openai.Int(4000),
+		TopP:        openai.Float(0.7),
+		Temperature: openai.Float(0.9),
+		ResponseFormat: openai.F[openai.ChatCompletionNewParamsResponseFormatUnion](
+			openai.ResponseFormatJSONSchemaParam{
+				Type:       openai.F(openai.ResponseFormatJSONSchemaTypeJSONSchema),
+				JSONSchema: openai.F(schemaParam),
 			},
-			MaxTokens:   1500,
-			Temperature: 0.7,
-		},
-	)
+		),
+		Model: openai.F(os.Getenv("AI_MODEL")),
+	})
 
-	if err != nil {
-		log.Println("OpenAI error:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "AI processing error"})
-	}
+	response := response.GeneratedModelResponse{}
+	_ = json.Unmarshal([]byte(chat.Choices[0].Message.Content), &response)
 
-	// Extraire et parser directement la réponse dans la struct
-	var modelResponse response.GeneratedModelResponse
-	if err := json.Unmarshal([]byte(resp.Choices[0].Message.Content), &modelResponse); err != nil {
-		log.Println("Unmarshal error:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Invalid AI response format"})
-	}
-
-	return c.JSON(modelResponse)
+	return c.JSON(response)
 }

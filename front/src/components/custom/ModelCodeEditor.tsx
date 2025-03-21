@@ -1,8 +1,9 @@
+import { loadMonaco } from '@/lib/loadMonaco';
 import Editor from '@monaco-editor/react';
 import type { ComponentProps } from 'react'
 import { useEffect, useRef, useState } from 'react';
 import { Form, useForm } from 'react-hook-form';
-//import {useDebounceCallback} from 'usehooks-ts'
+import {useDebounceCallback} from 'usehooks-ts'
 
 type ModelCodeEditorProps = {
     code: string
@@ -20,15 +21,19 @@ export const ModelCodeEditor = ({code, onSave}: ModelCodeEditorProps) => {
             code,
         }
     })
+    const [isInitialized, setIsInitialized] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
     const [height, setHeight] = useState('100vh')
-    //const debounceOnChange = useDebounceCallback((newValue: string) => methods.setValue('code', newValue), 500)
+    const debounceOnChange = useDebounceCallback((newValue: string) => methods.setValue('code', newValue), 500)
 
     useEffect(() => {
         if (containerRef.current) {
             const {height: containerHeight} = containerRef.current.getBoundingClientRect()
             setHeight(`${containerHeight}px`)
         }
+        loadMonaco().then(() => {
+            setIsInitialized(true)
+        })
     }, [])
 
     const onValidate: ComponentProps<typeof Editor>['onValidate'] = (markers) => {
@@ -49,10 +54,14 @@ export const ModelCodeEditor = ({code, onSave}: ModelCodeEditorProps) => {
 
     const currentCode = methods.watch('code')
 
+    if (!isInitialized) {
+        return null
+    }
+
     return (
         <Form onSubmit={onSubmit} {...methods} className='grid'>
             <div ref={containerRef} className='grid'>
-            <Editor height={height} defaultLanguage="javascript" defaultValue={currentCode} onChange={(newCode) => {
+            <Editor theme="vs-dark" height={height} defaultLanguage="python" defaultValue={currentCode} onChange={(newCode) => {
                 debounceOnChange(newCode ?? '')
             }} onValidate={onValidate} />
             </div>

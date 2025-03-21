@@ -11,7 +11,7 @@ import '@xyflow/react/dist/base.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import DiagramGenerator from '@/pages/generate/diagramGenerator';
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { Login } from '@/pages/login/login';
 import { Register } from '@/pages/register/register';
 import { MinimalLayout } from "@/layouts/minimalLayout";
@@ -20,13 +20,44 @@ import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { DiagramDetailPage} from '@/pages/diagrams/detail';
 import Test from "./pages/test";
 import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
+import LibraryForm from "./pages/library/LibraryForm";
+import LibraryDelete from "./pages/library/LibraryDelete";
 
 const HomePage = () => <div>Page d'accueil</div>;
 const OnlineDEVSEditor = () => <div>Contact</div>;
 
+/*
+  ============================
+  Routes front pour EasyDEVS
+  ============================
+
+  Libraries :
+  - Liste            : /library
+  - Création         : /library/new
+  - Détail (ID)      : /library/:id
+  - Édition (ID)     : /library/:id/edit
+  - Suppression (ID) : /library/:id/delete
+
+  Models :
+  - Liste            : /model
+  - Création         : /model/new
+  - Détail (ID)      : /model/:id
+  - Édition (ID)     : /model/:id/edit
+  - Suppression (ID) : /model/:id/delete
+
+  Diagrams :
+  - Liste            : /diagram
+  - Création         : /diagram/new
+  - Détail (ID)      : /diagram/:id
+  - Édition (ID)     : /diagram/:id/edit
+  - Suppression (ID) : /diagram/:id/delete
+
+*/
+
 const Main = () => {
   
   const { isAuthenticated, isInitialized } = useAuth()
+  const { id } = useParams<{ id: string }>();
 
   if(!isInitialized) return null;
 
@@ -46,8 +77,11 @@ const Main = () => {
   ) : (
     <DefaultLayout>
       <Routes>
+        <Route path="/library/new" element={<LibraryForm />} />
+        <Route path="/library/:id/delete" element={<LibraryDelete />} />
+
         <Route path="/" element={<HomePage />} />
-        <Route path="/diagrams/:id" element={<HomePage />} />
+        
         <Route path="/online-devs" element={<OnlineDEVSEditor />} />
         <Route path="/devs-generator" element={<DiagramGenerator />} />
         <Route path="/model-code-editor" element={<DiagramDetailPage />} />

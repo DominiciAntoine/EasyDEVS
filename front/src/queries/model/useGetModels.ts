@@ -6,7 +6,7 @@ const path: keyof paths = "/model"
 
 type GetRequestType = TypesForRequest<paths, 'get', typeof path>
 
-export const useGetDiagrams = (
+export const useGetModels = (
     params: GetRequestType['Init'] = undefined,
     config: GetRequestType['SWRConfig'] = {}
 ) => useQuery(path, params, config);

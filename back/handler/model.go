@@ -12,9 +12,9 @@ import (
 func SetupModelRoutes(app *fiber.App) {
 	group := app.Group("/model", middleware.Protected())
 
-	group.Get("/", getAllModels)
+	group.Get("", getAllModels)
 	group.Get("/:id", getModel)
-	group.Post("/", createModel)
+	group.Post("", createModel)
 	group.Delete("/:id", deleteModel)
 	group.Patch("/:id", patchModel)
 }

@@ -64,17 +64,19 @@ export default function DiagramPrompt({
         try {
             const response = await client.POST("/ai/generate-diagram", {
                 body: {
-                    prompt: values.prompt,
+                    userPrompt: values.prompt,
                     diagramName: values.diagramName,
                 },
+
             });
     
             if (!response.data) {
                 throw new Error("No data received from API");
             }
             const diagramData = response.data;
+            console.log(diagramData)
             const convertedData = convertDevsToReactFlow(diagramData);
-            //onGenerate(convertedData);
+            onGenerate(convertedData);
             toast({
                 title: "Diagram generated successfully!",
             });

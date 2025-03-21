@@ -2,11 +2,13 @@ package model
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Workspace struct
 type Workspace struct {
-	ID          string    `gorm:"primaryKey;<-:false;default:uuid_generate_v4()"`
+	ID          uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	Title       string    `gorm:"not null" json:"title"`
 	Description string    `gorm:"not null" json:"description"`
 	CreatedAt   time.Time `gorm:"type:timestamp;default:now()" json:"createdAt"`

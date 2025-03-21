@@ -8,30 +8,6 @@ definitions:
     x-enum-varnames:
     - Atomic
     - Coupled
-  handler.GenerateDiagramRequest:
-    properties:
-      diagramName:
-        example: MyDiagram
-        type: string
-      userPrompt:
-        example: Create a software architecture diagram
-        type: string
-    type: object
-  handler.GenerateModelRequest:
-    properties:
-      modelName:
-        example: MyModel
-        type: string
-      modelType:
-        example: DEVS
-        type: string
-      previousModelsCode:
-        example: Existing model code
-        type: string
-      userPrompt:
-        example: Generate a model based on the previous code
-        type: string
-    type: object
   model.Diagram:
     properties:
       createdAt:
@@ -147,6 +123,23 @@ definitions:
       updatedAt:
         type: string
     type: object
+  request.GenerateDiagramRequest:
+    type: object
+  request.GenerateModelRequest:
+    properties:
+      modelName:
+        example: MyModel
+        type: string
+      modelType:
+        example: DEVS
+        type: string
+      previousModelsCode:
+        example: Existing model code
+        type: string
+      userPrompt:
+        example: Generate a model based on the previous code
+        type: string
+    type: object
   request.LoginRequest:
     properties:
       identity:
@@ -163,6 +156,16 @@ definitions:
     properties:
       password:
         type: string
+    type: object
+  request.PastMessages:
+    properties:
+      content:
+        type: string
+      role:
+        type: string
+    required:
+    - content
+    - role
     type: object
   request.RefreshRequest:
     properties:
@@ -330,7 +333,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/handler.GenerateDiagramRequest'
+          $ref: '#/definitions/request.GenerateDiagramRequest'
       produces:
       - application/json
       responses:
@@ -364,7 +367,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/handler.GenerateModelRequest'
+          $ref: '#/definitions/request.GenerateModelRequest'
       produces:
       - application/json
       responses:

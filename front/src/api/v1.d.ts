@@ -27,7 +27,7 @@ export interface paths {
             /** @description Data required to generate a diagram */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["handler.GenerateDiagramRequest"];
+                    "application/json": components["schemas"]["request.GenerateDiagramRequest"];
                 };
             };
             responses: {
@@ -93,7 +93,7 @@ export interface paths {
             /** @description Data required to generate a model */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["handler.GenerateModelRequest"];
+                    "application/json": components["schemas"]["request.GenerateModelRequest"];
                 };
             };
             responses: {
@@ -1730,22 +1730,6 @@ export interface components {
     schemas: {
         /** @enum {string} */
         "enum.ModelType": "atomic" | "coupled";
-        "handler.GenerateDiagramRequest": {
-            /** @example MyDiagram */
-            diagramName?: string;
-            /** @example Create a software architecture diagram */
-            userPrompt?: string;
-        };
-        "handler.GenerateModelRequest": {
-            /** @example MyModel */
-            modelName?: string;
-            /** @example DEVS */
-            modelType?: string;
-            /** @example Existing model code */
-            previousModelsCode?: string;
-            /** @example Generate a model based on the previous code */
-            userPrompt?: string;
-        };
         "model.Diagram": {
             createdAt?: string;
             deletedAt?: string;
@@ -1800,6 +1784,17 @@ export interface components {
             title?: string;
             updatedAt?: string;
         };
+        "request.GenerateDiagramRequest": Record<string, never>;
+        "request.GenerateModelRequest": {
+            /** @example MyModel */
+            modelName?: string;
+            /** @example DEVS */
+            modelType?: string;
+            /** @example Existing model code */
+            previousModelsCode?: string;
+            /** @example Generate a model based on the previous code */
+            userPrompt?: string;
+        };
         "request.LoginRequest": {
             identity?: string;
             password?: string;
@@ -1809,6 +1804,10 @@ export interface components {
         };
         "request.PasswordRequest": {
             password?: string;
+        };
+        "request.PastMessages": {
+            content: string;
+            role: string;
         };
         "request.RefreshRequest": {
             refreshToken?: string;

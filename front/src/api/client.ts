@@ -21,11 +21,12 @@ import { paths} from "@/api/v1";
 export const client = createClient<paths>({ baseUrl: import.meta.env.VITE_API_BASE_URL });
 const prefix = "my-api";
 
-const getAuthToken = (): string | null => localStorage.getItem("authToken");
+const getAuthToken = (): string | null => localStorage.getItem("accessToken");
 
 const myMiddleware: Middleware = {
   async onRequest({ request }) {
     const token = getAuthToken();
+    console.log(token)
     if (token) {
       request.headers.set("Authorization", `Bearer ${token}`);
     }
