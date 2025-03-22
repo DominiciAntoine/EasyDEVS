@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 
 import { NavLibrary } from "./nav-library"
-import { NavDiagrams } from "./nav-diagrams"
+import { NavWorkspace } from "./nav-workspace"
 import { NavMain } from "./nav-main"
 import { NavUser } from "./nav-user"
 
@@ -140,7 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain mains={data.mains} />
         <NavLibrary />
-        <NavDiagrams />
+        <NavWorkspace />
       </SidebarContent>
       <SidebarFooter>
         

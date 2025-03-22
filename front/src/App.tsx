@@ -11,17 +11,17 @@ import '@xyflow/react/dist/base.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import DiagramGenerator from '@/pages/generate/diagramGenerator';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from '@/pages/login/login';
 import { Register } from '@/pages/register/register';
 import { MinimalLayout } from "@/layouts/minimalLayout";
 import { DefaultLayout } from "@/layouts/defaultLayout";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
-import { DiagramDetailPage} from '@/pages/diagrams/detail';
 import Test from "./pages/test";
 import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
 import LibraryForm from "./pages/library/LibraryForm";
-import LibraryDelete from "./pages/library/LibraryDelete";
+import WorkspaceForm from "./pages/workspace/workspaceForm";
+import ModelForm from "./pages/model/modelForm";
 
 const HomePage = () => <div>Page d'accueil</div>;
 const OnlineDEVSEditor = () => <div>Contact</div>;
@@ -52,12 +52,13 @@ const OnlineDEVSEditor = () => <div>Contact</div>;
   - Édition (ID)     : /diagram/:id/edit
   - Suppression (ID) : /diagram/:id/delete
 
+  <Route path="/test2" element={<ModelCodeEditor code='' onSave={() => {}} />} />
+  <Route path="/devs-generator" element={<DiagramGenerator />} />
 */
 
 const Main = () => {
   
   const { isAuthenticated, isInitialized } = useAuth()
-  const { id } = useParams<{ id: string }>();
 
   if(!isInitialized) return null;
 
@@ -78,15 +79,16 @@ const Main = () => {
     <DefaultLayout>
       <Routes>
         <Route path="/library/new" element={<LibraryForm />} />
-        <Route path="/library/:id/delete" element={<LibraryDelete />} />
+
+        <Route path="/workspace/new" element={<WorkspaceForm />} />
+        <Route path="/library/:id/model/new" element={<ModelForm />} />
 
         <Route path="/" element={<HomePage />} />
         
         <Route path="/online-devs" element={<OnlineDEVSEditor />} />
-        <Route path="/devs-generator" element={<DiagramGenerator />} />
-        <Route path="/model-code-editor" element={<DiagramDetailPage />} />
+        
         <Route path="/test" element={<Test />} />
-        <Route path="/test2" element={<ModelCodeEditor />} />
+        
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </DefaultLayout>

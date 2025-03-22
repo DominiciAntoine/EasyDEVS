@@ -32,32 +32,29 @@ import {
 } from "../ui/context-menu";
 import { Button } from "../ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetLibraries } from "@/queries/library/useGetLibraries";
-import { useGetModels } from "@/queries/model/useGetModels";
-import { librairiesToFront } from "@/lib/Parser/librairiesToFront";
-import { LibraryDeleteDialog } from "@/modals/library/LibraryDeleteDialog";
+import { WorkspaceDeleteDialog } from "@/modals/workspace/WorkspaceDeleteDialog";
+import { useGetWorkspaces } from "@/queries/workspace/useGetWorkspaces";
+import { useGetDiagrams } from "@/queries/diagram/useGetDiagrams";
+import { workspacesToFront } from "@/lib/Parser/workspacesToFront";
 
-export function NavLibrary() 
+export function NavWorkspace() 
 {
-  //a voir avec dorian si on met ca dans ce composant ou le composant parent
-  const libraries = useGetLibraries();
-  const models = useGetModels();
+  const workspaces = useGetWorkspaces();
+  const diagrams = useGetDiagrams();
 
   const navigate = useNavigate()
 
-  const navLibraries = librairiesToFront(libraries.data ?? [], models.data ?? []);
-
-  console.log("Libraries transformed:", libraries);
+  const navWorkspaces = workspacesToFront(workspaces.data ?? [], diagrams.data ?? []);
 
   return (
     <SidebarGroup>
         <ContextMenu>
           <ContextMenuTrigger>
           <SidebarGroupLabel className="flex justify-between items-center w-full pl-2 pr-1">
-            <span>Library</span>
+            <span>Workspaces</span>
 
             <Button asChild variant={"ghost"} size={"sm"} className="h-6 w-6">
-              <Link to={"/library/new"}>
+              <Link to={"/workspace/new"}>
                 <PlusIcon />
               </Link>
             </Button>
@@ -65,14 +62,14 @@ export function NavLibrary()
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem>
-            <Link to={"/library/new"}>New library</Link>
+            <Link to={"/workspace/new"}>New workspace</Link>
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
 
 
       <SidebarMenu>
-        {navLibraries.map((item) => (
+        { navWorkspaces.map((item) => (
           <Collapsible
             key={item.title}
             asChild
@@ -91,14 +88,14 @@ export function NavLibrary()
                 </ContextMenuTrigger>
                 <ContextMenuContent>
                   <ContextMenuItem>
-                    <Link to={"/library/" + item.id + "/model/new"}>New model...</Link>
+                    <a href={"#new_model_in_lib_" + item.title}>New diagram...</a>
                   </ContextMenuItem>
                   {item.id ? (
-                    <LibraryDeleteDialog
-                    libraryId={item.id}
-                    libraryName={item.title}
+                    <WorkspaceDeleteDialog
+                    workspaceId={item.id}
+                    workspaceName={item.title}
                     onSubmitSuccess={async () => {
-                      await libraries.mutate()
+                      await workspaces.mutate()
                       navigate("/");
                     }}
                     disclosure={

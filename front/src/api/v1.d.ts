@@ -553,7 +553,7 @@ export interface paths {
             /** @description Diagram data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["model.Diagram"];
+                    "application/json": components["schemas"]["request.DiagramRequest"];
                 };
             };
             responses: {
@@ -699,7 +699,12 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody: components["requestBodies"]["Updatedata"];
+            /** @description Fields to update */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["request.DiagramRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -834,7 +839,7 @@ export interface paths {
             /** @description Library data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["model.Library"];
+                    "application/json": components["schemas"]["request.LibraryRequest"];
                 };
             };
             responses: {
@@ -951,6 +956,17 @@ export interface paths {
                         };
                     };
                 };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -980,7 +996,12 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody: components["requestBodies"]["Updatedata"];
+            /** @description Fields to update */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["request.LibraryRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -1074,7 +1095,7 @@ export interface paths {
             /** @description Model data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["model.Model"];
+                    "application/json": components["schemas"]["request.ModelRequest"];
                 };
             };
             responses: {
@@ -1220,7 +1241,12 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody: components["requestBodies"]["Updatedata"];
+            /** @description Fields to update */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["request.ModelRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -1547,7 +1573,7 @@ export interface paths {
             /** @description Workspace object */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["model.Workspace"];
+                    "application/json": components["schemas"]["request.WorkspaceRequest"];
                 };
             };
             responses: {
@@ -1685,7 +1711,7 @@ export interface paths {
             /** @description Partial workspace update */
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["request.WorkspaceRequest"];
                 };
             };
             responses: {
@@ -1735,6 +1761,7 @@ export interface components {
             deletedAt?: string;
             description?: string;
             id?: string;
+            model?: components["schemas"]["model.Model"];
             modelId?: string;
             name: string;
             updatedAt?: string;
@@ -1746,8 +1773,10 @@ export interface components {
             deletedAt?: string;
             description?: string;
             id?: string;
+            models?: components["schemas"]["model.Model"][];
             title?: string;
             updatedAt?: string;
+            userId?: string;
         };
         "model.Model": {
             code?: string;
@@ -1755,6 +1784,7 @@ export interface components {
             connectionsJson?: string;
             createdAt?: string;
             deletedAt?: string;
+            description?: string;
             id?: string;
             libId?: string;
             metadataJson?: string;
@@ -1771,18 +1801,27 @@ export interface components {
             email: string;
             fullname?: string;
             id?: string;
+            libraries?: components["schemas"]["model.Library"][];
+            models?: components["schemas"]["model.Model"][];
             password: string;
             refresh_token?: string;
             updatedAt?: string;
             username: string;
+            workspaces?: components["schemas"]["model.Workspace"][];
         };
         "model.Workspace": {
             createdAt?: string;
             deletedAt?: string;
             description?: string;
+            diagrams?: components["schemas"]["model.Diagram"][];
             id?: string;
             title?: string;
             updatedAt?: string;
+            userId?: string;
+        };
+        "request.DiagramRequest": {
+            description?: string;
+            name?: string;
         };
         "request.GenerateDiagramRequest": Record<string, never>;
         "request.GenerateModelRequest": {
@@ -1795,12 +1834,28 @@ export interface components {
             /** @example Generate a model based on the previous code */
             userPrompt?: string;
         };
+        "request.LibraryRequest": {
+            description?: string;
+            title?: string;
+        };
         "request.LoginRequest": {
             identity?: string;
             password?: string;
         };
         "request.LogoutRequest": {
             refreshToken?: string;
+        };
+        "request.ModelRequest": {
+            code?: string;
+            componentsJson?: string;
+            connectionsJson?: string;
+            description?: string;
+            libId?: string;
+            metadataJson?: string;
+            name?: string;
+            portInJson?: string;
+            portOutJson?: string;
+            type?: components["schemas"]["enum.ModelType"];
         };
         "request.PasswordRequest": {
             password?: string;
@@ -1819,6 +1874,10 @@ export interface components {
         };
         "request.UpdateUserRequest": {
             names?: string;
+        };
+        "request.WorkspaceRequest": {
+            description?: string;
+            title?: string;
         };
         "response.Connection": {
             /** @description obligatoire */
@@ -1878,16 +1937,7 @@ export interface components {
     };
     responses: never;
     parameters: never;
-    requestBodies: {
-        /** @description Fields to update */
-        Updatedata: {
-            content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
-            };
-        };
-    };
+    requestBodies: never;
     headers: never;
     pathItems: never;
 }

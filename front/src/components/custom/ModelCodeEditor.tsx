@@ -1,9 +1,9 @@
-import { loadMonaco } from '@/lib/loadMonaco';
-import Editor from '@monaco-editor/react';
 import type { ComponentProps } from 'react'
 import { useEffect, useRef, useState } from 'react';
 import { Form, useForm } from 'react-hook-form';
 import {useDebounceCallback} from 'usehooks-ts'
+import Editor from "@codingame/monaco-editor-react";
+import {initialize} from '@codingame/monaco-editor-wrapper'
 
 type ModelCodeEditorProps = {
     code: string
@@ -15,13 +15,13 @@ type ModelCodeEditorFormValues = {
 }
 
 export const ModelCodeEditor = ({code, onSave}: ModelCodeEditorProps) => {
+    const [isReady, setIsReady] = useState(false);
     const methods = useForm<ModelCodeEditorFormValues>({
         mode: 'onChange',
         defaultValues: {
             code,
         }
     })
-    const [isInitialized, setIsInitialized] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
     const [height, setHeight] = useState('100vh')
     const debounceOnChange = useDebounceCallback((newValue: string) => methods.setValue('code', newValue), 500)
@@ -31,16 +31,7 @@ export const ModelCodeEditor = ({code, onSave}: ModelCodeEditorProps) => {
             const {height: containerHeight} = containerRef.current.getBoundingClientRect()
             setHeight(`${containerHeight}px`)
         }
-        loadMonaco().then(() => {
-            setIsInitialized(true)
-        })
     }, [])
-
-    const onValidate: ComponentProps<typeof Editor>['onValidate'] = (markers) => {
-        if(markers.some(({severity}) => severity === 8)) {
-            methods.setError('code', {message: 'Invalid code'})
-        }
-    }
 
     const onSubmit: ComponentProps<typeof Form<ModelCodeEditorFormValues>>['onSubmit'] = async ({data, event}) => {
         try {
@@ -51,20 +42,20 @@ export const ModelCodeEditor = ({code, onSave}: ModelCodeEditorProps) => {
         }
     }
 
+    useEffect(() => {
+        initialize().then(() => setIsReady(true));
+      }, []);
+
 
     const currentCode = methods.watch('code')
 
-    if (!isInitialized) {
-        return null
-    }
-
-    return (
+    return isReady ?(
         <Form onSubmit={onSubmit} {...methods} className='grid'>
             <div ref={containerRef} className='grid'>
-            <Editor theme="vs-dark" height={height} defaultLanguage="python" defaultValue={currentCode} onChange={(newCode) => {
+            <Editor options={{theme: 'vscode-dark'}} height="auto" programmingLanguage="python" value={currentCode} onChange={(newCode) => {
                 debounceOnChange(newCode ?? '')
-            }} onValidate={onValidate} />
+            }} />
             </div>
         </Form>
-    )
+    ) : null
 }

@@ -7,21 +7,21 @@ import { useForm } from "react-hook-form";
 
 import { useToast } from "@/hooks/use-toast";
 import { client } from '@/api/client.ts';
-import { useGetLibraries } from '@/queries/library/useGetLibraries.ts';
 import { Form } from '@/components/form/Form';
 import { TextareaField } from '@/components/form/TextareaField';
 import { InputField } from '@/components/form/InputField';
 import { Submit } from '@/components/form/Submit';
 import { FormSubmitError } from '@/components/form/FormSubmitError';
+import { useGetWorkspaces } from "@/queries/workspace/useGetWorkspaces";
 
 const formSchema = z.object({
     title: z.string().min(3, {
-        message: "The title must be at least 3 characters long.",
+        message: "The name must be at least 3 characters long.",
     }),
     description: z.string().optional(),
 });
 
-export default function LibraryForm({
+export default function WorkspaceForm({
     onSubmitSuccess
 }: {
     onSubmitSuccess?: () => void;
@@ -36,10 +36,10 @@ export default function LibraryForm({
         },
     });
 
-    const {mutate} = useGetLibraries();
+    const {mutate} = useGetWorkspaces();
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-        const response = await client.POST("/library", {
+        const response = await client.POST("/workspace", {
         body: {
             title: values.title,
             description: values.description
@@ -51,17 +51,17 @@ export default function LibraryForm({
         }
 
         toast({
-        title: "Library created successfully!",
+        title: "Diagrams created successfully!",
         });
 
         await mutate();
 
         onSubmitSuccess?.();
-        //todo : navigate to the library detail page
+        //todo : navigate to the diagram page
         form.reset();
     } catch (error) {
         toast({
-        title: "Error creating library",
+        title: "Error creating diagram",
         description: (error as Error).message,
         variant: "destructive",
         });
@@ -71,15 +71,15 @@ export default function LibraryForm({
     return (
         <div className='h-full w-full flex flex-col justify-center items-center'>
             <div className='text-3xl text-foreground pb-20 font-bold'>
-                Create a new Library
+                Create a new workspace
             </div>
 
             <Form methods={form} onSubmit={onSubmit} className="w-4/5 space-y-8">
-                    <InputField placeholder="My library name"  label="Title" control={form.control} name='title' />
-                    <TextareaField placeholder="A short description of this library." label="Description" control={form.control} name='description' />
+                    <InputField placeholder="My workspace title"  label="Title" control={form.control} name='title' />
+                    <TextareaField placeholder="A short description of this workspace." label="Description" control={form.control} name='description' />
                     <FormSubmitError />
                     <Submit>
-                        Create Library
+                        Create workspace
                     </Submit>
             </Form>
         </div>

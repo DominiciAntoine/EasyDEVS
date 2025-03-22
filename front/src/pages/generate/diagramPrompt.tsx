@@ -17,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button.tsx"
 import { useToast } from "@/hooks/use-toast"
 import {useAuth} from "@/providers/AuthProvider";
-import { generateDiagram } from "@/api/old/diagramApi.ts"
 import { DiagramDataType } from '@/types';
 
 import {client} from "@/api/client";
