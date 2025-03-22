@@ -4,8 +4,10 @@ import (
 	"app/database"
 	"app/middleware"
 	"app/model"
+	"app/request"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 // SetupDiagramRoutes configures diagram-related routes
@@ -30,7 +32,7 @@ func SetupDiagramRoutes(app *fiber.App) {
 func getAllDiagrams(c *fiber.Ctx) error {
 	db := database.DB
 	var Diagrams []model.Diagram
-	db.Find(&Diagrams)
+	db.Find(&Diagrams, "user_id = ?", c.Locals("user_id").(string))
 	return c.JSON(Diagrams)
 }
 
@@ -47,7 +49,7 @@ func getDiagram(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
 	var diagram model.Diagram
-	db.Find(&diagram, id)
+	db.Find(&diagram, "user_id = ? AND id = ?", c.Locals("user_id").(string), id)
 	if diagram.Name == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No diagram found with ID", "data": nil})
 	}
@@ -60,19 +62,65 @@ func getDiagram(c *fiber.Ctx) error {
 // @Tags diagrams
 // @Accept json
 // @Produce json
-// @Param diagram body model.Diagram true "Diagram data"
+// @Param diagram body request.DiagramRequest true "Diagram data"
 // @Success 201 {object} model.Diagram
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /diagram [post]
 func createDiagram(c *fiber.Ctx) error {
 	db := database.DB
-	diagram := new(model.Diagram)
-	if err := c.BodyParser(diagram); err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create diagram", "data": err})
+	req := new(request.DiagramRequest)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Invalid request body", "data": err.Error()})
 	}
-	db.Create(&diagram)
-	return c.JSON(diagram)
+
+	userID, ok := c.Locals("user_id").(string)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"status": "error", "message": "Unauthorized"})
+	}
+
+	// On démarre la transaction
+	err := db.Transaction(func(tx *gorm.DB) error {
+		diagram := model.Diagram{
+			Name:        req.Name,
+			Description: req.Description,
+			UserID:      userID,
+			// Si besoin, tu peux ajouter WorkspaceID ou ModelID ici
+		}
+
+		if err := tx.Create(&diagram).Error; err != nil {
+			return err
+		}
+
+		model := model.Model{
+			LibID:          nil,
+			Name:           req.Name,
+			Description:    req.Description,
+			Type:           "coupled",
+			Code:           "",
+			MetadataJSON:   "{}",
+			ComponentsJSON: "[]",
+			PortInJSON:     "[]",
+			PortOutJSON:    "[]",
+			UserID:         userID,
+		}
+
+		if err := tx.Create(&model).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&diagram).Update("model_id", model.ID).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to create diagram and model", "data": err.Error()})
+	}
+
+	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Diagram and model created successfully"})
 }
 
 // patchDiagram updates an existing diagram by ID
@@ -82,7 +130,7 @@ func createDiagram(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "Diagram ID"
-// @Param updateData body map[string]interface{} true "Fields to update"
+// @Param updateData body request.DiagramRequest true "Fields to update"
 // @Success 200 {object} model.Diagram
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
@@ -92,16 +140,16 @@ func patchDiagram(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	var diagram model.Diagram
-	if err := db.First(&diagram, "id = ?", id).Error; err != nil {
+	if err := db.First(&diagram, "user_id = ? AND id = ?", c.Locals("user_id").(string), id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Diagram not found"})
 	}
 
-	updateData := make(map[string]interface{})
-	if err := c.BodyParser(&updateData); err != nil {
+	req := new(request.DiagramRequest)
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Invalid input", "data": err.Error()})
 	}
 
-	db.Model(&diagram).Updates(updateData)
+	db.Model(&diagram).Updates(req)
 
 	return c.JSON(diagram)
 }
@@ -119,7 +167,7 @@ func deleteDiagram(c *fiber.Ctx) error {
 	db := database.DB
 
 	var diagram model.Diagram
-	db.First(&diagram, id)
+	db.First(&diagram, "user_id = ? AND id = ?", c.Locals("user_id").(string), id)
 	if diagram.Name == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No diagram found with ID", "data": nil})
 	}

@@ -4,6 +4,7 @@ import (
 	"app/database"
 	"app/middleware"
 	"app/model"
+	"app/request"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -30,7 +31,7 @@ func SetupModelRoutes(app *fiber.App) {
 func getAllModels(c *fiber.Ctx) error {
 	db := database.DB
 	var Models []model.Model
-	db.Find(&Models)
+	db.Find(&Models, "user_id = ?", c.Locals("user_id").(string))
 	return c.JSON(Models)
 }
 
@@ -47,7 +48,7 @@ func getModel(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
 	var model model.Model
-	db.Find(&model, id)
+	db.Find(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), id)
 	if model.Name == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
 	}
@@ -60,17 +61,31 @@ func getModel(c *fiber.Ctx) error {
 // @Tags models
 // @Accept json
 // @Produce json
-// @Param model body model.Model true "Model data"
+// @Param model body request.ModelRequest true "Model data"
 // @Success 201 {object} model.Model
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /model [post]
 func createModel(c *fiber.Ctx) error {
 	db := database.DB
-	model := new(model.Model)
-	if err := c.BodyParser(model); err != nil {
+	req := new(request.ModelRequest)
+	if err := c.BodyParser(req); err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create model", "data": err})
 	}
+
+	model := model.Model{
+		LibID:          req.LibID,
+		Name:           req.Name,
+		Description:    req.Description,
+		Type:           req.Type,
+		Code:           req.Code,
+		MetadataJSON:   req.MetadataJSON,
+		ComponentsJSON: req.ComponentsJSON,
+		PortInJSON:     req.PortInJSON,
+		PortOutJSON:    req.PortOutJSON,
+		UserID:         c.Locals("user_id").(string),
+	}
+
 	db.Create(&model)
 	return c.JSON(model)
 }
@@ -88,7 +103,7 @@ func deleteModel(c *fiber.Ctx) error {
 	db := database.DB
 
 	var model model.Model
-	db.First(&model, id)
+	db.First(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), id)
 	if model.Name == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
 	}
@@ -103,7 +118,7 @@ func deleteModel(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "Model ID"
-// @Param updateData body map[string]interface{} true "Fields to update"
+// @Param updateData body request.ModelRequest true "Fields to update"
 // @Success 200 {object} model.Model
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
@@ -113,16 +128,16 @@ func patchModel(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	var model model.Model
-	if err := db.First(&model, "id = ?", id).Error; err != nil {
+	if err := db.First(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Model not found"})
 	}
 
-	updateData := make(map[string]interface{})
-	if err := c.BodyParser(&updateData); err != nil {
+	req := new(request.ModelRequest)
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Invalid input", "data": err.Error()})
 	}
 
-	db.Model(&model).Updates(updateData)
+	db.Model(&model).Updates(req)
 
 	return c.JSON(model)
 }

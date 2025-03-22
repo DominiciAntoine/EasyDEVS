@@ -4,18 +4,16 @@ import (
 	"time"
 
 	"app/enum"
-
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type Model struct {
-	ID     uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	UserID uuid.UUID  `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"userId"`
-	LibID  *uuid.UUID `gorm:"type:uuid;constraint:OnDelete:CASCADE;" json:"libId"`
+	ID     string  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey;<-:false" json:"id"`
+	UserID string  `gorm:"type:uuid" json:"userId"`
+	LibID  *string `gorm:"type:uuid" json:"libId"`
 
 	Name            string         `gorm:"type:varchar(255);not null" json:"name"`
 	Type            enum.ModelType `gorm:"type:model_type;not null" json:"type"`
+	Description     string         `gorm:"type:text;not null" json:"description"`
 	Code            string         `gorm:"type:text;not null" json:"code"`
 	MetadataJSON    string         `gorm:"type:jsonb;default:'{}'" json:"metadataJson"`
 	ComponentsJSON  string         `gorm:"type:jsonb;default:'[]'" json:"componentsJson"`
@@ -25,11 +23,4 @@ type Model struct {
 	CreatedAt       time.Time      `gorm:"type:timestamp;default:now()" json:"createdAt"`
 	UpdatedAt       time.Time      `gorm:"type:timestamp;default:now()" json:"updatedAt"`
 	DeletedAt       time.Time      `gorm:"index" json:"deletedAt"`
-}
-
-func (m *Model) BeforeCreate(tx *gorm.DB) (err error) {
-	if m.ID == uuid.Nil {
-		m.ID = uuid.New()
-	}
-	return
 }

@@ -418,7 +418,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Diagram"
+                            "$ref": "#/definitions/request.DiagramRequest"
                         }
                     }
                 ],
@@ -539,8 +539,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/request.DiagramRequest"
                         }
                     }
                 ],
@@ -640,7 +639,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Library"
+                            "$ref": "#/definitions/request.LibraryRequest"
                         }
                     }
                 ],
@@ -726,6 +725,13 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -761,8 +767,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/request.LibraryRequest"
                         }
                     }
                 ],
@@ -838,7 +843,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Model"
+                            "$ref": "#/definitions/request.ModelRequest"
                         }
                     }
                 ],
@@ -959,8 +964,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/request.ModelRequest"
                         }
                     }
                 ],
@@ -1217,7 +1221,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Workspace"
+                            "$ref": "#/definitions/request.WorkspaceRequest"
                         }
                     }
                 ],
@@ -1331,7 +1335,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/request.WorkspaceRequest"
                         }
                     }
                 ],
@@ -1390,6 +1394,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "model": {
+                    "$ref": "#/definitions/model.Model"
+                },
                 "modelId": {
                     "type": "string"
                 },
@@ -1424,10 +1431,19 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "models": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Model"
+                    }
+                },
                 "title": {
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                },
+                "userId": {
                     "type": "string"
                 }
             }
@@ -1448,6 +1464,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deletedAt": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "id": {
@@ -1502,6 +1521,18 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "libraries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Library"
+                    }
+                },
+                "models": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Model"
+                    }
+                },
                 "password": {
                     "type": "string",
                     "maxLength": 50,
@@ -1517,6 +1548,12 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
+                },
+                "workspaces": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Workspace"
+                    }
                 }
             }
         },
@@ -1532,6 +1569,12 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "diagrams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Diagram"
+                    }
+                },
                 "id": {
                     "type": "string"
                 },
@@ -1539,6 +1582,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.DiagramRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -1567,6 +1624,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.LibraryRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "request.LoginRequest": {
             "type": "object",
             "properties": {
@@ -1583,6 +1651,41 @@ const docTemplate = `{
             "properties": {
                 "refreshToken": {
                     "type": "string"
+                }
+            }
+        },
+        "request.ModelRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "componentsJson": {
+                    "type": "string"
+                },
+                "connectionsJson": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "libId": {
+                    "type": "string"
+                },
+                "metadataJson": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "portInJson": {
+                    "type": "string"
+                },
+                "portOutJson": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/enum.ModelType"
                 }
             }
         },
@@ -1644,6 +1747,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "names": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.WorkspaceRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }

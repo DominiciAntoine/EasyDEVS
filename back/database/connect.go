@@ -9,6 +9,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // ConnectDB initializes the database connection
@@ -39,11 +40,18 @@ func ConnectDB() {
 	)
 
 	// Connect to the database
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		panic("ERROR: Failed to connect to the database")
 	}
 
-	// AutoMigrate models
-	DB.AutoMigrate(&model.Library{}, &model.Diagram{}, &model.User{}, &model.Workspace{}, &model.Model{})
+	currentLogger := DB.Config.Logger
+
+	DB.Session(&gorm.Session{
+		Logger: logger.Default.LogMode(logger.Warn),
+	}).AutoMigrate(&model.User{}, &model.Library{}, &model.Diagram{}, &model.Workspace{}, &model.Model{})
+
+	DB.Config.Logger = currentLogger
 }

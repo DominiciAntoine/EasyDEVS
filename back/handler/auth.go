@@ -76,12 +76,12 @@ func register(c *fiber.Ctx) error {
 	}
 
 	// Generate the tokens
-	accessToken, err := generateToken(user.ID.String(), jwtSecret, time.Minute*15)
+	accessToken, err := generateToken(user.ID, jwtSecret, time.Minute*15)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to generate access token"})
 	}
 
-	refreshToken, err := generateToken(user.ID.String(), refreshSecret, time.Hour*24*7)
+	refreshToken, err := generateToken(user.ID, refreshSecret, time.Hour*24*7)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to generate refresh token"})
 	}
@@ -191,12 +191,12 @@ func login(c *fiber.Ctx) error {
 	}
 
 	// Generate tokens
-	accessToken, err := generateToken(userModel.ID.String(), jwtSecret, time.Minute*15)
+	accessToken, err := generateToken(userModel.ID, jwtSecret, time.Minute*15)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to generate access token"})
 	}
 
-	refreshToken, err := generateToken(userModel.ID.String(), refreshSecret, time.Hour*24*7)
+	refreshToken, err := generateToken(userModel.ID, refreshSecret, time.Hour*24*7)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to generate refresh token"})
 	}
@@ -249,7 +249,7 @@ func refreshToken(c *fiber.Ctx) error {
 	}
 
 	// Generate a new access token
-	newAccessToken, err := generateToken(user.ID.String(), jwtSecret, time.Minute*15)
+	newAccessToken, err := generateToken(user.ID, jwtSecret, time.Minute*15)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to generate new access token"})
 	}
@@ -302,9 +302,7 @@ func logout(c *fiber.Ctx) error {
 func getCurrentUser(c *fiber.Ctx) error {
 	db := database.DB
 
-	jwt_user := c.Locals("user").(*jwt.Token)
-	claims := jwt_user.Claims.(jwt.MapClaims)
-	user_id := claims["user_id"].(string)
+	user_id := c.Locals("user_id").(string)
 
 	// Récupérer l'utilisateur en base de données
 	var user model.User

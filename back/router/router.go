@@ -27,6 +27,9 @@ func SetupRoutes(app *fiber.App) {
 	// Model
 	handler.SetupModelRoutes(app)
 
+	// Workspace
+	handler.SetupWorkspaceRoutes(app)
+
 	// AI
 	handler.SetupAiRoutes(app)
 }

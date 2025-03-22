@@ -18,6 +18,8 @@ definitions:
         type: string
       id:
         type: string
+      model:
+        $ref: '#/definitions/model.Model'
       modelId:
         type: string
       name:
@@ -43,9 +45,15 @@ definitions:
         type: string
       id:
         type: string
+      models:
+        items:
+          $ref: '#/definitions/model.Model'
+        type: array
       title:
         type: string
       updatedAt:
+        type: string
+      userId:
         type: string
     type: object
   model.Model:
@@ -59,6 +67,8 @@ definitions:
       createdAt:
         type: string
       deletedAt:
+        type: string
+      description:
         type: string
       id:
         type: string
@@ -91,6 +101,14 @@ definitions:
         type: string
       id:
         type: string
+      libraries:
+        items:
+          $ref: '#/definitions/model.Library'
+        type: array
+      models:
+        items:
+          $ref: '#/definitions/model.Model'
+        type: array
       password:
         maxLength: 50
         minLength: 6
@@ -103,6 +121,10 @@ definitions:
         maxLength: 50
         minLength: 3
         type: string
+      workspaces:
+        items:
+          $ref: '#/definitions/model.Workspace'
+        type: array
     required:
     - email
     - password
@@ -116,11 +138,24 @@ definitions:
         type: string
       description:
         type: string
+      diagrams:
+        items:
+          $ref: '#/definitions/model.Diagram'
+        type: array
       id:
         type: string
       title:
         type: string
       updatedAt:
+        type: string
+      userId:
+        type: string
+    type: object
+  request.DiagramRequest:
+    properties:
+      description:
+        type: string
+      name:
         type: string
     type: object
   request.GenerateDiagramRequest:
@@ -140,6 +175,13 @@ definitions:
         example: Generate a model based on the previous code
         type: string
     type: object
+  request.LibraryRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
   request.LoginRequest:
     properties:
       identity:
@@ -151,6 +193,29 @@ definitions:
     properties:
       refreshToken:
         type: string
+    type: object
+  request.ModelRequest:
+    properties:
+      code:
+        type: string
+      componentsJson:
+        type: string
+      connectionsJson:
+        type: string
+      description:
+        type: string
+      libId:
+        type: string
+      metadataJson:
+        type: string
+      name:
+        type: string
+      portInJson:
+        type: string
+      portOutJson:
+        type: string
+      type:
+        $ref: '#/definitions/enum.ModelType'
     type: object
   request.PasswordRequest:
     properties:
@@ -192,6 +257,13 @@ definitions:
   request.UpdateUserRequest:
     properties:
       names:
+        type: string
+    type: object
+  request.WorkspaceRequest:
+    properties:
+      description:
+        type: string
+      title:
         type: string
     type: object
   response.Connection:
@@ -591,7 +663,7 @@ paths:
         name: diagram
         required: true
         schema:
-          $ref: '#/definitions/model.Diagram'
+          $ref: '#/definitions/request.DiagramRequest'
       produces:
       - application/json
       responses:
@@ -673,8 +745,7 @@ paths:
         name: updateData
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/request.DiagramRequest'
       produces:
       - application/json
       responses:
@@ -741,7 +812,7 @@ paths:
         name: library
         required: true
         schema:
-          $ref: '#/definitions/model.Library'
+          $ref: '#/definitions/request.LibraryRequest'
       produces:
       - application/json
       responses:
@@ -774,6 +845,11 @@ paths:
       responses:
         "204":
           description: No Content
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
           schema:
             additionalProperties: true
             type: object
@@ -823,8 +899,7 @@ paths:
         name: updateData
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/request.LibraryRequest'
       produces:
       - application/json
       responses:
@@ -875,7 +950,7 @@ paths:
         name: model
         required: true
         schema:
-          $ref: '#/definitions/model.Model'
+          $ref: '#/definitions/request.ModelRequest'
       produces:
       - application/json
       responses:
@@ -957,8 +1032,7 @@ paths:
         name: updateData
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/request.ModelRequest'
       produces:
       - application/json
       responses:
@@ -1132,7 +1206,7 @@ paths:
         name: workspace
         required: true
         schema:
-          $ref: '#/definitions/model.Workspace'
+          $ref: '#/definitions/request.WorkspaceRequest'
       produces:
       - application/json
       responses:
@@ -1209,7 +1283,7 @@ paths:
         name: workspace
         required: true
         schema:
-          type: object
+          $ref: '#/definitions/request.WorkspaceRequest'
       produces:
       - application/json
       responses:
