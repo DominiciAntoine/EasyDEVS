@@ -1822,6 +1822,7 @@ export interface components {
         "request.DiagramRequest": {
             description?: string;
             name?: string;
+            workspaceId?: string;
         };
         "request.GenerateDiagramRequest": Record<string, never>;
         "request.GenerateModelRequest": {

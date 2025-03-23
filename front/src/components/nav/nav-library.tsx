@@ -36,6 +36,7 @@ import { useGetLibraries } from "@/queries/library/useGetLibraries";
 import { useGetModels } from "@/queries/model/useGetModels";
 import { librairiesToFront } from "@/lib/Parser/librairiesToFront";
 import { LibraryDeleteDialog } from "@/modals/library/LibraryDeleteDialog";
+import { ModelDeleteDialog } from "@/modals/model/ModelDeleteDialog";
 
 export function NavLibrary() 
 {
@@ -47,7 +48,6 @@ export function NavLibrary()
 
   const navLibraries = librairiesToFront(libraries.data ?? [], models.data ?? []);
 
-  console.log("Libraries transformed:", libraries);
 
   return (
     <SidebarGroup>
@@ -131,11 +131,23 @@ export function NavLibrary()
                       </ContextMenuTrigger>
                       <ContextMenuContent>
                         <ContextMenuItem>
-                          <a href={"#edit_model_" + subItem.title}>Edit</a>
+                        <Link to={"/library/" + item.id + "/model/" + subItem.id}>Edit</Link>
                         </ContextMenuItem>
-                        <ContextMenuItem>
-                          <a href={"#delete_model_" + subItem.title}>Delete model</a>
-                        </ContextMenuItem>
+                        {subItem.id ? (
+                    <ModelDeleteDialog
+                    modelId={subItem.id}
+                    modelName={subItem.title}
+                    onSubmitSuccess={async () => {
+                      await models.mutate()
+                      navigate("/");
+                    }}
+                    disclosure={
+                      <ContextMenuItem onSelect={e => e.preventDefault()}>
+                          Delete
+                      </ContextMenuItem>
+                      }
+                    />
+                  ) : null}
                         
                       </ContextMenuContent>
               </ContextMenu>

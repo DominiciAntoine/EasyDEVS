@@ -19,9 +19,15 @@ import { DefaultLayout } from "@/layouts/defaultLayout";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import Test from "./pages/test";
 import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
-import LibraryForm from "./pages/library/LibraryForm";
-import WorkspaceForm from "./pages/workspace/workspaceForm";
-import ModelForm from "./pages/model/modelForm";
+import LibraryForm from "./components/library/libraryForm";
+import WorkspaceForm from "./components/workspace/workspaceForm";
+import ModelForm from "./components/model/model/modelForm";
+import DiagramForm from "./components/diagram/diagramForm";
+import { CreateDiagram } from "./pages/diagram/CreateDiagram";
+import { CreateLibrary } from "./pages/library/CreateLibrary";
+import { CreateWorkspace } from "./pages/workspace/CreateWorkspace";
+import { CreateModel } from "./pages/model/CreateModel";
+import { EditModel } from "./pages/model/EditModel";
 
 const HomePage = () => <div>Page d'accueil</div>;
 const OnlineDEVSEditor = () => <div>Contact</div>;
@@ -78,10 +84,14 @@ const Main = () => {
   ) : (
     <DefaultLayout>
       <Routes>
-        <Route path="/library/new" element={<LibraryForm />} />
+        <Route path="/library/new" element={<CreateLibrary />} />
+        <Route path="/library/:id/model/new" element={<CreateModel />} />
+        <Route path="/library/:libraryId/model/:modelId" element={<EditModel />} />
 
-        <Route path="/workspace/new" element={<WorkspaceForm />} />
-        <Route path="/library/:id/model/new" element={<ModelForm />} />
+        <Route path="/workspace/new" element={<CreateWorkspace />} />
+        <Route path="/workspace/:id/diagram/new" element={<CreateDiagram />} />
+
+        
 
         <Route path="/" element={<HomePage />} />
         

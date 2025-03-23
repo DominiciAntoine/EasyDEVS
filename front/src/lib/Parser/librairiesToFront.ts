@@ -10,6 +10,7 @@ type Library = {
     items?: {
       icon?: LucideIcon;
       title: string;
+      id?: string;
       url: string;
     }[];
   }[];
@@ -29,6 +30,7 @@ export function librairiesToFront(
       .map((model) => ({
         icon: model.type === "atomic" ? Square : LayoutDashboard,
         title: model.name ?? "Modèle sans titre",
+        id: model.id,
         url: `/model/${model.id}`,
       })),
   }));

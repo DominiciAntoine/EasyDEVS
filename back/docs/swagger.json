@@ -1427,6 +1427,9 @@
 				},
 				"name": {
 					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
 				}
 			}
 		},

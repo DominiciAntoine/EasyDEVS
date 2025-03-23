@@ -10,6 +10,7 @@ type Workspace = {
     items?: {
       icon?: LucideIcon;
       title: string;
+      id?: string;
       url: string;
     }[];
   }[];
@@ -25,10 +26,11 @@ export function workspacesToFront(
     id: workspace.id,
     isActive: false,
     items: diagramsData
-      .filter((diagram) => diagram.id === workspace.id)
+      .filter((diagram) => diagram.workspaceId === workspace.id)
       .map((diagram) => ({
         icon:  LayoutDashboard,
         title: diagram.name ?? "Untitled diagram",
+        id: diagram.id,
         url: `/diagram/${diagram.id}`,
       })),
   }));

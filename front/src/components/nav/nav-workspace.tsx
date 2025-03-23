@@ -36,6 +36,7 @@ import { WorkspaceDeleteDialog } from "@/modals/workspace/WorkspaceDeleteDialog"
 import { useGetWorkspaces } from "@/queries/workspace/useGetWorkspaces";
 import { useGetDiagrams } from "@/queries/diagram/useGetDiagrams";
 import { workspacesToFront } from "@/lib/Parser/workspacesToFront";
+import { DiagramDeleteDialog } from "@/modals/diagram/DiagramDeleteDialog";
 
 export function NavWorkspace() 
 {
@@ -45,6 +46,7 @@ export function NavWorkspace()
   const navigate = useNavigate()
 
   const navWorkspaces = workspacesToFront(workspaces.data ?? [], diagrams.data ?? []);
+
 
   return (
     <SidebarGroup>
@@ -88,7 +90,7 @@ export function NavWorkspace()
                 </ContextMenuTrigger>
                 <ContextMenuContent>
                   <ContextMenuItem>
-                    <a href={"#new_model_in_lib_" + item.title}>New diagram...</a>
+                    <Link to={"/workspace/" + item.id + "/diagram/new"}>New diagram...</Link>
                   </ContextMenuItem>
                   {item.id ? (
                     <WorkspaceDeleteDialog
@@ -130,9 +132,21 @@ export function NavWorkspace()
                         <ContextMenuItem>
                           <a href={"#edit_model_" + subItem.title}>Edit</a>
                         </ContextMenuItem>
-                        <ContextMenuItem>
-                          <a href={"#delete_model_" + subItem.title}>Delete model</a>
-                        </ContextMenuItem>
+                        {subItem.id ? (
+                    <DiagramDeleteDialog
+                    diagramId={subItem.id}
+                    diagramName={subItem.title}
+                    onSubmitSuccess={async () => {
+                      await diagrams.mutate()
+                      navigate("/");
+                    }}
+                    disclosure={
+                      <ContextMenuItem onSelect={e => e.preventDefault()}>
+                          Delete
+                      </ContextMenuItem>
+                      }
+                    />
+                  ) : null}
                         
                       </ContextMenuContent>
               </ContextMenu>

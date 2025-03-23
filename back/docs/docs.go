@@ -1597,6 +1597,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "workspaceId": {
+                    "type": "string"
                 }
             }
         },

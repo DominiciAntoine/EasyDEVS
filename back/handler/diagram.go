@@ -74,25 +74,12 @@ func createDiagram(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Invalid request body", "data": err.Error()})
 	}
 
-	userID, ok := c.Locals("user_id").(string)
-	if !ok {
-		return c.Status(401).JSON(fiber.Map{"status": "error", "message": "Unauthorized"})
-	}
+	userID := c.Locals("user_id").(string)
 
-	// On démarre la transaction
+	var diagram model.Diagram
+
 	err := db.Transaction(func(tx *gorm.DB) error {
-		diagram := model.Diagram{
-			Name:        req.Name,
-			Description: req.Description,
-			UserID:      userID,
-			// Si besoin, tu peux ajouter WorkspaceID ou ModelID ici
-		}
-
-		if err := tx.Create(&diagram).Error; err != nil {
-			return err
-		}
-
-		model := model.Model{
+		devsModel := model.Model{
 			LibID:          nil,
 			Name:           req.Name,
 			Description:    req.Description,
@@ -105,11 +92,19 @@ func createDiagram(c *fiber.Ctx) error {
 			UserID:         userID,
 		}
 
-		if err := tx.Create(&model).Error; err != nil {
+		if err := tx.Create(&devsModel).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Model(&diagram).Update("model_id", model.ID).Error; err != nil {
+		diagram = model.Diagram{
+			Name:        req.Name,
+			Description: req.Description,
+			UserID:      userID,
+			ModelID:     devsModel.ID,
+			WorkspaceID: req.WorkspaceID,
+		}
+
+		if err := tx.Create(&diagram).Error; err != nil {
 			return err
 		}
 
@@ -120,7 +115,7 @@ func createDiagram(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to create diagram and model", "data": err.Error()})
 	}
 
-	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Diagram and model created successfully"})
+	return c.Status(201).JSON(diagram)
 }
 
 // patchDiagram updates an existing diagram by ID

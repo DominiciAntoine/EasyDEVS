@@ -1,0 +1,23 @@
+import LibraryForm from "@/components/library/libraryForm";
+import NavHeader from "@/components/nav/nav-header";
+
+
+
+export function CreateLibrary(
+
+){
+  return(
+<div className="flex flex-col h-screen w-full">
+<NavHeader
+      breadcrumbs={[
+        { label: "Libraries", href: "/library" },
+        { label: "New Library" },
+      ]}
+      showNavActions={false}
+      showModeToggle={true}
+    >
+        </NavHeader>
+    <LibraryForm />
+    </div>
+  )
+}

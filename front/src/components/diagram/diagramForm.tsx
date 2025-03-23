@@ -14,7 +14,6 @@ import { Submit } from '@/components/form/Submit';
 import { FormSubmitError } from '@/components/form/FormSubmitError';
 import { useGetDiagrams } from "@/queries/diagram/useGetDiagrams";
 import { useParams } from "react-router-dom";
-import { useGetModels } from "@/queries/model/useGetModels";
 
 const formSchema = z.object({
     name: z.string().min(3, {
@@ -41,73 +40,39 @@ export default function DiagramForm({
         },
     });
 
-    const {mutate: mutateDiagrams} = useGetDiagrams();
-    const {mutate: mutateModels} = useGetModels();
+    const {mutate} = useGetDiagrams();
 
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-
-        const modelResponse = await client.POST("/model", {
-            body: {
-                name: values.name,
-                description: values.description,
-                code: "",
-                type: "coupled",
-                componentsJson: "[]",
-                connectionsJson: "[]",
-
-                
-            },
-            });
-
-            if (!modelResponse.data) {
-
-                throw new Error("No data received from API during diagram creation");
-            }
-        
-            await mutateModels();
-
-
-
-        const diagramResponse = await client.POST("/diagram", {
-            body: {
-                name: values.name,
-                description: values.description,
-            },
-            });
-
-        if (!diagramResponse.data) {
-            
-            throw new Error("No data received from API during diagram creation");
-        }
-
-        const diagramID = diagramResponse.data.id;
-
-     
-
-        
-
-        
-
-        
-
-        toast({
-        title: "Diagrams created successfully!",
-        });
-
-        
-
-        onSubmitSuccess?.();
-        //todo : navigate to the diagram page
-        form.reset();
-    } catch (error) {
-        toast({
-        title: "Error creating diagram",
-        description: (error as Error).message,
-        variant: "destructive",
-        });
-    }
-    };
+     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+     try {
+         const response = await client.POST("/diagram", {
+         body: {
+             name: values.name,
+             description: values.description,
+             workspaceId: params.id,
+         },
+         });
+ 
+         if (!response.data) {
+         throw new Error("No data received from API");
+         }
+ 
+         toast({
+         title: "Library created successfully!",
+         });
+ 
+         await mutate();
+ 
+         onSubmitSuccess?.();
+         //todo : navigate to the library detail page
+         form.reset();
+     } catch (error) {
+         toast({
+         title: "Error creating diagram",
+         description: (error as Error).message,
+         variant: "destructive",
+         });
+     }
+     };
 
     return (
         <div className='h-full w-full flex flex-col justify-center items-center'>
