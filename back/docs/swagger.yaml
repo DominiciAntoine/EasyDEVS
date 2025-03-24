@@ -61,9 +61,13 @@ definitions:
       code:
         type: string
       componentsJson:
-        type: string
+        items:
+          $ref: '#/definitions/response.DatabaseModelMetadata'
+        type: array
       connectionsJson:
-        type: string
+        items:
+          $ref: '#/definitions/response.DatabaseConnection'
+        type: array
       createdAt:
         type: string
       deletedAt:
@@ -75,13 +79,17 @@ definitions:
       libId:
         type: string
       metadataJson:
-        type: string
+        $ref: '#/definitions/response.DatabaseModelMetadata'
       name:
         type: string
       portInJson:
-        type: string
+        items:
+          $ref: '#/definitions/response.DatabaseModelLink'
+        type: array
       portOutJson:
-        type: string
+        items:
+          $ref: '#/definitions/response.DatabaseModelLink'
+        type: array
       type:
         $ref: '#/definitions/enum.ModelType'
       updatedAt:
@@ -282,6 +290,51 @@ definitions:
     - from
     - to
     type: object
+  response.DatabaseConnection:
+    properties:
+      from:
+        $ref: '#/definitions/response.DatabaseModelLink'
+      to:
+        $ref: '#/definitions/response.DatabaseModelLink'
+    type: object
+  response.DatabaseModelLink:
+    properties:
+      model:
+        type: string
+      port:
+        type: string
+    type: object
+  response.DatabaseModelMetadata:
+    properties:
+      alwaysShowExtraInfo:
+        type: boolean
+      alwaysShowToolbar:
+        type: boolean
+      backgroundColor:
+        type: string
+      position:
+        $ref: '#/definitions/response.DatabaseModelPosition'
+      style:
+        $ref: '#/definitions/response.DatabaseModelStyle'
+      toolbarPosition:
+        $ref: '#/definitions/response.ToolbarPosition'
+      toolbarVisible:
+        type: boolean
+    type: object
+  response.DatabaseModelPosition:
+    properties:
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  response.DatabaseModelStyle:
+    properties:
+      height:
+        type: integer
+      width:
+        type: integer
+    type: object
   response.DiagramResponse:
     properties:
       connections:
@@ -381,6 +434,18 @@ definitions:
       user:
         $ref: '#/definitions/response.UserResponse'
     type: object
+  response.ToolbarPosition:
+    enum:
+    - top
+    - left
+    - right
+    - bottom
+    type: string
+    x-enum-varnames:
+    - ToolbarPositionTop
+    - ToolbarPositionLeft
+    - ToolbarPositionRight
+    - ToolbarPositionBottom
   response.UserResponse:
     properties:
       email:

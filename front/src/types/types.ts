@@ -62,12 +62,14 @@ export type OutputPort = {
 	id: string;
 };
 
-export type Style = {
-	width: number;
-	height: number;
+
+
+export type Connection = {
+    
+	inputPorts: InputPort[];
+	outputPorts: OutputPort[];
 };
 
-export type Position = {
-	x: number;
-	y: number;
-};
+
+
+

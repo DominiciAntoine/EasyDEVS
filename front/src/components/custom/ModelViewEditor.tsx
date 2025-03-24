@@ -10,7 +10,7 @@ import { ZoomSlider } from "../zoom-slider";
   import BiDirectionalEdge from "../../components/custom/reactFlow/BiDirectionalEdge.tsx";
 import { getLayoutedElements } from "@/lib/getLayoutedElements.ts";
 import ModelNode from "./reactFlow/ModelNode.tsx";
-import { DiagramDataType, NodeData } from "@/types/newTypes.ts";
+import { ReactFlowInput, ReactFlowModelData } from "@/types/modelType.ts";
 
 
 
@@ -30,11 +30,11 @@ const defaultEdgeOptions = {
   };
 
 
-export function ModelViewEditor({ models }: { models: DiagramDataType }) {
-  const [ReactFlowData, setReactFlowData] = useState<DiagramDataType | undefined>(models);
+export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
+  const [ReactFlowData, setReactFlowData] = useState<ReactFlowInput | undefined>(models);
   const { fitView } = useReactFlow();
   
-  const onNodesChange = useCallback((changes: NodeChange<Node<NodeData>>[]) => {
+  const onNodesChange = useCallback((changes: NodeChange<Node<ReactFlowModelData>>[]) => {
     setReactFlowData((prev) =>
       prev
         ? {
@@ -43,6 +43,7 @@ export function ModelViewEditor({ models }: { models: DiagramDataType }) {
         }
         : undefined
     );
+    console.log("we need to save")
   }, []);
 
   const onEdgesChange = useCallback((changes: EdgeChange<Edge>[]) => {

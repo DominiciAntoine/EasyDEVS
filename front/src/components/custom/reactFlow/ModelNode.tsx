@@ -1,40 +1,37 @@
-import { memo } from "react";
-import { Handle, Position, NodeResizer, Node } from "@xyflow/react";
+import { memo} from "react";
+import { Handle, Position, NodeResizer} from "@xyflow/react";
 import ModelHeader from "./ModelHeader";
 import ModelExtraInfo from "./ModelExtraInfo";
+import { ReactFlowModelData } from "@/types/modelType";
 
 
 
-type ModelNodeData = Node['data'] & {
-    toolbarVisible: boolean;
-    toolbarPosition: Position;
-    label:string;
 
-  };
 
   type ModelNodeProps = {
-    data: ModelNodeData;
+    data: ReactFlowModelData;
     selected: boolean;
   };
   
 
 function ModelNode({ data, selected }: ModelNodeProps) {
-  const visible = selected ? true : false;
+
   return (
     <>
       <NodeResizer
-        isVisible={visible}
+        isVisible={selected}
         minWidth={100}
         minHeight={30}
         handleClassName="h-2 w-2 z-50 before:content-[''] before:absolute before:inset-[-10px] before:bg-transparent"
       />
 
-      <ModelExtraInfo data={data}/>
+
+      { (data.alwaysShowExtraInfo === true || data.alwaysShowExtraInfo === undefined  ) && <ModelExtraInfo data={data}/>} 
 
       {/* Conteneur principal avec une bordure */}
       <div className="h-full w-full border-border border rounded-lg border-solid ">
         {/* En-tête avec le label */}
-        <ModelHeader selected={selected} label={data.label}/>
+        <ModelHeader selected={selected} data={data} />
 
         {/* Conteneur principal pour les ports */}
         <div className="flex relative h-4/5 bg-card">

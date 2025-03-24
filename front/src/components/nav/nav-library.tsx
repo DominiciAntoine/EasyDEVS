@@ -122,10 +122,11 @@ export function NavLibrary()
                       <ContextMenuTrigger>
                       <SidebarMenuSubItem className="relative z-10">
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
-                            {subItem.icon && <subItem.icon />}
-                            <span>{subItem.title}</span>
-                          </a>
+
+                        <Link to={"/library/" + item.id + "/model/" + subItem.id}>
+                          {subItem.icon && <subItem.icon />}
+                          <span>{subItem.title}</span>
+                        </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                       </ContextMenuTrigger>

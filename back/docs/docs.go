@@ -1455,10 +1455,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "componentsJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DatabaseModelMetadata"
+                    }
                 },
                 "connectionsJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DatabaseConnection"
+                    }
                 },
                 "createdAt": {
                     "type": "string"
@@ -1476,16 +1482,22 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "metadataJson": {
-                    "type": "string"
+                    "$ref": "#/definitions/response.DatabaseModelMetadata"
                 },
                 "name": {
                     "type": "string"
                 },
                 "portInJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DatabaseModelLink"
+                    }
                 },
                 "portOutJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DatabaseModelLink"
+                    }
                 },
                 "type": {
                     "$ref": "#/definitions/enum.ModelType"
@@ -1790,6 +1802,76 @@ const docTemplate = `{
                 }
             }
         },
+        "response.DatabaseConnection": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "$ref": "#/definitions/response.DatabaseModelLink"
+                },
+                "to": {
+                    "$ref": "#/definitions/response.DatabaseModelLink"
+                }
+            }
+        },
+        "response.DatabaseModelLink": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.DatabaseModelMetadata": {
+            "type": "object",
+            "properties": {
+                "alwaysShowExtraInfo": {
+                    "type": "boolean"
+                },
+                "alwaysShowToolbar": {
+                    "type": "boolean"
+                },
+                "backgroundColor": {
+                    "type": "string"
+                },
+                "position": {
+                    "$ref": "#/definitions/response.DatabaseModelPosition"
+                },
+                "style": {
+                    "$ref": "#/definitions/response.DatabaseModelStyle"
+                },
+                "toolbarPosition": {
+                    "$ref": "#/definitions/response.ToolbarPosition"
+                },
+                "toolbarVisible": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "response.DatabaseModelPosition": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.DatabaseModelStyle": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.DiagramResponse": {
             "type": "object",
             "required": [
@@ -1940,6 +2022,21 @@ const docTemplate = `{
                     "$ref": "#/definitions/response.UserResponse"
                 }
             }
+        },
+        "response.ToolbarPosition": {
+            "type": "string",
+            "enum": [
+                "top",
+                "left",
+                "right",
+                "bottom"
+            ],
+            "x-enum-varnames": [
+                "ToolbarPositionTop",
+                "ToolbarPositionLeft",
+                "ToolbarPositionRight",
+                "ToolbarPositionBottom"
+            ]
         },
         "response.UserResponse": {
             "type": "object",

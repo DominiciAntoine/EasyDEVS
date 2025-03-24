@@ -1,69 +1,69 @@
 import { components } from "@/api/v1";
-import { Edge, Node } from "@xyflow/react";
-
-
-export type DiagramDataType =
-{
-    nodes: Node<NodeData>[]
-    edges: Edge[]
-}
-
-
-export type NodeData = {
-  modelType: "atomic" | "coupled"
-  label: string
-  inputPorts?: { id: string }[]
-  outputPorts?: { id: string }[]
-  isSelected?: boolean
-}
-
-
-export type Port = { id: string }[]
+import { DatabaseModelMetadata, ReactFlowInput, ReactFlowPort } from "@/types/modelType";
+import { Edge, Position } from "@xyflow/react";
 
 
 
+export function modelToReactflow(models: components["schemas"]["model.Model"][]): ReactFlowInput {
 
+  function safeJsonParse<T>(value: unknown, fallback: T): T {
+    if (typeof value === "string") {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return fallback;
+      }
+    } else if (Array.isArray(value)) {
+      return value as T;
+    }
+    else if (typeof value === "object" && value !== null) {
+      return value as T;
+    }
+    return fallback;
+  }
 
-export function modelToReactflow( models: components["schemas"]["model.Model"][] ): DiagramDataType {
   return { 
     nodes: models.map((model) => {
-      const inputPorts = JSON.parse(model.portInJson?? "[]") as Port;
-      const outputPorts = JSON.parse(model.portOutJson?? "[]") as Port;
+      const inputPorts = safeJsonParse<ReactFlowPort[]>(model.portInJson, []);
+      const outputPorts = safeJsonParse<ReactFlowPort[]>(model.portOutJson, []);
+      const metadata = safeJsonParse<DatabaseModelMetadata>(model.metadataJson, {});
+      
       return {
-        id: model.id??"Unamed model",
-        type:  "resizer",
+        id: model.id ?? "Unnamed model",
+        type: "resizer",
         style: {
-          height: 200,
-          width: 200,
+          height: metadata.style?.height ?? 200,
+          width: metadata.style?.width ?? 200,
+          backgroundColor: metadata.backgroundColor ?? undefined,
         },
         data: { 
-          modelType: model.type?? "atomic",
-          label: model.name?? "Unamed model",
-          inputPorts: inputPorts,
-          outputPorts: outputPorts,
+          id: model.id ?? "Unnamed model",
+          modelType: model.type ?? "atomic",
+          label: model.name ?? "Unnamed model",
+          inputPorts,
+          outputPorts,
+          toolbarVisible: metadata.toolbarVisible ?? false,
+          toolbarPosition: metadata.toolbarPosition ?? Position.Top, 
+          alwaysShowToolbar: metadata.alwaysShowToolbar,
+          alwaysShowExtraInfo: metadata.alwaysShowExtraInfo,
         },
-        position: {
-          x: 0,
-          y: 0,
-        },
-      }
+        position: metadata.position ?? { x: 0, y: 0 },
+      };
     }),
-    edges: models.map((model) => {
-      const connections = JSON.parse(model.connectionsJson?? "[]"); ;
-      return connections.map((connection : Edge ) => {
-        return {
-          id: connection.id??"Unamed connection",
-          source: connection.source?? "Unamed source",
-          target: connection.target?? "Unamed target",
-          sourceHandle: connection.sourceHandle?? "Unamed source handle",
-          targetHandle: connection.targetHandle?? "Unamed target handle",
-          type: "step",
-          animated: true,
-          style: { zIndex: 1000 },
-        }
-      })
+    edges: models.flatMap((model) => {
+      const connections = safeJsonParse<Edge[]>(model.connectionsJson, []);
+      return connections.map((connection: Edge) => ({
+        id: connection.id ?? "Unnamed connection",
+        source: connection.source ?? "Unnamed source",
+        target: connection.target ?? "Unnamed target",
+        sourceHandle: connection.sourceHandle ?? "Unnamed source handle",
+        targetHandle: connection.targetHandle ?? "Unnamed target handle",
+        type: "step",
+        animated: true,
+        style: { zIndex: 1000 },
+      }));
     }),
-}
+  };
 }
 
 

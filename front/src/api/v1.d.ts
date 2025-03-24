@@ -1780,17 +1780,17 @@ export interface components {
         };
         "model.Model": {
             code?: string;
-            componentsJson?: string;
-            connectionsJson?: string;
+            componentsJson?: components["schemas"]["response.DatabaseModelMetadata"][];
+            connectionsJson?: components["schemas"]["response.DatabaseConnection"][];
             createdAt?: string;
             deletedAt?: string;
             description?: string;
             id?: string;
             libId?: string;
-            metadataJson?: string;
+            metadataJson?: components["schemas"]["response.DatabaseModelMetadata"];
             name?: string;
-            portInJson?: string;
-            portOutJson?: string;
+            portInJson?: components["schemas"]["response.DatabaseModelLink"][];
+            portOutJson?: components["schemas"]["response.DatabaseModelLink"][];
             type?: components["schemas"]["enum.ModelType"];
             updatedAt?: string;
             userId?: string;
@@ -1886,6 +1886,31 @@ export interface components {
             /** @description obligatoire */
             to: components["schemas"]["response.Endpoint"];
         };
+        "response.DatabaseConnection": {
+            from?: components["schemas"]["response.DatabaseModelLink"];
+            to?: components["schemas"]["response.DatabaseModelLink"];
+        };
+        "response.DatabaseModelLink": {
+            model?: string;
+            port?: string;
+        };
+        "response.DatabaseModelMetadata": {
+            alwaysShowExtraInfo?: boolean;
+            alwaysShowToolbar?: boolean;
+            backgroundColor?: string;
+            position?: components["schemas"]["response.DatabaseModelPosition"];
+            style?: components["schemas"]["response.DatabaseModelStyle"];
+            toolbarPosition?: components["schemas"]["response.ToolbarPosition"];
+            toolbarVisible?: boolean;
+        };
+        "response.DatabaseModelPosition": {
+            x?: number;
+            y?: number;
+        };
+        "response.DatabaseModelStyle": {
+            height?: number;
+            width?: number;
+        };
         "response.DiagramResponse": {
             /** @description obligatoire */
             connections: components["schemas"]["response.Connection"][];
@@ -1931,6 +1956,8 @@ export interface components {
             refreshToken?: string;
             user?: components["schemas"]["response.UserResponse"];
         };
+        /** @enum {string} */
+        "response.ToolbarPosition": "top" | "left" | "right" | "bottom";
         "response.UserResponse": {
             email?: string;
             username?: string;
