@@ -1,6 +1,4 @@
-export const examplePythonCode: string = 
-
-`from DomainInterface.DomainBehavior import DomainBehavior
+export const examplePythonCode: string = `from DomainInterface.DomainBehavior import DomainBehavior
 from DomainInterface.Object import Message
 
 class ModelName(DomainBehavior):
@@ -31,7 +29,4 @@ class ModelName(DomainBehavior):
         pass  # Customize as needed
 
     def timeAdvance(self):
-        return self.getSigma()`
-
-;
-
+        return self.getSigma()`;

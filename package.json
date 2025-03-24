@@ -1,8 +1,9 @@
 {
 	"scripts": {
-		"format": "biome format --write .",
-		"lint": "biome lint --write .",
-		"check": "biome check --write .",
+		"format:front": "biome format --write .",
+		"format:back": "cd back && go fmt",
+		"lint": "biome lint --write ./front",
+		"check": "biome check --write ./front",
 		"generateSDK": "cd back && swag init && swagger2openapi -o ./docs/openapi.json ./docs/swagger.json && npx openapi-typescript ./docs/openapi.json -o ../front/src/api/v1.d.ts",
 		"start:front": "cd front && npm run dev",
 		"start:back": "cd back && docker compose up --watch",
@@ -13,5 +14,5 @@
 		"@biomejs/biome": "1.9.4",
 		"lefthook": "^1.10.10"
 	},
-	"packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af"
+	"packageManager": "pnpm@10.6.5"
 }

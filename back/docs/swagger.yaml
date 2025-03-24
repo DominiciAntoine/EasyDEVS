@@ -8,6 +8,92 @@ definitions:
     x-enum-varnames:
     - Atomic
     - Coupled
+  json.Connection:
+    properties:
+      from:
+        $ref: '#/definitions/json.ModelLink'
+      to:
+        $ref: '#/definitions/json.ModelLink'
+    required:
+    - from
+    - to
+    type: object
+  json.ModelComponents:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  json.ModelLink:
+    properties:
+      model:
+        type: string
+      port:
+        type: string
+    required:
+    - model
+    - port
+    type: object
+  json.ModelMetadata:
+    properties:
+      alwaysShowExtraInfo:
+        type: boolean
+      alwaysShowToolbar:
+        type: boolean
+      backgroundColor:
+        type: string
+      position:
+        $ref: '#/definitions/json.ModelPosition'
+      style:
+        $ref: '#/definitions/json.ModelStyle'
+      toolbarPosition:
+        $ref: '#/definitions/json.ToolbarPosition'
+      toolbarVisible:
+        type: boolean
+    required:
+    - position
+    - style
+    type: object
+  json.ModelPort:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  json.ModelPosition:
+    properties:
+      x:
+        type: integer
+      "y":
+        type: integer
+    required:
+    - x
+    - "y"
+    type: object
+  json.ModelStyle:
+    properties:
+      height:
+        type: integer
+      width:
+        type: integer
+    required:
+    - height
+    - width
+    type: object
+  json.ToolbarPosition:
+    enum:
+    - top
+    - left
+    - right
+    - bottom
+    type: string
+    x-enum-varnames:
+    - ToolbarPositionTop
+    - ToolbarPositionLeft
+    - ToolbarPositionRight
+    - ToolbarPositionBottom
   model.Diagram:
     properties:
       createdAt:
@@ -62,11 +148,11 @@ definitions:
         type: string
       componentsJson:
         items:
-          $ref: '#/definitions/response.DatabaseModelMetadata'
+          $ref: '#/definitions/json.ModelComponents'
         type: array
       connectionsJson:
         items:
-          $ref: '#/definitions/response.DatabaseConnection'
+          $ref: '#/definitions/json.Connection'
         type: array
       createdAt:
         type: string
@@ -79,16 +165,16 @@ definitions:
       libId:
         type: string
       metadataJson:
-        $ref: '#/definitions/response.DatabaseModelMetadata'
+        $ref: '#/definitions/json.ModelMetadata'
       name:
         type: string
       portInJson:
         items:
-          $ref: '#/definitions/response.DatabaseModelLink'
+          $ref: '#/definitions/json.ModelPort'
         type: array
       portOutJson:
         items:
-          $ref: '#/definitions/response.DatabaseModelLink'
+          $ref: '#/definitions/json.ModelPort'
         type: array
       type:
         $ref: '#/definitions/enum.ModelType'
@@ -167,6 +253,10 @@ definitions:
         type: string
       workspaceId:
         type: string
+    required:
+    - description
+    - name
+    - workspaceId
     type: object
   request.GenerateDiagramRequest:
     type: object
@@ -184,6 +274,11 @@ definitions:
       userPrompt:
         example: Generate a model based on the previous code
         type: string
+    required:
+    - modelName
+    - modelType
+    - previousModelsCode
+    - userPrompt
     type: object
   request.LibraryRequest:
     properties:
@@ -191,6 +286,9 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - description
+    - title
     type: object
   request.LoginRequest:
     properties:
@@ -198,39 +296,64 @@ definitions:
         type: string
       password:
         type: string
+    required:
+    - identity
+    - password
     type: object
   request.LogoutRequest:
     properties:
       refreshToken:
         type: string
+    required:
+    - refreshToken
     type: object
   request.ModelRequest:
     properties:
       code:
         type: string
       componentsJson:
-        type: string
+        items:
+          $ref: '#/definitions/json.ModelComponents'
+        type: array
       connectionsJson:
-        type: string
+        items:
+          $ref: '#/definitions/json.Connection'
+        type: array
       description:
         type: string
       libId:
         type: string
       metadataJson:
-        type: string
+        $ref: '#/definitions/json.ModelMetadata'
       name:
         type: string
       portInJson:
-        type: string
+        items:
+          $ref: '#/definitions/json.ModelPort'
+        type: array
       portOutJson:
-        type: string
+        items:
+          $ref: '#/definitions/json.ModelPort'
+        type: array
       type:
         $ref: '#/definitions/enum.ModelType'
+    required:
+    - code
+    - componentsJson
+    - connectionsJson
+    - description
+    - metadataJson
+    - name
+    - portInJson
+    - portOutJson
+    - type
     type: object
   request.PasswordRequest:
     properties:
       password:
         type: string
+    required:
+    - password
     type: object
   request.PastMessages:
     properties:
@@ -246,6 +369,8 @@ definitions:
     properties:
       refreshToken:
         type: string
+    required:
+    - refreshToken
     type: object
   request.RegisterRequest:
     properties:
@@ -268,6 +393,8 @@ definitions:
     properties:
       names:
         type: string
+    required:
+    - names
     type: object
   request.WorkspaceRequest:
     properties:
@@ -275,6 +402,9 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - description
+    - title
     type: object
   response.Connection:
     properties:
@@ -289,51 +419,6 @@ definitions:
     required:
     - from
     - to
-    type: object
-  response.DatabaseConnection:
-    properties:
-      from:
-        $ref: '#/definitions/response.DatabaseModelLink'
-      to:
-        $ref: '#/definitions/response.DatabaseModelLink'
-    type: object
-  response.DatabaseModelLink:
-    properties:
-      model:
-        type: string
-      port:
-        type: string
-    type: object
-  response.DatabaseModelMetadata:
-    properties:
-      alwaysShowExtraInfo:
-        type: boolean
-      alwaysShowToolbar:
-        type: boolean
-      backgroundColor:
-        type: string
-      position:
-        $ref: '#/definitions/response.DatabaseModelPosition'
-      style:
-        $ref: '#/definitions/response.DatabaseModelStyle'
-      toolbarPosition:
-        $ref: '#/definitions/response.ToolbarPosition'
-      toolbarVisible:
-        type: boolean
-    type: object
-  response.DatabaseModelPosition:
-    properties:
-      x:
-        type: integer
-      "y":
-        type: integer
-    type: object
-  response.DatabaseModelStyle:
-    properties:
-      height:
-        type: integer
-      width:
-        type: integer
     type: object
   response.DiagramResponse:
     properties:
@@ -367,6 +452,8 @@ definitions:
     properties:
       code:
         type: string
+    required:
+    - code
     type: object
   response.LoginResponse:
     properties:
@@ -378,6 +465,11 @@ definitions:
         type: string
       username:
         type: string
+    required:
+    - accessToken
+    - email
+    - refreshToken
+    - username
     type: object
   response.Model:
     properties:
@@ -399,6 +491,51 @@ definitions:
         description: enum obligatoire
     required:
     - id
+    - type
+    type: object
+  response.ModelResponse:
+    properties:
+      code:
+        type: string
+      componentsJson:
+        items:
+          $ref: '#/definitions/json.ModelComponents'
+        type: array
+      connectionsJson:
+        items:
+          $ref: '#/definitions/json.Connection'
+        type: array
+      description:
+        type: string
+      id:
+        type: string
+      libId:
+        type: string
+      metadataJson:
+        $ref: '#/definitions/json.ModelMetadata'
+      name:
+        type: string
+      portInJson:
+        items:
+          $ref: '#/definitions/json.ModelPort'
+        type: array
+      portOutJson:
+        items:
+          $ref: '#/definitions/json.ModelPort'
+        type: array
+      type:
+        $ref: '#/definitions/enum.ModelType'
+      userId:
+        type: string
+    required:
+    - code
+    - componentsJson
+    - connectionsJson
+    - description
+    - metadataJson
+    - name
+    - portInJson
+    - portOutJson
     - type
     type: object
   response.ModelType:
@@ -424,6 +561,8 @@ definitions:
     properties:
       accessToken:
         type: string
+    required:
+    - accessToken
     type: object
   response.RegisterResponse:
     properties:
@@ -433,25 +572,20 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/response.UserResponse'
+    required:
+    - accessToken
+    - refreshToken
+    - user
     type: object
-  response.ToolbarPosition:
-    enum:
-    - top
-    - left
-    - right
-    - bottom
-    type: string
-    x-enum-varnames:
-    - ToolbarPositionTop
-    - ToolbarPositionLeft
-    - ToolbarPositionRight
-    - ToolbarPositionBottom
   response.UserResponse:
     properties:
       email:
         type: string
       username:
         type: string
+    required:
+    - email
+    - username
     type: object
 host: localhost:3000
 info:
@@ -1024,7 +1158,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.Model'
+            $ref: '#/definitions/response.ModelResponse'
         "400":
           description: Bad Request
           schema:
@@ -1075,7 +1209,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Model'
+            $ref: '#/definitions/response.ModelResponse'
         "404":
           description: Not Found
           schema:
@@ -1106,7 +1240,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Model'
+            $ref: '#/definitions/response.ModelResponse'
         "400":
           description: Bad Request
           schema:

@@ -5,6 +5,7 @@ import (
 	"app/middleware"
 	"app/model"
 	"app/request"
+	"app/response"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -30,9 +31,15 @@ func SetupModelRoutes(app *fiber.App) {
 // @Router /model [get]
 func getAllModels(c *fiber.Ctx) error {
 	db := database.DB
-	var Models []model.Model
-	db.Find(&Models, "user_id = ?", c.Locals("user_id").(string))
-	return c.JSON(Models)
+	var models []model.Model
+	db.Find(&models, "user_id = ?", c.Locals("user_id").(string))
+
+	res := []response.ModelResponse{}
+
+	for _, model := range models {
+		res = append(res, response.CreateModelResponse(model))
+	}
+	return c.JSON(res)
 }
 
 // getModel retrieves a single model by ID
@@ -41,7 +48,7 @@ func getAllModels(c *fiber.Ctx) error {
 // @Tags models
 // @Produce json
 // @Param id path string true "Model ID"
-// @Success 200 {object} model.Model
+// @Success 200 {object} response.ModelResponse
 // @Failure 404 {object} map[string]interface{}
 // @Router /model/{id} [get]
 func getModel(c *fiber.Ctx) error {
@@ -52,7 +59,10 @@ func getModel(c *fiber.Ctx) error {
 	if model.Name == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
 	}
-	return c.JSON(model)
+
+	res := response.CreateModelResponse(model)
+
+	return c.JSON(res)
 }
 
 // createModel creates a new model
@@ -62,7 +72,7 @@ func getModel(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param model body request.ModelRequest true "Model data"
-// @Success 201 {object} model.Model
+// @Success 201 {object} response.ModelResponse
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /model [post]
@@ -74,20 +84,24 @@ func createModel(c *fiber.Ctx) error {
 	}
 
 	model := model.Model{
-		LibID:          req.LibID,
-		Name:           req.Name,
-		Description:    req.Description,
-		Type:           req.Type,
-		Code:           req.Code,
-		MetadataJSON:   req.MetadataJSON,
-		ComponentsJSON: req.ComponentsJSON,
-		PortInJSON:     req.PortInJSON,
-		PortOutJSON:    req.PortOutJSON,
-		UserID:         c.Locals("user_id").(string),
+		LibID:           req.LibID,
+		Name:            req.Name,
+		Description:     req.Description,
+		Type:            req.Type,
+		Code:            req.Code,
+		MetadataJSON:    req.MetadataJSON,
+		ComponentsJSON:  req.ComponentsJSON,
+		ConnectionsJSON: req.ConnectionsJSON,
+		PortInJSON:      req.PortInJSON,
+		PortOutJSON:     req.PortOutJSON,
+		UserID:          c.Locals("user_id").(string),
 	}
 
 	db.Create(&model)
-	return c.JSON(model)
+
+	res := response.CreateModelResponse(model)
+
+	return c.JSON(res)
 }
 
 // deleteModel deletes a model by its ID
@@ -119,7 +133,7 @@ func deleteModel(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path string true "Model ID"
 // @Param updateData body request.ModelRequest true "Fields to update"
-// @Success 200 {object} model.Model
+// @Success 200 {object} response.ModelResponse
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Router /model/{id} [patch]
@@ -139,5 +153,7 @@ func patchModel(c *fiber.Ctx) error {
 
 	db.Model(&model).Updates(req)
 
-	return c.JSON(model)
+	res := response.CreateModelResponse(model)
+
+	return c.JSON(res)
 }

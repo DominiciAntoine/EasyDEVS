@@ -851,7 +851,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.Model"
+                            "$ref": "#/definitions/response.ModelResponse"
                         }
                     },
                     "400": {
@@ -894,7 +894,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Model"
+                            "$ref": "#/definitions/response.ModelResponse"
                         }
                     },
                     "404": {
@@ -972,7 +972,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Model"
+                            "$ref": "#/definitions/response.ModelResponse"
                         }
                     },
                     "400": {
@@ -1376,6 +1376,133 @@ const docTemplate = `{
                 "Coupled"
             ]
         },
+        "json.Connection": {
+            "type": "object",
+            "required": [
+                "from",
+                "to"
+            ],
+            "properties": {
+                "from": {
+                    "$ref": "#/definitions/json.ModelLink"
+                },
+                "to": {
+                    "$ref": "#/definitions/json.ModelLink"
+                }
+            }
+        },
+        "json.ModelComponents": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "json.ModelLink": {
+            "type": "object",
+            "required": [
+                "model",
+                "port"
+            ],
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                }
+            }
+        },
+        "json.ModelMetadata": {
+            "type": "object",
+            "required": [
+                "position",
+                "style"
+            ],
+            "properties": {
+                "alwaysShowExtraInfo": {
+                    "type": "boolean"
+                },
+                "alwaysShowToolbar": {
+                    "type": "boolean"
+                },
+                "backgroundColor": {
+                    "type": "string"
+                },
+                "position": {
+                    "$ref": "#/definitions/json.ModelPosition"
+                },
+                "style": {
+                    "$ref": "#/definitions/json.ModelStyle"
+                },
+                "toolbarPosition": {
+                    "$ref": "#/definitions/json.ToolbarPosition"
+                },
+                "toolbarVisible": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "json.ModelPort": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "json.ModelPosition": {
+            "type": "object",
+            "required": [
+                "x",
+                "y"
+            ],
+            "properties": {
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
+                }
+            }
+        },
+        "json.ModelStyle": {
+            "type": "object",
+            "required": [
+                "height",
+                "width"
+            ],
+            "properties": {
+                "height": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
+                }
+            }
+        },
+        "json.ToolbarPosition": {
+            "type": "string",
+            "enum": [
+                "top",
+                "left",
+                "right",
+                "bottom"
+            ],
+            "x-enum-varnames": [
+                "ToolbarPositionTop",
+                "ToolbarPositionLeft",
+                "ToolbarPositionRight",
+                "ToolbarPositionBottom"
+            ]
+        },
         "model.Diagram": {
             "type": "object",
             "required": [
@@ -1457,13 +1584,13 @@ const docTemplate = `{
                 "componentsJson": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.DatabaseModelMetadata"
+                        "$ref": "#/definitions/json.ModelComponents"
                     }
                 },
                 "connectionsJson": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.DatabaseConnection"
+                        "$ref": "#/definitions/json.Connection"
                     }
                 },
                 "createdAt": {
@@ -1482,7 +1609,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "metadataJson": {
-                    "$ref": "#/definitions/response.DatabaseModelMetadata"
+                    "$ref": "#/definitions/json.ModelMetadata"
                 },
                 "name": {
                     "type": "string"
@@ -1490,13 +1617,13 @@ const docTemplate = `{
                 "portInJson": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.DatabaseModelLink"
+                        "$ref": "#/definitions/json.ModelPort"
                     }
                 },
                 "portOutJson": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.DatabaseModelLink"
+                        "$ref": "#/definitions/json.ModelPort"
                     }
                 },
                 "type": {
@@ -1603,6 +1730,11 @@ const docTemplate = `{
         },
         "request.DiagramRequest": {
             "type": "object",
+            "required": [
+                "description",
+                "name",
+                "workspaceId"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -1620,6 +1752,12 @@ const docTemplate = `{
         },
         "request.GenerateModelRequest": {
             "type": "object",
+            "required": [
+                "modelName",
+                "modelType",
+                "previousModelsCode",
+                "userPrompt"
+            ],
             "properties": {
                 "modelName": {
                     "type": "string",
@@ -1641,6 +1779,10 @@ const docTemplate = `{
         },
         "request.LibraryRequest": {
             "type": "object",
+            "required": [
+                "description",
+                "title"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -1652,6 +1794,10 @@ const docTemplate = `{
         },
         "request.LoginRequest": {
             "type": "object",
+            "required": [
+                "identity",
+                "password"
+            ],
             "properties": {
                 "identity": {
                     "type": "string"
@@ -1663,6 +1809,9 @@ const docTemplate = `{
         },
         "request.LogoutRequest": {
             "type": "object",
+            "required": [
+                "refreshToken"
+            ],
             "properties": {
                 "refreshToken": {
                     "type": "string"
@@ -1671,15 +1820,32 @@ const docTemplate = `{
         },
         "request.ModelRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "componentsJson",
+                "connectionsJson",
+                "description",
+                "metadataJson",
+                "name",
+                "portInJson",
+                "portOutJson",
+                "type"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
                 },
                 "componentsJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.ModelComponents"
+                    }
                 },
                 "connectionsJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.Connection"
+                    }
                 },
                 "description": {
                     "type": "string"
@@ -1688,16 +1854,22 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "metadataJson": {
-                    "type": "string"
+                    "$ref": "#/definitions/json.ModelMetadata"
                 },
                 "name": {
                     "type": "string"
                 },
                 "portInJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.ModelPort"
+                    }
                 },
                 "portOutJson": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.ModelPort"
+                    }
                 },
                 "type": {
                     "$ref": "#/definitions/enum.ModelType"
@@ -1706,6 +1878,9 @@ const docTemplate = `{
         },
         "request.PasswordRequest": {
             "type": "object",
+            "required": [
+                "password"
+            ],
             "properties": {
                 "password": {
                     "type": "string"
@@ -1729,6 +1904,9 @@ const docTemplate = `{
         },
         "request.RefreshRequest": {
             "type": "object",
+            "required": [
+                "refreshToken"
+            ],
             "properties": {
                 "refreshToken": {
                     "type": "string"
@@ -1760,6 +1938,9 @@ const docTemplate = `{
         },
         "request.UpdateUserRequest": {
             "type": "object",
+            "required": [
+                "names"
+            ],
             "properties": {
                 "names": {
                     "type": "string"
@@ -1768,6 +1949,10 @@ const docTemplate = `{
         },
         "request.WorkspaceRequest": {
             "type": "object",
+            "required": [
+                "description",
+                "title"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -1799,76 +1984,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Endpoint"
                         }
                     ]
-                }
-            }
-        },
-        "response.DatabaseConnection": {
-            "type": "object",
-            "properties": {
-                "from": {
-                    "$ref": "#/definitions/response.DatabaseModelLink"
-                },
-                "to": {
-                    "$ref": "#/definitions/response.DatabaseModelLink"
-                }
-            }
-        },
-        "response.DatabaseModelLink": {
-            "type": "object",
-            "properties": {
-                "model": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.DatabaseModelMetadata": {
-            "type": "object",
-            "properties": {
-                "alwaysShowExtraInfo": {
-                    "type": "boolean"
-                },
-                "alwaysShowToolbar": {
-                    "type": "boolean"
-                },
-                "backgroundColor": {
-                    "type": "string"
-                },
-                "position": {
-                    "$ref": "#/definitions/response.DatabaseModelPosition"
-                },
-                "style": {
-                    "$ref": "#/definitions/response.DatabaseModelStyle"
-                },
-                "toolbarPosition": {
-                    "$ref": "#/definitions/response.ToolbarPosition"
-                },
-                "toolbarVisible": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "response.DatabaseModelPosition": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "integer"
-                },
-                "y": {
-                    "type": "integer"
-                }
-            }
-        },
-        "response.DatabaseModelStyle": {
-            "type": "object",
-            "properties": {
-                "height": {
-                    "type": "integer"
-                },
-                "width": {
-                    "type": "integer"
                 }
             }
         },
@@ -1914,6 +2029,9 @@ const docTemplate = `{
         },
         "response.GeneratedModelResponse": {
             "type": "object",
+            "required": [
+                "code"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1922,6 +2040,12 @@ const docTemplate = `{
         },
         "response.LoginResponse": {
             "type": "object",
+            "required": [
+                "accessToken",
+                "email",
+                "refreshToken",
+                "username"
+            ],
             "properties": {
                 "accessToken": {
                     "type": "string"
@@ -1973,6 +2097,70 @@ const docTemplate = `{
                 }
             }
         },
+        "response.ModelResponse": {
+            "type": "object",
+            "required": [
+                "code",
+                "componentsJson",
+                "connectionsJson",
+                "description",
+                "metadataJson",
+                "name",
+                "portInJson",
+                "portOutJson",
+                "type"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "componentsJson": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.ModelComponents"
+                    }
+                },
+                "connectionsJson": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.Connection"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "libId": {
+                    "type": "string"
+                },
+                "metadataJson": {
+                    "$ref": "#/definitions/json.ModelMetadata"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "portInJson": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.ModelPort"
+                    }
+                },
+                "portOutJson": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.ModelPort"
+                    }
+                },
+                "type": {
+                    "$ref": "#/definitions/enum.ModelType"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
         "response.ModelType": {
             "type": "string",
             "enum": [
@@ -2003,6 +2191,9 @@ const docTemplate = `{
         },
         "response.RefreshResponse": {
             "type": "object",
+            "required": [
+                "accessToken"
+            ],
             "properties": {
                 "accessToken": {
                     "type": "string"
@@ -2011,6 +2202,11 @@ const docTemplate = `{
         },
         "response.RegisterResponse": {
             "type": "object",
+            "required": [
+                "accessToken",
+                "refreshToken",
+                "user"
+            ],
             "properties": {
                 "accessToken": {
                     "type": "string"
@@ -2023,23 +2219,12 @@ const docTemplate = `{
                 }
             }
         },
-        "response.ToolbarPosition": {
-            "type": "string",
-            "enum": [
-                "top",
-                "left",
-                "right",
-                "bottom"
-            ],
-            "x-enum-varnames": [
-                "ToolbarPositionTop",
-                "ToolbarPositionLeft",
-                "ToolbarPositionRight",
-                "ToolbarPositionBottom"
-            ]
-        },
         "response.UserResponse": {
             "type": "object",
+            "required": [
+                "email",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string"

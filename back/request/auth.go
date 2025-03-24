@@ -1,7 +1,7 @@
 package request
 
 type RefreshRequest struct {
-	RefreshToken string `json:"refreshToken"`
+	RefreshToken string `json:"refreshToken" validate:"required"`
 }
 
 type RegisterRequest struct {
@@ -11,10 +11,10 @@ type RegisterRequest struct {
 }
 
 type LogoutRequest struct {
-	RefreshToken string `json:"refreshToken"`
+	RefreshToken string `json:"refreshToken" validate:"required"`
 }
 
 type LoginRequest struct {
-	Identity string `json:"identity"`
-	Password string `json:"password"`
+	Identity string `json:"identity" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"app/database"
+	"app/json"
 	"app/middleware"
 	"app/model"
 	"app/request"
@@ -85,10 +86,10 @@ func createDiagram(c *fiber.Ctx) error {
 			Description:    req.Description,
 			Type:           "coupled",
 			Code:           "",
-			MetadataJSON:   "{}",
-			ComponentsJSON: "[]",
-			PortInJSON:     "[]",
-			PortOutJSON:    "[]",
+			MetadataJSON:   json.ModelMetadata{},
+			ComponentsJSON: []json.ModelComponents{},
+			PortInJSON:     []json.ModelPort{},
+			PortOutJSON:    []json.ModelPort{},
 			UserID:         userID,
 		}
 

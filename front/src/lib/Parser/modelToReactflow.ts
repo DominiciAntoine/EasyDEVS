@@ -1,69 +1,54 @@
-import { components } from "@/api/v1";
-import { DatabaseModelMetadata, ReactFlowInput, ReactFlowPort } from "@/types/modelType";
-import { Edge, Position } from "@xyflow/react";
+import type { components } from "@/api/v1";
+import type { ReactFlowInput } from "@/types/modelType";
+import { Position } from "@xyflow/react";
 
+const connectionToEdge = ({
+	from,
+	to,
+}: components["schemas"]["json.Connection"]): ReactFlowInput["edges"][number] => ({
+	id: `from-${from.model}-${from.port}-to-${to.model}-${to.port}`,
+	source: from.model,
+	target: to.model,
+	sourceHandle: from.port,
+	targetHandle: to.port,
+	type: "step",
+	animated: true,
+	style: { zIndex: 1000 },
+});
 
+const modelToNode = (
+	model: components["schemas"]["response.ModelResponse"],
+): ReactFlowInput["nodes"][number] => {
+	return {
+		id: model.id ?? "Unnamed model",
+		type: "resizer",
+		style: {
+			height: model.metadataJson.style?.height ?? 200,
+			width: model.metadataJson.style?.width ?? 200,
+			backgroundColor: model.metadataJson.backgroundColor ?? undefined,
+		},
+		data: {
+			id: model.id ?? "Unnamed model",
+			modelType: model.type ?? "atomic",
+			label: model.name ?? "Unnamed model",
+			inputPorts: model.portInJson,
+			outputPorts: model.portOutJson,
+			toolbarVisible: model.metadataJson.toolbarVisible ?? false,
+			// as because Position is an enum
+			toolbarPosition:
+				(model.metadataJson.toolbarPosition as Position) ?? Position.Top,
+			alwaysShowToolbar: model.metadataJson.alwaysShowToolbar,
+			alwaysShowExtraInfo: model.metadataJson.alwaysShowExtraInfo,
+		},
+		position: model.metadataJson.position ?? { x: 0, y: 0 },
+	};
+};
 
-export function modelToReactflow(models: components["schemas"]["model.Model"][]): ReactFlowInput {
-
-  function safeJsonParse<T>(value: unknown, fallback: T): T {
-    if (typeof value === "string") {
-      try {
-        return JSON.parse(value);
-      } catch {
-        return fallback;
-      }
-    } else if (Array.isArray(value)) {
-      return value as T;
-    }
-    else if (typeof value === "object" && value !== null) {
-      return value as T;
-    }
-    return fallback;
-  }
-
-  return { 
-    nodes: models.map((model) => {
-      const inputPorts = safeJsonParse<ReactFlowPort[]>(model.portInJson, []);
-      const outputPorts = safeJsonParse<ReactFlowPort[]>(model.portOutJson, []);
-      const metadata = safeJsonParse<DatabaseModelMetadata>(model.metadataJson, {});
-      
-      return {
-        id: model.id ?? "Unnamed model",
-        type: "resizer",
-        style: {
-          height: metadata.style?.height ?? 200,
-          width: metadata.style?.width ?? 200,
-          backgroundColor: metadata.backgroundColor ?? undefined,
-        },
-        data: { 
-          id: model.id ?? "Unnamed model",
-          modelType: model.type ?? "atomic",
-          label: model.name ?? "Unnamed model",
-          inputPorts,
-          outputPorts,
-          toolbarVisible: metadata.toolbarVisible ?? false,
-          toolbarPosition: metadata.toolbarPosition ?? Position.Top, 
-          alwaysShowToolbar: metadata.alwaysShowToolbar,
-          alwaysShowExtraInfo: metadata.alwaysShowExtraInfo,
-        },
-        position: metadata.position ?? { x: 0, y: 0 },
-      };
-    }),
-    edges: models.flatMap((model) => {
-      const connections = safeJsonParse<Edge[]>(model.connectionsJson, []);
-      return connections.map((connection: Edge) => ({
-        id: connection.id ?? "Unnamed connection",
-        source: connection.source ?? "Unnamed source",
-        target: connection.target ?? "Unnamed target",
-        sourceHandle: connection.sourceHandle ?? "Unnamed source handle",
-        targetHandle: connection.targetHandle ?? "Unnamed target handle",
-        type: "step",
-        animated: true,
-        style: { zIndex: 1000 },
-      }));
-    }),
-  };
-}
-
-
+export const modelToReactflow = (
+	models: components["schemas"]["response.ModelResponse"][],
+): ReactFlowInput => ({
+	nodes: models.map(modelToNode),
+	edges: models.flatMap((model) => {
+		return model.connectionsJson.map(connectionToEdge);
+	}),
+});

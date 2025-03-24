@@ -1,5 +1,5 @@
-export const defaultPythonCode = (name: string) : string => {
-    return` 
+export const defaultPythonCode = (name: string): string => {
+	return ` 
     from DomainInterface.DomainBehavior import DomainBehavior
     from DomainInterface.Object import Message
 
