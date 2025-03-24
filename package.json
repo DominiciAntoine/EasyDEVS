@@ -12,6 +12,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
+		"@commitlint/config-conventional": "^19.8.0",
 		"lefthook": "^1.10.10"
 	},
 	"packageManager": "pnpm@10.6.5"

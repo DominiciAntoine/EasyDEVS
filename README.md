@@ -79,3 +79,8 @@ Une fois le projet démarré, vous pouvez commencer à interagir avec l'API et l
 
 - Start front using : `npm run start:front` it will run the project locally using your OS
 - Start back using : `npm run start:back` it will run a docker-compose.yml located in `back/docker-compose.yml`
+
+
+## How to commit
+
+The project use lefthook and commitlint with conventional commit : https://www.conventionalcommits.org/en/v1.0.0/ 
