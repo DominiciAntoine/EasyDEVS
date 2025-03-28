@@ -17,7 +17,7 @@ export function CreateModel() {
 				]}
 				showNavActions={false}
 				showModeToggle={true}
-			></NavHeader>
+			/>
 			{params.libId ? (
 				<ModelForm libId={params.libId} />
 			) : (

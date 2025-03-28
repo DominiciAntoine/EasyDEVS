@@ -1,5 +1,5 @@
 import type { components } from "@/api/v1";
-import type { ReactFlowInput } from "@/types/modelType";
+import type { ReactFlowInput } from "@/types";
 import { Position } from "@xyflow/react";
 
 const connectionToEdge = ({
@@ -45,10 +45,10 @@ const modelToNode = (
 };
 
 export const modelToReactflow = (
-	models: components["schemas"]["response.ModelResponse"][],
+	res: components["schemas"]["response.ModelResponse"][],
 ): ReactFlowInput => ({
-	nodes: models.map(modelToNode),
-	edges: models.flatMap((model) => {
+	nodes: res.map((model) => modelToNode(model)),
+	edges: res.flatMap((model) => {
 		return model.connectionsJson.map(connectionToEdge);
 	}),
 });

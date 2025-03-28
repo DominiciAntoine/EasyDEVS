@@ -22,6 +22,7 @@ import { CreateLibrary } from "./pages/library/CreateLibrary";
 import { CreateModel } from "./pages/model/CreateModel";
 import { EditModel } from "./pages/model/EditModel";
 import { CreateWorkspace } from "./pages/workspace/CreateWorkspace";
+import { DnDProvider } from "./providers/DnDContext";
 
 const HomePage = () => <div>Page d'accueil</div>;
 const OnlineDEVSEditor = () => <div>Contact</div>;
@@ -73,7 +74,7 @@ const Main = () => {
 		<DefaultLayout>
 			<Routes>
 				<Route path="/library/new" element={<CreateLibrary />} />
-				<Route path="/library/:id/model/new" element={<CreateModel />} />
+				<Route path="/library/:libId/model/new" element={<CreateModel />} />
 				<Route
 					path="/library/:libraryId/model/:modelId"
 					element={<EditModel />}
@@ -97,14 +98,16 @@ const App = () => (
 	<Router>
 		<AuthProvider>
 			<ReactFlowProvider>
-				<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-					<SidebarProvider>
-						<SidebarInset>
-							<Main />
-							<Toaster />
-						</SidebarInset>
-					</SidebarProvider>
-				</ThemeProvider>
+				<DnDProvider>
+					<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+						<SidebarProvider>
+							<SidebarInset>
+								<Main />
+								<Toaster />
+							</SidebarInset>
+						</SidebarProvider>
+					</ThemeProvider>
+				</DnDProvider>
 			</ReactFlowProvider>
 		</AuthProvider>
 	</Router>

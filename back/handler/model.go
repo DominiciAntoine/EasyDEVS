@@ -19,6 +19,7 @@ func SetupModelRoutes(app *fiber.App) {
 	group.Post("", createModel)
 	group.Delete("/:id", deleteModel)
 	group.Patch("/:id", patchModel)
+	group.Get("/:id/recursive", getModelRecursive)
 }
 
 // getAllModels retrieves a list of all models
@@ -63,6 +64,49 @@ func getModel(c *fiber.Ctx) error {
 	res := response.CreateModelResponse(model)
 
 	return c.JSON(res)
+}
+
+// getModel retrieves a single model by ID
+// @Summary Get a model by ID
+// @Description Retrieve a single model by its ID
+// @Tags models
+// @Produce json
+// @Param id path string true "Model ID"
+// @Success 200 {object} []response.ModelResponse
+// @Failure 404 {object} map[string]interface{}
+// @Router /model/{id}/recursive [get]
+func getModelRecursive(c *fiber.Ctx) error {
+	db := database.DB
+
+	componentsId := make([]string, 0)
+	componentsId = append(componentsId, c.Params("id"))
+	models := make([]response.ModelResponse, 0)
+
+	for len(componentsId) > 0 {
+		var model model.Model
+
+		flag := false
+
+		for _, v := range models {
+			if v.ID == componentsId[0] {
+				flag = true
+			}
+		}
+		if !flag {
+			db.Find(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), componentsId[0])
+			if model.Name == "" {
+				return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
+			} else {
+				models = append(models, response.CreateModelResponse(model))
+				for _, v := range model.ComponentsJSON {
+					componentsId = append(componentsId, v.ID)
+				}
+			}
+		}
+		componentsId = componentsId[1:]
+	}
+
+	return c.JSON(models)
 }
 
 // createModel creates a new model

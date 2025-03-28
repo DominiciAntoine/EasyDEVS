@@ -16,9 +16,14 @@ import "@xyflow/react/dist/base.css";
 import BiDirectionalEdge from "@/components/custom/reactFlow/BiDirectionalEdge.tsx";
 import { ZoomSlider } from "@/components/zoom-slider";
 import { getLayoutedElements } from "@/lib/getLayoutedElements.ts";
+import { useDnD } from "@/providers/DnDContext.tsx";
 import type { ReactFlowInput, ReactFlowModelData } from "@/types";
 import { type ComponentProps, useCallback, useRef, useState } from "react";
 import ModelNode from "./reactFlow/ModelNode.tsx";
+
+import { client } from "@/api/client.ts";
+import { useToast } from "@/hooks/use-toast.ts";
+import { modelToReactflow } from "@/lib/Parser/modelToReactflow.ts";
 
 const nodeTypes = {
 	resizer: ModelNode,
@@ -39,6 +44,9 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 		ReactFlowInput | undefined
 	>(models);
 	const { fitView } = useReactFlow();
+	const { screenToFlowPosition } = useReactFlow();
+	const [dragId, setdragId] = useDnD();
+	const { toast } = useToast();
 
 	const onNodesChange = useCallback(
 		(changes: NodeChange<Node<ReactFlowModelData>>[]) => {
@@ -50,7 +58,6 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 						}
 					: undefined,
 			);
-			console.log("we need to save");
 		},
 		[],
 	);
@@ -69,6 +76,61 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 	const onOrganizeClick = () => {
 		onLayoutRef.current({ direction: "RIGHT" });
 	};
+
+	const onDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
+		(event) => {
+			event.preventDefault();
+			event.dataTransfer.dropEffect = "move";
+		},
+		[],
+	);
+
+	const onDrop = useCallback<
+		NonNullable<ComponentProps<typeof ReactFlow>["onDrop"]>
+	>(
+		async (event) => {
+			event.preventDefault();
+
+			// check if the dropped element is valid
+			if (!dragId) {
+				return;
+			}
+
+			const { data, error } = await client.GET("/model/{id}/recursive", {
+				params: {
+					path: {
+						id: dragId,
+					},
+				},
+			});
+
+			if (error) {
+				toast({
+					title: "An error occured",
+					description: "Can't load model data",
+					variant: "destructive",
+				});
+				return;
+			}
+
+			const dragReactFlowData = modelToReactflow(data);
+
+			const position = screenToFlowPosition({
+				x: event.clientX,
+				y: event.clientY,
+			});
+
+			setReactFlowData((prev) =>
+				prev
+					? {
+							nodes: [...prev.nodes, ...dragReactFlowData.nodes],
+							edges: [...prev.edges, ...dragReactFlowData.edges],
+						}
+					: dragReactFlowData,
+			);
+		},
+		[screenToFlowPosition, dragId, toast],
+	);
 
 	const onConnect = useCallback<
 		NonNullable<ComponentProps<typeof ReactFlow>["onConnect"]>
@@ -117,6 +179,8 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 				defaultEdgeOptions={defaultEdgeOptions}
 				connectionMode={ConnectionMode.Loose}
 				onConnect={onConnect}
+				onDrop={onDrop}
+				onDragOver={onDragOver}
 			>
 				<MiniMap zoomable pannable />
 				<ZoomSlider onOrganizeClick={onOrganizeClick} />

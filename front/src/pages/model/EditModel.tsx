@@ -1,5 +1,6 @@
 import ModelCodeEditorTemp from "@/components/custom/ModelCodeEditorTemp";
 import { ModelViewEditor } from "@/components/custom/ModelViewEditor";
+import NavDragModel from "@/components/nav/NavDragModel";
 import NavHeader from "@/components/nav/nav-header";
 import {
 	ResizableHandle,
@@ -7,7 +8,7 @@ import {
 	ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
-import { useGetModelById } from "@/queries/model/useGetModelById";
+import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
 import { Loader } from "lucide-react";
 import { useParams } from "react-router-dom";
 
@@ -15,13 +16,13 @@ export function EditModel() {
 	const { modelId } = useParams<{
 		modelId: string;
 	}>();
-	const { data, error, isLoading } = useGetModelById({
+	const { data, error, isLoading } = useGetModelByIdRecursive({
 		params: { path: { id: modelId ?? "" } },
 	});
 
 	if (!data) return null;
 
-	const reactFlowData = modelToReactflow([data]);
+	const reactFlowData = modelToReactflow(data);
 
 	if (isLoading) {
 		return (
@@ -42,14 +43,22 @@ export function EditModel() {
 				]}
 				showNavActions={true}
 				showModeToggle={true}
-			></NavHeader>
+			/>
 			<ResizablePanelGroup direction="horizontal">
-				<ResizablePanel defaultSize={60} minSize={20}>
+				<ResizablePanel defaultSize={50} minSize={20}>
 					<ModelCodeEditorTemp />
 				</ResizablePanel>
-				<ResizableHandle />
-				<ResizablePanel defaultSize={40} minSize={20}>
-					<ModelViewEditor models={reactFlowData} />
+				<ResizableHandle withHandle />
+				<ResizablePanel defaultSize={50}>
+					<ResizablePanelGroup direction="vertical">
+						<ResizablePanel defaultSize={40} minSize={20}>
+							<ModelViewEditor models={reactFlowData} />
+						</ResizablePanel>
+						<ResizableHandle withHandle />
+						<ResizablePanel defaultSize={60} minSize={20}>
+							<NavDragModel />
+						</ResizablePanel>
+					</ResizablePanelGroup>
 				</ResizablePanel>
 			</ResizablePanelGroup>
 		</div>

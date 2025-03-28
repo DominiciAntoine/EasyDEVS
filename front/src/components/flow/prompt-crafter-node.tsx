@@ -1,5 +1,19 @@
 "use client";
 
+import { BaseNode } from "@/components/flow/base-node";
+import {
+	EditableHandle,
+	EditableHandleDialog,
+} from "@/components/flow/editable-handle";
+import { LabeledHandle } from "@/components/flow/labeled-handle";
+import {
+	NodeHeader,
+	NodeHeaderAction,
+	NodeHeaderActions,
+	NodeHeaderIcon,
+	NodeHeaderTitle,
+} from "@/components/flow/node-header";
+import { NodeHeaderStatus } from "@/components/flow/node-header-status";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -16,20 +30,6 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { BaseNode } from "@/components/flow/base-node";
-import {
-	EditableHandle,
-	EditableHandleDialog,
-} from "@/components/flow/editable-handle";
-import { LabeledHandle } from "@/components/flow/labeled-handle";
-import {
-	NodeHeader,
-	NodeHeaderAction,
-	NodeHeaderActions,
-	NodeHeaderIcon,
-	NodeHeaderTitle,
-} from "@/components/flow/node-header";
-import { NodeHeaderStatus } from "@/components/flow/node-header-status";
 import { StreamLanguage } from "@codemirror/language";
 import type { EditorView } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
