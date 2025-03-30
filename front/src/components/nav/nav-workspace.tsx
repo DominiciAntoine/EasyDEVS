@@ -87,7 +87,7 @@ export function NavWorkspace() {
 								</ContextMenuTrigger>
 								<ContextMenuContent>
 									<ContextMenuItem>
-										<Link to={"/workspace/" + item.id + "/diagram/new"}>
+										<Link to={`/workspace/${item.id}/diagram/new`}>
 											New diagram...
 										</Link>
 									</ContextMenuItem>
@@ -108,7 +108,7 @@ export function NavWorkspace() {
 									) : null}
 									<ContextMenuSeparator />
 									<ContextMenuItem>
-										<a href={"#share_lib_" + item.title}>Share</a>
+										<a href={`#share_lib_${item.title}`}>Share</a>
 									</ContextMenuItem>
 								</ContextMenuContent>
 							</ContextMenu>
@@ -129,7 +129,7 @@ export function NavWorkspace() {
 												</ContextMenuTrigger>
 												<ContextMenuContent>
 													<ContextMenuItem>
-														<a href={"#edit_model_" + subItem.title}>Edit</a>
+														<a href={`#edit_model_${subItem.title}`}>Edit</a>
 													</ContextMenuItem>
 													{subItem.id ? (
 														<DiagramDeleteDialog

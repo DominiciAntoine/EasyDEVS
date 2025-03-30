@@ -41,7 +41,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({
 			<Breadcrumb>
 				<BreadcrumbList>
 					{breadcrumbs.map((item, index) => (
-						<React.Fragment key={index}>
+						<React.Fragment key={item.href + item.label}>
 							<BreadcrumbItem
 								className={index < lastIndex ? "hidden md:block" : ""}
 							>
@@ -51,9 +51,9 @@ const NavHeader: React.FC<NavHeaderProps> = ({
 									<BreadcrumbPage>{item.label}</BreadcrumbPage>
 								)}
 							</BreadcrumbItem>
-							{index < lastIndex && (
+							{index < lastIndex ? (
 								<BreadcrumbSeparator className="hidden md:block" />
-							)}
+							) : null}
 						</React.Fragment>
 					))}
 				</BreadcrumbList>

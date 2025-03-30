@@ -107,6 +107,7 @@ type ToolbarButtonProps = {
 
 const ToolbarButton = ({ icon, label, onClick }: ToolbarButtonProps) => (
 	<button
+		type="button"
 		className="rounded hover:bg-primary/50 active:ring-2 active:ring-ring transition-all duration-150"
 		title={label}
 		onClick={onClick}

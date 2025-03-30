@@ -11,7 +11,7 @@ export function CreateLibrary() {
 				]}
 				showNavActions={false}
 				showModeToggle={true}
-			></NavHeader>
+			/>
 			<LibraryForm />
 		</div>
 	);

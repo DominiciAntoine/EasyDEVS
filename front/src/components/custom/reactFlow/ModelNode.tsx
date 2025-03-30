@@ -34,9 +34,9 @@ function ModelNode({ data, selected }: ModelNodeProps) {
 					{/* Ports d'entrée (aligné à gauche) */}
 					<div className="flex flex-col justify-evenly relative -left-2 text-primary ">
 						{Array.isArray(data.inputPorts) &&
-							data.inputPorts.map((port: { id: string }, index: number) => (
+							data.inputPorts.map((port: { id: string }) => (
 								<div
-									key={`in-group-${index}`}
+									key={`in-group-${port.id}`}
 									className="flex flex-row justify-start"
 								>
 									<Handle
@@ -58,14 +58,14 @@ function ModelNode({ data, selected }: ModelNodeProps) {
 					</div>
 
 					{/* Contenu central */}
-					<div style={{ flexGrow: 1, textAlign: "center" }}></div>
+					<div className="flex-grow text-center">&nbsp;</div>
 
 					{/* Ports de sortie (aligné à droite) */}
 					<div className="flex flex-col justify-evenly  relative text-primary -right-2">
 						{Array.isArray(data.outputPorts) &&
-							data.outputPorts.map((port: { id: string }, index: number) => (
+							data.outputPorts.map((port: { id: string }) => (
 								<div
-									key={`out-group-${index}`}
+									key={`out-group-${port.id}`}
 									className="flex flex-row justify-start"
 								>
 									{data.modelType === "coupled" && (

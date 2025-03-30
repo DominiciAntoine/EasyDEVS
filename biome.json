@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["**/node_modules", "**/tsconfig.*", "**/dist"],
+		"ignore": ["**/node_modules", "**/tsconfig.*", "**/dist", "**/old"],
 		"include": ["front"]
 	},
 	"formatter": {
@@ -23,6 +23,9 @@
 			"recommended": true,
 			"style": {
 				"useImportType": "error"
+			},
+			"complexity": {
+				"noForEach": "off"
 			}
 		}
 	},

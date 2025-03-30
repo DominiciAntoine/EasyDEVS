@@ -80,7 +80,7 @@ function ModelExtraInfo({ data }: ModelNodeProps) {
 							<div className="flex flex-wrap gap-2">
 								{value.map((obj, index) => (
 									<Badge
-										key={index}
+										key={obj.name + obj.id}
 										variant="secondary"
 										className="text-xs shadow-sm hover:scale-105 transition-transform cursor-default"
 									>

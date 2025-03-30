@@ -11,7 +11,7 @@ export function CreateWorkspace() {
 				]}
 				showNavActions={false}
 				showModeToggle={true}
-			></NavHeader>
+			/>
 			<WorkspaceForm />
 		</div>
 	);

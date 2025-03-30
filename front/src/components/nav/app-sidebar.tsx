@@ -6,7 +6,7 @@ import {
 	Frame,
 	House,
 	LayoutDashboard,
-	Map,
+	MapIcon,
 	PieChart,
 	Square,
 } from "lucide-react";
@@ -105,7 +105,7 @@ const data = {
 		{
 			name: "Travel",
 			url: "#",
-			icon: Map,
+			icon: MapIcon,
 		},
 	],
 	mains: [
@@ -138,7 +138,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavLibrary />
 				<NavWorkspace />
 			</SidebarContent>
-			<SidebarFooter></SidebarFooter>
+			<SidebarFooter />
 			<SidebarRail />
 		</Sidebar>
 	);

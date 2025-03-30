@@ -25,9 +25,9 @@ commit-msg:
 pre-commit:
   parallel: true
   jobs:
-    # - name: Format front
-    #   run: pnpm run @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
-    #   glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
+    - name: Format front
+      run: pnpm biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
 
     - name: Format back
       run: go fmt

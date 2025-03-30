@@ -16,7 +16,7 @@ export function CreateDiagram() {
 				]}
 				showNavActions={false}
 				showModeToggle={true}
-			></NavHeader>
+			/>
 			{params.workspaceId ? (
 				<DiagramForm workspaceId={params.workspaceId} />
 			) : (

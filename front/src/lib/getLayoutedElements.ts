@@ -1,6 +1,5 @@
-import type { Edge, Node } from "@xyflow/react";
-import ELK, { type ElkNode } from "elkjs/lib/elk.bundled.js";
-import type { NodeData } from "./types";
+import type { ReactFlowInput } from "@/types";
+import ELK, { type ElkNode } from "elkjs";
 
 const elk = new ELK();
 const elkOptions = {
@@ -11,7 +10,7 @@ const elkOptions = {
 };
 
 // Fonction pour construire la hiérarchie des nœuds avec leurs enfants
-const buildHierarchy = (nodes: Node<NodeData>[], _isHorizontal: boolean) => {
+const buildHierarchy = (nodes: ReactFlowInput["nodes"]) => {
 	const nodeMap: Record<string, ElkNode> = {};
 	const rootNodes: ElkNode[] = [];
 
@@ -42,13 +41,13 @@ const buildHierarchy = (nodes: Node<NodeData>[], _isHorizontal: boolean) => {
 
 // Fonction pour aplatir les nœuds hiérarchisés après la mise en page
 const flattenNodes = (nodes: ElkNode[]) => {
-	const flatList: Node<NodeData>[] = [];
+	const flatList: ReactFlowInput["nodes"] = [];
 
 	const extractNodes = (node: ElkNode) => {
 		flatList.push({
 			...node,
 			position: { x: node.x || 0, y: node.y || 0 },
-		} as Node<NodeData>);
+		} as (typeof flatList)[number]);
 		if (node.children) {
 			node.children.forEach(extractNodes);
 		}
@@ -60,17 +59,15 @@ const flattenNodes = (nodes: ElkNode[]) => {
 };
 
 export const getLayoutedElements = async (
-	nodes: Node<NodeData>[],
-	edges: Edge[],
+	nodes: ReactFlowInput["nodes"],
+	edges: ReactFlowInput["edges"],
 	direction = "RIGHT",
-): Promise<{ nodes: Node<NodeData>[]; edges: Edge[] }> => {
-	const isHorizontal = direction === "RIGHT";
-
+): Promise<ReactFlowInput> => {
 	// Construire la hiérarchie de graphes avec les nœuds et leurs enfants
 	const graph = {
 		id: "root",
 		layoutOptions: { ...elkOptions, "elk.direction": direction },
-		children: buildHierarchy(nodes, isHorizontal),
+		children: buildHierarchy(nodes),
 		edges: edges.map((edge) => ({
 			id: edge.id,
 			sources: [edge.source],
@@ -86,12 +83,21 @@ export const getLayoutedElements = async (
 
 	// Remettre à jour les données des nœuds en incluant leurs positions
 	return {
-		nodes: layoutedFlatNodes.map((node) => ({
-			...nodes.find((n) => n.id === node.id)!,
-			width: node.width,
-			height: node.height,
-			position: node.position,
-		})),
+		nodes: layoutedFlatNodes
+			.map<(typeof layoutedFlatNodes)[number] | undefined>((node) => {
+				const nodeInNodes = nodes.find((n) => n.id === node.id);
+				if (nodeInNodes) {
+					return {
+						...nodeInNodes,
+						width: node.width,
+						height: node.height,
+						position: node.position,
+					};
+				}
+
+				return undefined;
+			})
+			.filter((node): node is (typeof layoutedFlatNodes)[number] => !!node),
 		edges,
 	};
 };

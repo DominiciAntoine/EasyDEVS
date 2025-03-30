@@ -88,7 +88,7 @@ export function NavLibrary() {
 								</ContextMenuTrigger>
 								<ContextMenuContent>
 									<ContextMenuItem>
-										<Link to={"/library/" + item.id + "/model/new"}>
+										<Link to={`/library/${item.id}/model/new`}>
 											New model...
 										</Link>
 									</ContextMenuItem>
@@ -109,7 +109,7 @@ export function NavLibrary() {
 									) : null}
 									<ContextMenuSeparator />
 									<ContextMenuItem>
-										<a href={"#share_lib_" + item.title}>Share</a>
+										<a href={`#share_lib_${item.title}`}>Share</a>
 									</ContextMenuItem>
 								</ContextMenuContent>
 							</ContextMenu>
@@ -122,9 +122,7 @@ export function NavLibrary() {
 													<SidebarMenuSubItem className="relative z-10">
 														<SidebarMenuSubButton asChild>
 															<Link
-																to={
-																	"/library/" + item.id + "/model/" + subItem.id
-																}
+																to={`/library/${item.id}/model/${subItem.id}`}
 															>
 																{subItem.icon && <subItem.icon />}
 																<span>{subItem.title}</span>
@@ -135,9 +133,7 @@ export function NavLibrary() {
 												<ContextMenuContent>
 													<ContextMenuItem>
 														<Link
-															to={
-																"/library/" + item.id + "/model/" + subItem.id
-															}
+															to={`/library/${item.id}/model/${subItem.id}`}
 														>
 															Edit
 														</Link>
