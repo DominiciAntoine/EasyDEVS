@@ -1,4 +1,5 @@
 {
+  "type": "module",
 	"scripts": {
 		"format:front": "biome format --write .",
 		"format:back": "cd back && go fmt",
