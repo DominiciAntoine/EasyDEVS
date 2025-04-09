@@ -15,7 +15,7 @@ type User struct {
 	CreatedAt    time.Time   `gorm:"type:timestamp;default:now()" json:"createdAt"`
 	UpdatedAt    time.Time   `gorm:"type:timestamp;default:now()" json:"updatedAt"`
 	DeletedAt    time.Time   `gorm:"index" json:"deletedAt"`
-	Models       []Model     `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"models"`
+	ModelTypes   []Model     `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"modelTypes"`
 	Workspaces   []Workspace `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"workspaces"`
 	Libraries    []Library   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"libraries"`
 }

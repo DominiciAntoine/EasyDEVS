@@ -81,16 +81,14 @@ func createDiagram(c *fiber.Ctx) error {
 
 	err := db.Transaction(func(tx *gorm.DB) error {
 		devsModel := model.Model{
-			LibID:          nil,
-			Name:           req.Name,
-			Description:    req.Description,
-			Type:           "coupled",
-			Code:           "",
-			MetadataJSON:   json.ModelMetadata{},
-			ComponentsJSON: []json.ModelComponents{},
-			PortInJSON:     []json.ModelPort{},
-			PortOutJSON:    []json.ModelPort{},
-			UserID:         userID,
+			LibID:       nil,
+			Name:        req.Name,
+			Description: req.Description,
+			Type:        "coupled",
+			Code:        "",
+			UserID:      userID,
+			Ports:       []json.ModelPort{},
+			Components:  []json.ModelComponents{},
 		}
 
 		if err := tx.Create(&devsModel).Error; err != nil {

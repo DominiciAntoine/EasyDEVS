@@ -98,7 +98,7 @@ func getModelRecursive(c *fiber.Ctx) error {
 				return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
 			} else {
 				models = append(models, response.CreateModelResponse(model))
-				for _, v := range model.ComponentsJSON {
+				for _, v := range model.Components {
 					componentsId = append(componentsId, v.ID)
 				}
 			}
@@ -133,12 +133,10 @@ func createModel(c *fiber.Ctx) error {
 		Description:     req.Description,
 		Type:            req.Type,
 		Code:            req.Code,
-		MetadataJSON:    req.MetadataJSON,
-		ComponentsJSON:  req.ComponentsJSON,
-		ConnectionsJSON: req.ConnectionsJSON,
-		PortInJSON:      req.PortInJSON,
-		PortOutJSON:     req.PortOutJSON,
 		UserID:          c.Locals("user_id").(string),
+        Components: req.Components,
+        Ports: req.Ports,
+
 	}
 
 	db.Create(&model)
