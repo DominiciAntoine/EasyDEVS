@@ -16,4 +16,14 @@ export default defineConfig({
 			usePolling: true, // Nécessaire pour les environnements Docker
 		},
 	},
+	build: {
+		rollupOptions: {
+			output: {
+				assetFileNames: "assets/[name].[ext]",
+			},
+		},
+	},
+	worker: {
+		format: "es",
+	},
 });

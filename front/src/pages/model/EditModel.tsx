@@ -1,3 +1,4 @@
+import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
 import ModelCodeEditorTemp from "@/components/custom/ModelCodeEditorTemp";
 import { ModelViewEditor } from "@/components/custom/ModelViewEditor";
 import NavDragModel from "@/components/nav/NavDragModel";
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/resizable";
 import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
 import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
+import { examplePythonCode } from "@/staticModel/examplePythonCode";
 import { Loader } from "lucide-react";
 import { useParams } from "react-router-dom";
 
@@ -46,7 +48,12 @@ export function EditModel() {
 			/>
 			<ResizablePanelGroup direction="horizontal">
 				<ResizablePanel defaultSize={50} minSize={20}>
-					<ModelCodeEditorTemp />
+					<ModelCodeEditor
+						onSave={(code) => {
+							console.log("toto");
+						}}
+						code={examplePythonCode}
+					/>
 				</ResizablePanel>
 				<ResizableHandle withHandle />
 				<ResizablePanel defaultSize={50}>

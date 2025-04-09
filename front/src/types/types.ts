@@ -18,3 +18,17 @@ export type ReactFlowModelData = {
 	alwaysShowToolbar?: boolean;
 	alwaysShowExtraInfo?: boolean;
 };
+
+export type WorkerResponse = {
+	diagnostics: Diagnostic[];
+	error?: Error;
+};
+
+export type Diagnostic = {
+	severity: number;
+	message: string;
+	startLineNumber: number;
+	startColumn: number;
+	endLineNumber: number;
+	endColumn: number;
+};

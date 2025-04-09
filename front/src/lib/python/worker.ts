@@ -1,43 +1,36 @@
+import type { WorkerResponse } from "@/types";
+
 // @ts-ignore
-importScripts("https://cdn.jsdelivr.net/npm/pyright-wasm");
+importScripts("https://cdn.jsdelivr.net/pyodide/v0.21.0/full/pyodide.js");
 
-let pyright = null;
+let working = false;
+async function loadPyodideAndRun(code: string): Promise<WorkerResponse> {
+	working = true;
+	let pyodide;
+	try {
+		pyodide = await loadPyodide();
+		await pyodide.loadPackage(["micropip"]);
+		const micropip = pyodide.pyimport("micropip");
+		await micropip.install("pyright");
 
-async function initPyright() {
-	pyright = await pyright.createFromCDN();
-	postMessage({ type: "ready" });
+		// Utiliser Pyright pour le linting
+		const pyright = pyodide.pyimport("pyright");
+		const diagnostics = pyright.runLinter(code);
+
+		return { diagnostics, error: "No error" };
+	} catch (error) {
+		return { diagnostics: [], error: error };
+	} finally {
+		// Libérer la mémoire si possible
+		pyodide = null;
+		working = false;
+	}
 }
 
-initPyright();
-
-self.onmessage = async (event) => {
-	if (!pyright) {
-		postMessage({ type: "error", message: "Pyright is not ready." });
-		return;
-	}
-
-	const { code, action, position } = event.data;
-
-	if (action === "lint") {
-		const diagnostics = pyright.analyze(code, {});
-
-		const markers = diagnostics.map((diag) => ({
-			message: diag.message,
-			line: diag.range.start.line + 1,
-			column: diag.range.start.character + 1,
-			severity: diag.severity === "error" ? 8 : 4, // 8 = Error, 4 = Warning
-		}));
-
-		postMessage({ type: "lint", markers });
-	}
-
-	if (action === "complete") {
-		const suggestions = pyright.getCompletions(code, position);
-		postMessage({ type: "completion", suggestions });
-	}
-
-	if (action === "hover") {
-		const hoverInfo = pyright.getHover(code, position);
-		postMessage({ type: "hover", hoverInfo });
+self.onmessage = async (event: MessageEvent<{ code: string }>) => {
+	const { code } = event.data;
+	if (!working) {
+		const response = await loadPyodideAndRun(code);
+		self.postMessage(response);
 	}
 };
