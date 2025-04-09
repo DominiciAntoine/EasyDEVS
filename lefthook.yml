@@ -32,6 +32,7 @@ pre-commit:
     - name: Format back
       run: go fmt
       root: "/back"
+      glob: "*.go"
 
     # - name: govet
     #   files: git ls-files -m
