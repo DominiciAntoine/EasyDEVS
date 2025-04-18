@@ -1,8 +1,8 @@
 package json
 
 type InstanceModelLink struct {
-	Model string `json:"model" validate:"required"`
-	Port  string `json:"port" validate:"required"`
+	InstanceModelID string `json:"instanceModelId" validate:"required"`
+	Port            string `json:"port" validate:"required"`
 }
 
 type InstanceModelConnection struct {
@@ -20,21 +20,21 @@ type InstanceModelPosition struct {
 	Y int `json:"y" validate:"required"`
 }
 
-type ToolbarPosition string
+type InstanceToolbarPosition string
 
 const (
-	ToolbarPositionTop    ToolbarPosition = "top"
-	ToolbarPositionLeft   ToolbarPosition = "left"
-	ToolbarPositionRight  ToolbarPosition = "right"
-	ToolbarPositionBottom ToolbarPosition = "bottom"
+	InstanceToolbarPositionTop    InstanceToolbarPosition = "top"
+	InstanceToolbarPositionLeft   InstanceToolbarPosition = "left"
+	InstanceToolbarPositionRight  InstanceToolbarPosition = "right"
+	InstanceToolbarPositionBottom InstanceToolbarPosition = "bottom"
 )
 
 type InstanceModelMetadata struct {
-	BackgroundColor     *string          `json:"backgroundColor,omitempty"`
-	AlwaysShowToolbar   *bool            `json:"alwaysShowToolbar,omitempty"`
-	AlwaysShowExtraInfo *bool            `json:"alwaysShowExtraInfo,omitempty"`
-	ToolbarVisible      *bool            `json:"toolbarVisible,omitempty"`
-	ToolbarPosition     *ToolbarPosition `json:"toolbarPosition,omitempty"`
-	Position            InstanceModelPosition    `json:"position" validate:"required"`
-	Style               InstanceModelStyle       `json:"style" validate:"required"`
+	BackgroundColor     *string               `json:"backgroundColor,omitempty"`
+	AlwaysShowToolbar   *bool                 `json:"alwaysShowToolbar,omitempty"`
+	AlwaysShowExtraInfo *bool                 `json:"alwaysShowExtraInfo,omitempty"`
+	ToolbarVisible      *bool                 `json:"toolbarVisible,omitempty"`
+	ToolbarPosition     *ToolbarPosition      `json:"toolbarPosition,omitempty"`
+	Position            InstanceModelPosition `json:"position" validate:"required"`
+	Style               InstanceModelStyle    `json:"style" validate:"required"`
 }

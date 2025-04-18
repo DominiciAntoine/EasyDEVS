@@ -88,7 +88,7 @@ func createDiagram(c *fiber.Ctx) error {
 			Code:        "",
 			UserID:      userID,
 			Ports:       []json.ModelPort{},
-			Components:  []json.ModelComponents{},
+			Components:  []model.ModelComponent{},
 		}
 
 		if err := tx.Create(&devsModel).Error; err != nil {

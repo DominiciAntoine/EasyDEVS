@@ -1,5 +1,13 @@
 basePath: /
 definitions:
+  enum.ModelPortDirection:
+    enum:
+    - in
+    - out
+    type: string
+    x-enum-varnames:
+    - ModelPortDirectionIn
+    - ModelPortDirectionOut
   enum.ModelType:
     enum:
     - atomic
@@ -8,7 +16,7 @@ definitions:
     x-enum-varnames:
     - Atomic
     - Coupled
-  json.Connection:
+  json.ModelConnection:
     properties:
       from:
         $ref: '#/definitions/json.ModelLink'
@@ -18,21 +26,14 @@ definitions:
     - from
     - to
     type: object
-  json.ModelComponents:
-    properties:
-      id:
-        type: string
-    required:
-    - id
-    type: object
   json.ModelLink:
     properties:
-      model:
+      modelId:
         type: string
       port:
         type: string
     required:
-    - model
+    - modelId
     - port
     type: object
   json.ModelMetadata:
@@ -59,8 +60,11 @@ definitions:
     properties:
       id:
         type: string
+      type:
+        $ref: '#/definitions/enum.ModelPortDirection'
     required:
     - id
+    - type
     type: object
   json.ModelPosition:
     properties:
@@ -104,10 +108,10 @@ definitions:
         type: string
       id:
         type: string
-      model:
-        $ref: '#/definitions/model.Model'
       modelId:
         type: string
+      modelType:
+        $ref: '#/definitions/model.Model'
       name:
         maxLength: 50
         minLength: 3
@@ -131,7 +135,7 @@ definitions:
         type: string
       id:
         type: string
-      models:
+      modelTypes:
         items:
           $ref: '#/definitions/model.Model'
         type: array
@@ -146,13 +150,13 @@ definitions:
     properties:
       code:
         type: string
-      componentsJson:
+      components:
         items:
-          $ref: '#/definitions/json.ModelComponents'
+          $ref: '#/definitions/model.ModelComponent'
         type: array
-      connectionsJson:
+      connections:
         items:
-          $ref: '#/definitions/json.Connection'
+          $ref: '#/definitions/json.ModelConnection'
         type: array
       createdAt:
         type: string
@@ -164,15 +168,11 @@ definitions:
         type: string
       libId:
         type: string
-      metadataJson:
+      metadata:
         $ref: '#/definitions/json.ModelMetadata'
       name:
         type: string
-      portInJson:
-        items:
-          $ref: '#/definitions/json.ModelPort'
-        type: array
-      portOutJson:
+      ports:
         items:
           $ref: '#/definitions/json.ModelPort'
         type: array
@@ -182,6 +182,16 @@ definitions:
         type: string
       userId:
         type: string
+    type: object
+  model.ModelComponent:
+    properties:
+      id:
+        type: string
+      model:
+        type: string
+    required:
+    - id
+    - model
     type: object
   model.User:
     properties:
@@ -199,7 +209,7 @@ definitions:
         items:
           $ref: '#/definitions/model.Library'
         type: array
-      models:
+      modelTypes:
         items:
           $ref: '#/definitions/model.Model'
         type: array
@@ -311,27 +321,23 @@ definitions:
     properties:
       code:
         type: string
-      componentsJson:
+      components:
         items:
-          $ref: '#/definitions/json.ModelComponents'
+          $ref: '#/definitions/model.ModelComponent'
         type: array
-      connectionsJson:
+      connections:
         items:
-          $ref: '#/definitions/json.Connection'
+          $ref: '#/definitions/json.ModelConnection'
         type: array
       description:
         type: string
       libId:
         type: string
-      metadataJson:
+      metadata:
         $ref: '#/definitions/json.ModelMetadata'
       name:
         type: string
-      portInJson:
-        items:
-          $ref: '#/definitions/json.ModelPort'
-        type: array
-      portOutJson:
+      ports:
         items:
           $ref: '#/definitions/json.ModelPort'
         type: array
@@ -339,13 +345,12 @@ definitions:
         $ref: '#/definitions/enum.ModelType'
     required:
     - code
-    - componentsJson
-    - connectionsJson
+    - components
+    - connections
     - description
-    - metadataJson
+    - metadata
     - name
-    - portInJson
-    - portOutJson
+    - ports
     - type
     type: object
   request.PasswordRequest:
@@ -497,13 +502,13 @@ definitions:
     properties:
       code:
         type: string
-      componentsJson:
+      components:
         items:
-          $ref: '#/definitions/json.ModelComponents'
+          $ref: '#/definitions/model.ModelComponent'
         type: array
-      connectionsJson:
+      connections:
         items:
-          $ref: '#/definitions/json.Connection'
+          $ref: '#/definitions/json.ModelConnection'
         type: array
       description:
         type: string
@@ -511,15 +516,11 @@ definitions:
         type: string
       libId:
         type: string
-      metadataJson:
+      metadata:
         $ref: '#/definitions/json.ModelMetadata'
       name:
         type: string
-      portInJson:
-        items:
-          $ref: '#/definitions/json.ModelPort'
-        type: array
-      portOutJson:
+      ports:
         items:
           $ref: '#/definitions/json.ModelPort'
         type: array
@@ -529,13 +530,12 @@ definitions:
         type: string
     required:
     - code
-    - componentsJson
-    - connectionsJson
+    - components
+    - connections
     - description
-    - metadataJson
+    - metadata
     - name
-    - portInJson
-    - portOutJson
+    - ports
     - type
     type: object
   response.ModelType:

@@ -16,8 +16,15 @@ type Model struct {
 	Description string                 `gorm:"type:text;not null" json:"description"`
 	Code        string                 `gorm:"type:text;not null" json:"code"`
 	Ports       []json.ModelPort       `gorm:"type:json;default:'[]';serializer:json" json:"ports"`
+	Metadata    json.ModelMetadata     `gorm:"type:json;default:'{}';serializer:json" json:"metadata"`
+	Connections []json.ModelConnection `gorm:"type:json;default:'[]';serializer:json" json:"connections"`
 	CreatedAt   time.Time              `gorm:"type:timestamp;default:now()" json:"createdAt"`
 	UpdatedAt   time.Time              `gorm:"type:timestamp;default:now()" json:"updatedAt"`
-	DeletedAt   time.Time              `gorm:"index" json:"deletedAt"`
-    Components  []Model `gorm:"type:json;default:'[]';serializer:json" json:"components"`
+	DeletedAt   *time.Time             `gorm:"index" json:"deletedAt"`
+	Components  []ModelComponent       `gorm:"type:json;default:'[]';serializer:json" json:"components"`
+}
+
+type ModelComponent struct {
+	ComponentID string `json:"id" validate:"required"`
+	ModelID     string `json:"model" validate:"required"`
 }

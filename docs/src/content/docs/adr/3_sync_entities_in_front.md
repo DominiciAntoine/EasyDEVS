@@ -1,3 +1,9 @@
+---
+title: 3-Synchronisation in between models in the front
+description: How the models are sychronised in the front
+---
+
+
 # How to sync model in front during development
 
 ## 1. Async saves

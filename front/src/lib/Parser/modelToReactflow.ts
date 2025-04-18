@@ -5,10 +5,10 @@ import { Position } from "@xyflow/react";
 const connectionToEdge = ({
 	from,
 	to,
-}: components["schemas"]["json.Connection"]): ReactFlowInput["edges"][number] => ({
-	id: `from-${from.model}-${from.port}-to-${to.model}-${to.port}`,
-	source: from.model,
-	target: to.model,
+}: components["schemas"]["json.ModelConnection"]): ReactFlowInput["edges"][number] => ({
+	id: `from-${from.modelId}-${from.port}-to-${to.modelId}-${to.port}`,
+	source: from.modelId,
+	target: to.modelId,
 	sourceHandle: from.port,
 	targetHandle: to.port,
 	type: "step",
@@ -19,28 +19,29 @@ const connectionToEdge = ({
 const modelToNode = (
 	model: components["schemas"]["response.ModelResponse"],
 ): ReactFlowInput["nodes"][number] => {
+	
 	return {
 		id: model.id ?? "Unnamed model",
 		type: "resizer",
 		style: {
-			height: model.metadataJson.style?.height ?? 200,
-			width: model.metadataJson.style?.width ?? 200,
-			backgroundColor: model.metadataJson.backgroundColor ?? undefined,
+			height: model.metadata.style?.height ?? 200,
+			width: model.metadata.style?.width ?? 200,
+			backgroundColor: model.metadata.backgroundColor ?? undefined,
 		},
 		data: {
 			id: model.id ?? "Unnamed model",
 			modelType: model.type ?? "atomic",
 			label: model.name ?? "Unnamed model",
-			inputPorts: model.portInJson,
-			outputPorts: model.portOutJson,
-			toolbarVisible: model.metadataJson.toolbarVisible ?? false,
+			inputPorts: model.ports.filter((p) => {p.type == "in"}),
+			outputPorts: model.ports.filter((p) => {p.type == "out"}),
+			toolbarVisible: model.metadata.toolbarVisible ?? false,
 			// as because Position is an enum
 			toolbarPosition:
-				(model.metadataJson.toolbarPosition as Position) ?? Position.Top,
-			alwaysShowToolbar: model.metadataJson.alwaysShowToolbar,
-			alwaysShowExtraInfo: model.metadataJson.alwaysShowExtraInfo,
+				(model.metadata.toolbarPosition as Position) ?? Position.Top,
+			alwaysShowToolbar: model.metadata.alwaysShowToolbar,
+			alwaysShowExtraInfo: model.metadata.alwaysShowExtraInfo,
 		},
-		position: model.metadataJson.position ?? { x: 0, y: 0 },
+		position: model.metadata.position ?? { x: 0, y: 0 },
 	};
 };
 
@@ -49,6 +50,6 @@ export const modelToReactflow = (
 ): ReactFlowInput => ({
 	nodes: res.map((model) => modelToNode(model)),
 	edges: res.flatMap((model) => {
-		return model.connectionsJson.map(connectionToEdge);
+		return model.connections.map(connectionToEdge);
 	}),
 });

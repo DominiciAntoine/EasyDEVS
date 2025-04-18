@@ -1,3 +1,8 @@
+---
+title: 4-Usage of DTOs in the backend
+description: Explanation of the usage of DTOs in the the backend 
+---
+
 # Using DTOs in the Go Backend
 
 ## Introduction

@@ -1,3 +1,8 @@
+---
+title: 2-Synchronisation in between models
+description: How the models are sychronised in the back
+---
+
 # How entities are synced
 
 ## Models Syncing

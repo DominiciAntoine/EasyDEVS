@@ -1,5 +1,5 @@
 import type { ReactFlowInput } from "@/types";
-import ELK, { type ElkNode } from "elkjs";
+import ELK, { type ElkNode } from "elkjs/lib/elk.bundled.js";
 
 const elk = new ELK();
 const elkOptions = {

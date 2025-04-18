@@ -1,5 +1,5 @@
 {
-  "type": "module",
+	"type": "module",
 	"scripts": {
 		"format:front": "biome format --write .",
 		"format:back": "cd back && go fmt",
@@ -16,5 +16,8 @@
 		"@commitlint/config-conventional": "^19.8.0",
 		"lefthook": "^1.10.10"
 	},
-	"packageManager": "pnpm@10.6.5"
+	"packageManager": "pnpm@10.6.5",
+	"dependencies": {
+		"swag": "^0.7.0"
+	}
 }

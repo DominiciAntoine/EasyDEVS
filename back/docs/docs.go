@@ -1404,6 +1404,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "enum.ModelPortDirection": {
+            "type": "string",
+            "enum": [
+                "in",
+                "out"
+            ],
+            "x-enum-varnames": [
+                "ModelPortDirectionIn",
+                "ModelPortDirectionOut"
+            ]
+        },
         "enum.ModelType": {
             "type": "string",
             "enum": [
@@ -1415,7 +1426,7 @@ const docTemplate = `{
                 "Coupled"
             ]
         },
-        "json.Connection": {
+        "json.ModelConnection": {
             "type": "object",
             "required": [
                 "from",
@@ -1430,25 +1441,14 @@ const docTemplate = `{
                 }
             }
         },
-        "json.ModelComponents": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
         "json.ModelLink": {
             "type": "object",
             "required": [
-                "model",
+                "modelId",
                 "port"
             ],
             "properties": {
-                "model": {
+                "modelId": {
                     "type": "string"
                 },
                 "port": {
@@ -1489,11 +1489,15 @@ const docTemplate = `{
         "json.ModelPort": {
             "type": "object",
             "required": [
-                "id"
+                "id",
+                "type"
             ],
             "properties": {
                 "id": {
                     "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/enum.ModelPortDirection"
                 }
             }
         },
@@ -1560,11 +1564,11 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "model": {
-                    "$ref": "#/definitions/model.Model"
-                },
                 "modelId": {
                     "type": "string"
+                },
+                "modelType": {
+                    "$ref": "#/definitions/model.Model"
                 },
                 "name": {
                     "type": "string",
@@ -1597,7 +1601,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "models": {
+                "modelTypes": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Model"
@@ -1620,16 +1624,16 @@ const docTemplate = `{
                 "code": {
                     "type": "string"
                 },
-                "componentsJson": {
+                "components": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/json.ModelComponents"
+                        "$ref": "#/definitions/model.ModelComponent"
                     }
                 },
-                "connectionsJson": {
+                "connections": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/json.Connection"
+                        "$ref": "#/definitions/json.ModelConnection"
                     }
                 },
                 "createdAt": {
@@ -1647,19 +1651,13 @@ const docTemplate = `{
                 "libId": {
                     "type": "string"
                 },
-                "metadataJson": {
+                "metadata": {
                     "$ref": "#/definitions/json.ModelMetadata"
                 },
                 "name": {
                     "type": "string"
                 },
-                "portInJson": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/json.ModelPort"
-                    }
-                },
-                "portOutJson": {
+                "ports": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/json.ModelPort"
@@ -1672,6 +1670,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ModelComponent": {
+            "type": "object",
+            "required": [
+                "id",
+                "model"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "model": {
                     "type": "string"
                 }
             }
@@ -1705,7 +1718,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/model.Library"
                     }
                 },
-                "models": {
+                "modelTypes": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Model"
@@ -1861,29 +1874,28 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "code",
-                "componentsJson",
-                "connectionsJson",
+                "components",
+                "connections",
                 "description",
-                "metadataJson",
+                "metadata",
                 "name",
-                "portInJson",
-                "portOutJson",
+                "ports",
                 "type"
             ],
             "properties": {
                 "code": {
                     "type": "string"
                 },
-                "componentsJson": {
+                "components": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/json.ModelComponents"
+                        "$ref": "#/definitions/model.ModelComponent"
                     }
                 },
-                "connectionsJson": {
+                "connections": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/json.Connection"
+                        "$ref": "#/definitions/json.ModelConnection"
                     }
                 },
                 "description": {
@@ -1892,19 +1904,13 @@ const docTemplate = `{
                 "libId": {
                     "type": "string"
                 },
-                "metadataJson": {
+                "metadata": {
                     "$ref": "#/definitions/json.ModelMetadata"
                 },
                 "name": {
                     "type": "string"
                 },
-                "portInJson": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/json.ModelPort"
-                    }
-                },
-                "portOutJson": {
+                "ports": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/json.ModelPort"
@@ -2140,29 +2146,28 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "code",
-                "componentsJson",
-                "connectionsJson",
+                "components",
+                "connections",
                 "description",
-                "metadataJson",
+                "metadata",
                 "name",
-                "portInJson",
-                "portOutJson",
+                "ports",
                 "type"
             ],
             "properties": {
                 "code": {
                     "type": "string"
                 },
-                "componentsJson": {
+                "components": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/json.ModelComponents"
+                        "$ref": "#/definitions/model.ModelComponent"
                     }
                 },
-                "connectionsJson": {
+                "connections": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/json.Connection"
+                        "$ref": "#/definitions/json.ModelConnection"
                     }
                 },
                 "description": {
@@ -2174,19 +2179,13 @@ const docTemplate = `{
                 "libId": {
                     "type": "string"
                 },
-                "metadataJson": {
+                "metadata": {
                     "$ref": "#/definitions/json.ModelMetadata"
                 },
                 "name": {
                     "type": "string"
                 },
-                "portInJson": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/json.ModelPort"
-                    }
-                },
-                "portOutJson": {
+                "ports": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/json.ModelPort"

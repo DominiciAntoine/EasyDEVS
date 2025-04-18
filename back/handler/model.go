@@ -99,7 +99,7 @@ func getModelRecursive(c *fiber.Ctx) error {
 			} else {
 				models = append(models, response.CreateModelResponse(model))
 				for _, v := range model.Components {
-					componentsId = append(componentsId, v.ID)
+					componentsId = append(componentsId, v.ModelID)
 				}
 			}
 		}
@@ -128,15 +128,16 @@ func createModel(c *fiber.Ctx) error {
 	}
 
 	model := model.Model{
-		LibID:           req.LibID,
-		Name:            req.Name,
-		Description:     req.Description,
-		Type:            req.Type,
-		Code:            req.Code,
-		UserID:          c.Locals("user_id").(string),
-        Components: req.Components,
-        Ports: req.Ports,
-
+		LibID:       req.LibID,
+		Name:        req.Name,
+		Description: req.Description,
+		Type:        req.Type,
+		Code:        req.Code,
+		UserID:      c.Locals("user_id").(string),
+		Components:  req.Components,
+		Ports:       req.Ports,
+		Metadata:    req.Metadata,
+		Connections: req.Connections,
 	}
 
 	db.Create(&model)

@@ -53,7 +53,7 @@ export default function ModelForm({
 					code: values.type === "atomic" ? defaultPythonCode(values.name) : "",
 					type: values.type,
 					libId: libId,
-					metadataJson: {
+					metadata: {
 						style: {
 							height: defaultSize,
 							width: defaultSize,
@@ -63,10 +63,9 @@ export default function ModelForm({
 							y: 0,
 						},
 					},
-					componentsJson: [],
-					connectionsJson: [],
-					portInJson: [],
-					portOutJson: [],
+					components: [],
+					connections: [],
+					ports: [],
 				},
 			});
 
