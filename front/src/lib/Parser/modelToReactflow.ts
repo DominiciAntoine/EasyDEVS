@@ -19,7 +19,6 @@ const connectionToEdge = ({
 const modelToNode = (
 	model: components["schemas"]["response.ModelResponse"],
 ): ReactFlowInput["nodes"][number] => {
-	
 	return {
 		id: model.id ?? "Unnamed model",
 		type: "resizer",
@@ -32,8 +31,12 @@ const modelToNode = (
 			id: model.id ?? "Unnamed model",
 			modelType: model.type ?? "atomic",
 			label: model.name ?? "Unnamed model",
-			inputPorts: model.ports.filter((p) => {p.type == "in"}),
-			outputPorts: model.ports.filter((p) => {p.type == "out"}),
+			inputPorts: model.ports.filter((p) => {
+				p.type == "in";
+			}),
+			outputPorts: model.ports.filter((p) => {
+				p.type == "out";
+			}),
 			toolbarVisible: model.metadata.toolbarVisible ?? false,
 			// as because Position is an enum
 			toolbarPosition:

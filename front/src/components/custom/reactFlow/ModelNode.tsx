@@ -5,11 +5,12 @@ import ModelExtraInfo from "./ModelExtraInfo";
 import ModelHeader from "./ModelHeader";
 
 type ModelNodeProps = {
+	id: string
 	data: ReactFlowModelData;
 	selected: boolean;
 };
 
-function ModelNode({ data, selected }: ModelNodeProps) {
+function ModelNode({id, data, selected }: ModelNodeProps) {
 	return (
 		<>
 			<NodeResizer
@@ -21,7 +22,7 @@ function ModelNode({ data, selected }: ModelNodeProps) {
 
 			{(data.alwaysShowExtraInfo === true ||
 				data.alwaysShowExtraInfo === undefined) && (
-				<ModelExtraInfo data={data} />
+				<ModelExtraInfo id={id} data={data} selected={selected} />
 			)}
 
 			{/* Conteneur principal avec une bordure */}
@@ -30,8 +31,10 @@ function ModelNode({ data, selected }: ModelNodeProps) {
 				<ModelHeader selected={selected} data={data} />
 
 				{/* Conteneur principal pour les ports */}
-				<div className="flex relative h-4/5 bg-card">
+				<div className="flex relative h-[calc(100%-2.5rem)] bg-card">
 					{/* Ports d'entrée (aligné à gauche) */}
+
+
 					<div className="flex flex-col justify-evenly relative -left-2 text-primary ">
 						{Array.isArray(data.inputPorts) &&
 							data.inputPorts.map((port: { id: string }) => (

@@ -7,21 +7,25 @@ import {
 	useStore,
 	useViewport,
 } from "@xyflow/react";
-import { Maximize, Minus, Plus, ReplaceAll } from "lucide-react";
+import { Info, Maximize, Minus, Plus, ReplaceAll } from "lucide-react";
 import * as React from "react";
 
 import { Slider } from "../components/ui/slider";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
+import { Toggle } from "./ui/toggle";
 
 type ZoomSliderProps = Omit<PanelProps, "children"> & {
 	onOrganizeClick?: () => void;
+	onInfoClick?: (state: boolean) => void;
 };
 
+
 const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
-	({ className, onOrganizeClick, ...props }) => {
+	({ className, onOrganizeClick, onInfoClick, ...props }) => {
 		const { zoom } = useViewport();
 		const { zoomTo, zoomIn, zoomOut, fitView } = useReactFlow();
+		const [infoToggled, setInfoToggled] = React.useState(false);
 
 		const { minZoom, maxZoom } = useStore(
 			(state) => ({
@@ -77,6 +81,16 @@ const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
 						<ReplaceAll className="h-4 w-4" />
 					</Button>
 				)}
+
+				<Toggle
+				pressed={infoToggled}
+				onPressedChange={(pressed) => {
+					setInfoToggled(pressed);
+					onInfoClick?.(pressed); // on envoie l'état mis à jour
+				}}
+				>
+				<Info className="h-4 w-4" />
+				</Toggle>
 			</Panel>
 		);
 	},

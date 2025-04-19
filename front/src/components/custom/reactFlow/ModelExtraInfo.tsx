@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
-import { type Node, NodeToolbar, type Position } from "@xyflow/react";
+import { type Node, NodeToolbar, Position } from "@xyflow/react";
 import { ChevronDown, ChevronUp, Info } from "lucide-react";
 import { memo, useState } from "react";
 
@@ -13,9 +13,11 @@ type ModelNodeData = Node["data"] & {
 
 type ModelNodeProps = {
 	data: ModelNodeData;
+	selected :boolean;
+	id: string;
 };
 
-function ModelExtraInfo({ data }: ModelNodeProps) {
+function ModelExtraInfo({ data, selected, id }: ModelNodeProps) {
 	const [expandedKeys, setExpandedKeys] = useState<Record<string, boolean>>({});
 
 	const toggleExpand = (key: string) => {
@@ -28,12 +30,26 @@ function ModelExtraInfo({ data }: ModelNodeProps) {
 	return (
 		<NodeToolbar
 			className="h-auto bg-muted/80 text-foreground p-6 border border-border rounded-2xl shadow-xl flex flex-col gap-3 w-80 animate-fadeIn"
-			isVisible={data.toolbarVisible}
-			position={data.toolbarPosition}
+			isVisible={selected}
+			position={Position.Right}
 		>
 			<h3 className="text-lg font-semibold text-primary mb-2 border-b pb-2">
 				Model Information
 			</h3>
+			<div
+							key={id}
+							className="flex flex-col gap-1 border-t pt-4 first:border-none"
+						>
+							<div className="flex items-center gap-2">
+								<Info className="w-4 h-4 text-muted-foreground" />
+								<Label className="text-sm font-medium">{"Instance ID"}</Label>
+							</div>
+							<Input
+								value={id}
+								disabled
+								className="w-full opacity-70 text-muted-foreground"
+							/>
+						</div>
 			{Object.entries(data).map(([key, value]) => {
 				if (["toolbarVisible", "toolbarPosition"].includes(key)) return null;
 

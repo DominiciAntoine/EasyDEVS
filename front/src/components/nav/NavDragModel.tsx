@@ -46,7 +46,7 @@ export default function NavDragModelSimple() {
 									<div
 										key={model.id}
 										draggable
-										onDragStart={(e) => onDragStart(e, model.id)}
+										onDragStart={(e) => onDragStart(e, model.id ?? "")}
 										className="h-32 w-32 rounded cursor-move  overflow-hidden border-border border rounded-lg border-solid m-2"
 									>
 										<div className="w-full bg-primary text-background flex justify-center">
