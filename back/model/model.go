@@ -21,10 +21,5 @@ type Model struct {
 	CreatedAt   time.Time              `gorm:"type:timestamp;default:now()" json:"createdAt"`
 	UpdatedAt   time.Time              `gorm:"type:timestamp;default:now()" json:"updatedAt"`
 	DeletedAt   *time.Time             `gorm:"index" json:"deletedAt"`
-	Components  []ModelComponent       `gorm:"type:json;default:'[]';serializer:json" json:"components"`
-}
-
-type ModelComponent struct {
-	ComponentID string `json:"id" validate:"required"`
-	ModelID     string `json:"model" validate:"required"`
+	Components  []json.ModelComponent       `gorm:"type:json;default:'[]';serializer:json" json:"components"`
 }

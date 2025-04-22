@@ -2,6 +2,7 @@ package handler
 
 import (
 	"app/database"
+	"app/json"
 	"app/middleware"
 	"app/model"
 	"app/request"
@@ -27,7 +28,7 @@ func SetupModelRoutes(app *fiber.App) {
 // @Description Retrieve a list of all models
 // @Tags models
 // @Produce json
-// @Success 200 {array} model.Model
+// @Success 200 {array} []response.ModelResponse
 // @Failure 500 {object} map[string]interface{}
 // @Router /model [get]
 func getAllModels(c *fiber.Ctx) error {
@@ -127,6 +128,14 @@ func createModel(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create model", "data": err})
 	}
 
+	components := make([]json.ModelComponent, 0)
+	for _, a_mc := range req.Components {
+		components = append(components, json.ModelComponent{
+			ComponentID: a_mc.ComponentID,
+			ModelID:     a_mc.ModelID,
+		})
+	}
+
 	model := model.Model{
 		LibID:       req.LibID,
 		Name:        req.Name,
@@ -134,7 +143,7 @@ func createModel(c *fiber.Ctx) error {
 		Type:        req.Type,
 		Code:        req.Code,
 		UserID:      c.Locals("user_id").(string),
-		Components:  req.Components,
+		Components:  components,
 		Ports:       req.Ports,
 		Metadata:    req.Metadata,
 		Connections: req.Connections,

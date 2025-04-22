@@ -47,3 +47,8 @@ type ModelMetadata struct {
 	Position            ModelPosition    `json:"position" validate:"required"`
 	Style               ModelStyle       `json:"style" validate:"required"`
 }
+
+type ModelComponent struct {
+	ComponentID string `json:"componentId" validate:"required"`
+	ModelID     string `json:"modelId" validate:"required"`
+}

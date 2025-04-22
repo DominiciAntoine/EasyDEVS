@@ -6,18 +6,23 @@ import (
 	"app/model"
 )
 
+type ModelComponentResponse struct {
+	ComponentID string `json:"componentId" validate:"required"`
+	ModelID     string `json:"modelId" validate:"required"`
+}
+
 type ModelResponse struct {
-	ID          string                 `json:"id"`
-	UserID      string                 `json:"userId"`
-	LibID       *string                `json:"libId"`
-	Name        string                 `json:"name" validate:"required"`
-	Type        enum.ModelType         `json:"type" validate:"required"`
-	Description string                 `json:"description" validate:"required"`
-	Code        string                 `json:"code" validate:"required"`
-	Components  []model.ModelComponent `json:"components" validate:"required"`
-	Ports       []json.ModelPort       `json:"ports" validate:"required"`
-	Metadata    json.ModelMetadata     `json:"metadata" validate:"required"`
-	Connections []json.ModelConnection `json:"connections" validate:"required"`
+	ID          string                   `json:"id"`
+	UserID      string                   `json:"userId"`
+	LibID       *string                  `json:"libId"`
+	Name        string                   `json:"name" validate:"required"`
+	Type        enum.ModelType           `json:"type" validate:"required"`
+	Description string                   `json:"description" validate:"required"`
+	Code        string                   `json:"code" validate:"required"`
+	Components  []json.ModelComponent `json:"components" validate:"required"`
+	Ports       []json.ModelPort         `json:"ports" validate:"required"`
+	Metadata    json.ModelMetadata       `json:"metadata" validate:"required"`
+	Connections []json.ModelConnection   `json:"connections" validate:"required"`
 }
 
 func CreateModelResponse(m model.Model) ModelResponse {
