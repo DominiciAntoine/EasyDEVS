@@ -13,7 +13,7 @@ type ModelNodeData = Node["data"] & {
 
 type ModelNodeProps = {
 	data: ModelNodeData;
-	selected :boolean;
+	selected: boolean;
 	id: string;
 };
 
@@ -37,19 +37,19 @@ function ModelExtraInfo({ data, selected, id }: ModelNodeProps) {
 				Model Information
 			</h3>
 			<div
-							key={id}
-							className="flex flex-col gap-1 border-t pt-4 first:border-none"
-						>
-							<div className="flex items-center gap-2">
-								<Info className="w-4 h-4 text-muted-foreground" />
-								<Label className="text-sm font-medium">{"Instance ID"}</Label>
-							</div>
-							<Input
-								value={id}
-								disabled
-								className="w-full opacity-70 text-muted-foreground"
-							/>
-						</div>
+				key={id}
+				className="flex flex-col gap-1 border-t pt-4 first:border-none"
+			>
+				<div className="flex items-center gap-2">
+					<Info className="w-4 h-4 text-muted-foreground" />
+					<Label className="text-sm font-medium">{"Instance ID"}</Label>
+				</div>
+				<Input
+					value={id}
+					disabled
+					className="w-full opacity-70 text-muted-foreground"
+				/>
+			</div>
 			{Object.entries(data).map(([key, value]) => {
 				if (["toolbarVisible", "toolbarPosition"].includes(key)) return null;
 

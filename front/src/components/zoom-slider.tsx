@@ -20,7 +20,6 @@ type ZoomSliderProps = Omit<PanelProps, "children"> & {
 	onInfoClick?: (state: boolean) => void;
 };
 
-
 const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
 	({ className, onOrganizeClick, onInfoClick, ...props }) => {
 		const { zoom } = useViewport();
@@ -83,13 +82,13 @@ const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
 				)}
 
 				<Toggle
-				pressed={infoToggled}
-				onPressedChange={(pressed) => {
-					setInfoToggled(pressed);
-					onInfoClick?.(pressed); // on envoie l'état mis à jour
-				}}
+					pressed={infoToggled}
+					onPressedChange={(pressed) => {
+						setInfoToggled(pressed);
+						onInfoClick?.(pressed); // on envoie l'état mis à jour
+					}}
 				>
-				<Info className="h-4 w-4" />
+					<Info className="h-4 w-4" />
 				</Toggle>
 			</Panel>
 		);

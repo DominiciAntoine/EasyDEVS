@@ -26,7 +26,7 @@ import { client } from "@/api/client.ts";
 import { useToast } from "@/hooks/use-toast.ts";
 import { modelToReactflow } from "@/lib/Parser/modelToReactflow.ts";
 import { FindParentNodeId } from "@/lib/findParentNodeId.ts";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 const nodeTypes = {
 	resizer: ModelNode,
 };
@@ -79,8 +79,8 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 		onLayoutRef.current({ direction: "RIGHT" });
 	};
 
-	const onInfoClick = (state : boolean) => {
-		toggleInfoForAllNodes(state)
+	const onInfoClick = (state: boolean) => {
+		toggleInfoForAllNodes(state);
 	};
 
 	const toggleInfoForAllNodes = (show: boolean) => {
@@ -92,8 +92,7 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 							...node,
 							data: {
 								...node.data,
-								alwaysShowExtraInfo:show
-								
+								alwaysShowExtraInfo: show,
 							},
 						})),
 					}
@@ -149,17 +148,13 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 				(model) => model.id === dragId,
 			);
 
-			
-
 			const targetId = FindParentNodeId(ReactFlowData?.nodes, position);
 			if (targetId && dragRootModel) {
 				dragRootModel.parentId = targetId;
 				dragRootModel.extent = "parent";
 				dragRootModel.id = uuidv4();
-				dragRootModel.data.alwaysShowExtraInfo=true;
+				dragRootModel.data.alwaysShowExtraInfo = true;
 			}
-
-			
 
 			setReactFlowData((prev) =>
 				prev
@@ -224,7 +219,10 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 				onDragOver={onDragOver}
 			>
 				<MiniMap zoomable pannable />
-				<ZoomSlider onOrganizeClick={onOrganizeClick} onInfoClick={onInfoClick}/>
+				<ZoomSlider
+					onOrganizeClick={onOrganizeClick}
+					onInfoClick={onInfoClick}
+				/>
 				<Background />
 			</ReactFlow>
 		</div>
