@@ -1,17 +1,21 @@
 import type { ReactFlowModelData, ReactFlowPort } from "@/types";
-import { useReactFlow } from "@xyflow/react";
+import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { CodeXml, Minus, Plus } from "lucide-react";
 import { memo, useCallback } from "react";
+import { v4 as uuidv4 } from "uuid";
+
 
 type ModelNodeProps = {
 	selected: boolean;
 	data: ReactFlowModelData;
+	id: string;
 };
 
-function ModelHeaderToolbar({ selected, data }: ModelNodeProps) {
+function ModelHeaderToolbar({ selected, data, id }: ModelNodeProps) {
 	const { setNodes } = useReactFlow();
+	const updateNodeInternals = useUpdateNodeInternals();
 
-	const handlePort = useCallback(
+	const handlePort = 
 		(
 			action: "add" | "remove",
 			portType: "input" | "output",
@@ -19,7 +23,7 @@ function ModelHeaderToolbar({ selected, data }: ModelNodeProps) {
 		) => {
 			setNodes((nodes) => {
 				return nodes.map((node) => {
-					if (node.id === data.id) {
+					if (node.id === id) {
 						const nodeData = node.data as ReactFlowModelData;
 						const portsKey =
 							portType === "input" ? "inputPorts" : "outputPorts";
@@ -28,7 +32,7 @@ function ModelHeaderToolbar({ selected, data }: ModelNodeProps) {
 						let updatedPorts: ReactFlowPort[];
 
 						if (action === "add") {
-							const newId = portId || `${portType}-${Date.now()}`;
+							const newId = portId || `${uuidv4()}`;
 							const newPort: ReactFlowPort = { id: newId };
 							updatedPorts = [...existingPorts, newPort];
 						} else {
@@ -53,12 +57,11 @@ function ModelHeaderToolbar({ selected, data }: ModelNodeProps) {
 							},
 						};
 					}
+					updateNodeInternals(id);
 					return node;
 				});
 			});
-		},
-		[data.id, setNodes],
-	);
+		};
 
 	if (!selected) return null;
 

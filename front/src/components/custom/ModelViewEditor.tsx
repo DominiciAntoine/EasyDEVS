@@ -47,7 +47,7 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 	>(models);
 	const { fitView } = useReactFlow();
 	const { screenToFlowPosition } = useReactFlow();
-	const [dragId, setdragId] = useDnD();
+	const [dragId, ] = useDnD();
 	const { toast } = useToast();
 
 	const onNodesChange = useCallback(
@@ -75,8 +75,28 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 		);
 	}, []);
 
+	const onLayoutFn = useCallback(({ direction = "RIGHT" }) => {
+		const opts = direction;
+		if (ReactFlowData) {
+			getLayoutedElements(ReactFlowData.nodes, ReactFlowData.edges, opts).then(
+				({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+					setReactFlowData((prev) =>
+						prev
+							? {
+									...prev,
+									nodes: layoutedNodes,
+									edges: layoutedEdges,
+								}
+							: undefined,
+					);
+					setTimeout(() => fitView(), 200);
+				},
+			);
+		}
+	}, [ReactFlowData, fitView]);
+
 	const onOrganizeClick = () => {
-		onLayoutRef.current({ direction: "RIGHT" });
+		onLayoutFn({ direction: "RIGHT" });
 	};
 
 	const onInfoClick = (state: boolean) => {
@@ -98,6 +118,8 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 					}
 				: undefined,
 		);
+
+		console.log(ReactFlowData)
 	};
 
 	const onDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
@@ -153,8 +175,12 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 				dragRootModel.parentId = targetId;
 				dragRootModel.extent = "parent";
 				dragRootModel.id = uuidv4();
-				dragRootModel.data.alwaysShowExtraInfo = true;
 			}
+			else if( dragRootModel)
+			{
+				dragRootModel.id = uuidv4();
+			}
+				
 
 			setReactFlowData((prev) =>
 				prev
@@ -171,6 +197,7 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 	const onConnect = useCallback<
 		NonNullable<ComponentProps<typeof ReactFlow>["onConnect"]>
 	>((connection) => {
+		console.log("Trying to connect:", connection);
 		setReactFlowData((prev) =>
 			prev
 				? {
@@ -179,27 +206,8 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 					}
 				: undefined,
 		);
+		
 	}, []);
-
-	const onLayoutRef = useRef(({ direction = "RIGHT" }) => {
-		const opts = direction;
-		if (ReactFlowData) {
-			getLayoutedElements(ReactFlowData.nodes, ReactFlowData.edges, opts).then(
-				({ nodes: layoutedNodes, edges: layoutedEdges }) => {
-					setReactFlowData((prev) =>
-						prev
-							? {
-									...prev,
-									nodes: layoutedNodes,
-									edges: layoutedEdges,
-								}
-							: undefined,
-					);
-					setTimeout(() => fitView(), 200);
-				},
-			);
-		}
-	});
 
 	return (
 		<div className="h-full w-full flex flex-col">

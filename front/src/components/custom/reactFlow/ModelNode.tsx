@@ -1,5 +1,5 @@
 import type { ReactFlowModelData } from "@/types";
-import { Handle, NodeResizer, Position } from "@xyflow/react";
+import { Handle, NodeResizer, Position, useUpdateNodeInternals } from "@xyflow/react";
 import { memo } from "react";
 import ModelExtraInfo from "./ModelExtraInfo";
 import ModelHeader from "./ModelHeader";
@@ -28,7 +28,7 @@ function ModelNode({ id, data, selected }: ModelNodeProps) {
 			{/* Conteneur principal avec une bordure */}
 			<div className="h-full w-full border-border border rounded-lg border-solid ">
 				{/* En-tête avec le label */}
-				<ModelHeader selected={selected} data={data} />
+				<ModelHeader selected={selected} data={data} id={id} />
 
 				{/* Conteneur principal pour les ports */}
 				<div className="flex relative h-[calc(100%-2.5rem)] bg-card">
@@ -41,9 +41,10 @@ function ModelNode({ id, data, selected }: ModelNodeProps) {
 									key={`in-group-${port.id}`}
 									className="flex flex-row justify-start"
 								>
+									
 									<Handle
 										className="relative h-5 w-2 secondary-foreground transform-none top-0"
-										type="source"
+										type="target"
 										id={`in-${port.id}`}
 										position={Position.Left}
 									/>
@@ -53,6 +54,7 @@ function ModelNode({ id, data, selected }: ModelNodeProps) {
 											type="source"
 											id={`in-internal-${port.id}`}
 											position={Position.Right}
+											
 										/>
 									)}
 								</div>
