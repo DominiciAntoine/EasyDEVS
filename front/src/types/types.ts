@@ -13,8 +13,8 @@ export type ReactFlowModelData = {
 	label: string;
 	inputPorts?: ReactFlowPort[];
 	outputPorts?: ReactFlowPort[];
-	toolbarVisible: boolean;
-	toolbarPosition: Position;
+	toolbarVisible?: boolean;
+	toolbarPosition?: Position | string;
 	alwaysShowToolbar?: boolean;
 	alwaysShowExtraInfo?: boolean;
 };

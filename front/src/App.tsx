@@ -21,9 +21,9 @@ import { CreateDiagram } from "./pages/diagram/CreateDiagram";
 import { CreateLibrary } from "./pages/library/CreateLibrary";
 import { CreateModel } from "./pages/model/CreateModel";
 import { EditModel } from "./pages/model/EditModel";
+import { TestModel } from "./pages/model/TestModel";
 import { CreateWorkspace } from "./pages/workspace/CreateWorkspace";
 import { DnDProvider } from "./providers/DnDContext";
-import { TestModel } from "./pages/model/TestModel";
 
 const HomePage = () => <div>Page d'accueil</div>;
 const OnlineDEVSEditor = () => <div>Contact</div>;
@@ -84,8 +84,7 @@ const Main = () => {
 				<Route path="/workspace/new" element={<CreateWorkspace />} />
 				<Route path="/workspace/:id/diagram/new" element={<CreateDiagram />} />
 
-		
-				<Route path="/" element={<TestModel/>} />
+				<Route path="/" element={<TestModel />} />
 
 				<Route path="/online-devs" element={<OnlineDEVSEditor />} />
 				{/* <Route path="/test2" element={<ModelCodeEditor code="" onSave={() => {}} />} /> */}

@@ -47,7 +47,7 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 	>(models);
 	const { fitView } = useReactFlow();
 	const { screenToFlowPosition } = useReactFlow();
-	const [dragId, ] = useDnD();
+	const [dragId] = useDnD();
 	const { toast } = useToast();
 
 	const onNodesChange = useCallback(
@@ -75,11 +75,15 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 		);
 	}, []);
 
-	const onLayoutFn = useCallback(({ direction = "RIGHT" }) => {
-		const opts = direction;
-		if (ReactFlowData) {
-			getLayoutedElements(ReactFlowData.nodes, ReactFlowData.edges, opts).then(
-				({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+	const onLayoutFn = useCallback(
+		({ direction = "RIGHT" }) => {
+			const opts = direction;
+			if (ReactFlowData) {
+				getLayoutedElements(
+					ReactFlowData.nodes,
+					ReactFlowData.edges,
+					opts,
+				).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
 					setReactFlowData((prev) =>
 						prev
 							? {
@@ -90,10 +94,11 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 							: undefined,
 					);
 					setTimeout(() => fitView(), 200);
-				},
-			);
-		}
-	}, [ReactFlowData, fitView]);
+				});
+			}
+		},
+		[ReactFlowData, fitView],
+	);
 
 	const onOrganizeClick = () => {
 		onLayoutFn({ direction: "RIGHT" });
@@ -101,6 +106,8 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 
 	const onInfoClick = (state: boolean) => {
 		toggleInfoForAllNodes(state);
+		console.log(ReactFlowData);
+		//suivi de la fonction 
 	};
 
 	const toggleInfoForAllNodes = (show: boolean) => {
@@ -119,7 +126,7 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 				: undefined,
 		);
 
-		console.log(ReactFlowData)
+		console.log(ReactFlowData);
 	};
 
 	const onDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
@@ -175,12 +182,11 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 				dragRootModel.parentId = targetId;
 				dragRootModel.extent = "parent";
 				dragRootModel.id = uuidv4();
-			}
-			else if( dragRootModel)
-			{
+				dragRootModel.style?.top = String(position.x) ?? "";
+				dragRootModel.position.y = position.y;
+			} else if (dragRootModel) {
 				dragRootModel.id = uuidv4();
 			}
-				
 
 			setReactFlowData((prev) =>
 				prev
@@ -206,7 +212,6 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 					}
 				: undefined,
 		);
-		
 	}, []);
 
 	return (

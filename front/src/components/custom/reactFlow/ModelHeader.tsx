@@ -8,7 +8,7 @@ type ModelNodeProps = {
 	id: string;
 };
 
-function ModelHeader({ data, selected, id  }: ModelNodeProps) {
+function ModelHeader({ data, selected, id }: ModelNodeProps) {
 	return (
 		<div className=" h-10  bg-card-foreground border-border rounded-t-lg text-primary-foreground flex flex-col justify-center items-center">
 			<div className={`${selected === true ? "h-10" : "h-5"} transition-all`}>

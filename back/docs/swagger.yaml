@@ -16,6 +16,76 @@ definitions:
     x-enum-varnames:
     - Atomic
     - Coupled
+  json.InstanceModelConnection:
+    properties:
+      from:
+        $ref: '#/definitions/json.InstanceModelLink'
+      to:
+        $ref: '#/definitions/json.InstanceModelLink'
+    required:
+    - from
+    - to
+    type: object
+  json.InstanceModelLink:
+    properties:
+      instanceModelId:
+        type: string
+      port:
+        type: string
+    required:
+    - instanceModelId
+    - port
+    type: object
+  json.InstanceModelMetadata:
+    properties:
+      alwaysShowExtraInfo:
+        type: boolean
+      alwaysShowToolbar:
+        type: boolean
+      backgroundColor:
+        type: string
+      position:
+        $ref: '#/definitions/json.InstanceModelPosition'
+      style:
+        $ref: '#/definitions/json.InstanceModelStyle'
+      toolbarPosition:
+        $ref: '#/definitions/json.ToolbarPosition'
+      toolbarVisible:
+        type: boolean
+    required:
+    - position
+    - style
+    type: object
+  json.InstanceModelPosition:
+    properties:
+      x:
+        type: integer
+      "y":
+        type: integer
+    required:
+    - x
+    - "y"
+    type: object
+  json.InstanceModelStyle:
+    properties:
+      height:
+        type: integer
+      width:
+        type: integer
+    required:
+    - height
+    - width
+    type: object
+  json.ModelComponent:
+    properties:
+      componentId:
+        type: string
+      modelId:
+        type: string
+    required:
+    - componentId
+    - modelId
+    type: object
   json.ModelConnection:
     properties:
       from:
@@ -108,10 +178,10 @@ definitions:
         type: string
       id:
         type: string
+      instanceModelId:
+        $ref: '#/definitions/model.InstanceModel'
       modelId:
         type: string
-      modelType:
-        $ref: '#/definitions/model.Model'
       name:
         maxLength: 50
         minLength: 3
@@ -124,6 +194,36 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  model.InstanceModel:
+    properties:
+      connections:
+        items:
+          $ref: '#/definitions/json.InstanceModelConnection'
+        type: array
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: string
+      metadata:
+        $ref: '#/definitions/json.InstanceModelMetadata'
+      modelTypeID:
+        type: string
+      parentID:
+        type: string
+      ports:
+        items:
+          $ref: '#/definitions/json.ModelPort'
+        type: array
+      rootID:
+        description: May be dont need me
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        type: string
     type: object
   model.Library:
     properties:
@@ -152,7 +252,7 @@ definitions:
         type: string
       components:
         items:
-          $ref: '#/definitions/model.ModelComponent'
+          $ref: '#/definitions/json.ModelComponent'
         type: array
       connections:
         items:
@@ -182,16 +282,6 @@ definitions:
         type: string
       userId:
         type: string
-    type: object
-  model.ModelComponent:
-    properties:
-      id:
-        type: string
-      model:
-        type: string
-    required:
-    - id
-    - model
     type: object
   model.User:
     properties:
@@ -323,13 +413,15 @@ definitions:
         type: string
       components:
         items:
-          $ref: '#/definitions/model.ModelComponent'
+          $ref: '#/definitions/json.ModelComponent'
         type: array
       connections:
         items:
           $ref: '#/definitions/json.ModelConnection'
         type: array
       description:
+        type: string
+      id:
         type: string
       libId:
         type: string
@@ -504,7 +596,7 @@ definitions:
         type: string
       components:
         items:
-          $ref: '#/definitions/model.ModelComponent'
+          $ref: '#/definitions/json.ModelComponent'
         type: array
       connections:
         items:
@@ -1131,7 +1223,9 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Model'
+              items:
+                $ref: '#/definitions/response.ModelResponse'
+              type: array
             type: array
         "500":
           description: Internal Server Error

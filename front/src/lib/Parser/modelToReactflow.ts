@@ -1,20 +1,22 @@
 import type { components } from "@/api/v1";
+import { DEFAULT_NODE_SIZE } from "@/constants";
 import type { ReactFlowInput } from "@/types";
-import { Position } from "@xyflow/react";
+import { addEdge } from "@xyflow/react";
+
+const DEFAULT_POSITION = { x: 0, y: 0 }
 
 const connectionToEdge = ({
 	from,
 	to,
-}: components["schemas"]["json.ModelConnection"]): ReactFlowInput["edges"][number] => ({
-	id: `from-${from.modelId}-${from.port}-to-${to.modelId}-${to.port}`,
+}: components["schemas"]["json.ModelConnection"]): ReactFlowInput["edges"][number] => addEdge({
 	source: from.modelId,
 	target: to.modelId,
 	sourceHandle: from.port,
 	targetHandle: to.port,
 	type: "step",
 	animated: true,
-	style: { zIndex: 1000 },
-});
+	zIndex: 1000,
+}, [])[0];
 
 const modelToNode = (
 	model: components["schemas"]["response.ModelResponse"],
@@ -22,29 +24,27 @@ const modelToNode = (
 	return {
 		id: model.id ?? "Unnamed model",
 		type: "resizer",
-		style: {
-			height: model.metadata.style?.height ?? 200,
-			width: model.metadata.style?.width ?? 200,
-			backgroundColor: model.metadata.backgroundColor ?? undefined,
+		measured: {
+			height: model.metadata.style.height ?? DEFAULT_NODE_SIZE,
+			width: model.metadata.style.width ?? DEFAULT_NODE_SIZE,
 		},
 		data: {
 			id: model.id ?? "Unnamed model",
 			modelType: model.type ?? "atomic",
 			label: model.name ?? "Unnamed model",
 			inputPorts: model.ports.filter((p) => {
-				p.type == "in";
+				p.type === "in";
 			}),
 			outputPorts: model.ports.filter((p) => {
-				p.type == "out";
+				p.type === "out";
 			}),
-			toolbarVisible: model.metadata.toolbarVisible ?? false,
-			// as because Position is an enum
-			toolbarPosition:
-				(model.metadata.toolbarPosition as Position) ?? Position.Top,
-			alwaysShowToolbar: model.metadata.alwaysShowToolbar,
-			alwaysShowExtraInfo: model.metadata.alwaysShowExtraInfo,
 		},
-		position: model.metadata.position ?? { x: 0, y: 0 },
+		position: model.metadata.position ?? DEFAULT_POSITION,
+		height: model.metadata.style.height ?? DEFAULT_NODE_SIZE,
+		width: model.metadata.style.width ?? DEFAULT_NODE_SIZE,
+		// TODO
+		// extent: '',
+		// parentId: '',
 	};
 };
 

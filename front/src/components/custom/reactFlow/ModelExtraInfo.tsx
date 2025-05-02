@@ -1,18 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { ReactFlowModelData } from "@/types";
 import { Label } from "@radix-ui/react-label";
-import { type Node, NodeToolbar, Position } from "@xyflow/react";
+import { NodeToolbar, Position } from "@xyflow/react";
 import { ChevronDown, ChevronUp, Info } from "lucide-react";
 import { memo, useState } from "react";
 
-type ModelNodeData = Node["data"] & {
-	toolbarVisible: boolean;
-	toolbarPosition: Position;
-};
-
 type ModelNodeProps = {
-	data: ModelNodeData;
+	data: ReactFlowModelData;
 	selected: boolean;
 	id: string;
 };
@@ -96,11 +92,11 @@ function ModelExtraInfo({ data, selected, id }: ModelNodeProps) {
 							<div className="flex flex-wrap gap-2">
 								{value.map((obj, index) => (
 									<Badge
-										key={obj.name + obj.id}
+										key={obj.id}
 										variant="secondary"
 										className="text-xs shadow-sm hover:scale-105 transition-transform cursor-default"
 									>
-										{obj.name || obj.id || `Item ${index + 1}`}
+										{obj.id || `Item ${index + 1}`}
 									</Badge>
 								))}
 							</div>

@@ -6,6 +6,7 @@ import (
 )
 
 type ModelRequest struct {
+	ID          *string                `json:"id"`
 	LibID       *string                `json:"libId"`
 	Name        string                 `json:"name" validate:"required"`
 	Type        enum.ModelType         `json:"type" validate:"required"`

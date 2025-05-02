@@ -12,6 +12,7 @@ import {
 	LineChart,
 	Link,
 	MoreHorizontal,
+	Save,
 	Settings2,
 	Star,
 	Trash,
@@ -115,6 +116,10 @@ export function NavActions() {
 
 	return (
 		<div className="flex items-center gap-2 text-sm">
+
+			<Button size="icon" className="h-7 w-7" >
+				<Save />
+			</Button>
 			<div className="hidden font-medium text-muted-foreground md:inline-block">
 				Edit Oct 08
 			</div>

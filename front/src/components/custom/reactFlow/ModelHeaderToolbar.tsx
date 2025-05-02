@@ -4,7 +4,6 @@ import { CodeXml, Minus, Plus } from "lucide-react";
 import { memo, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-
 type ModelNodeProps = {
 	selected: boolean;
 	data: ReactFlowModelData;
@@ -15,53 +14,49 @@ function ModelHeaderToolbar({ selected, data, id }: ModelNodeProps) {
 	const { setNodes } = useReactFlow();
 	const updateNodeInternals = useUpdateNodeInternals();
 
-	const handlePort = 
-		(
-			action: "add" | "remove",
-			portType: "input" | "output",
-			portId?: string,
-		) => {
-			setNodes((nodes) => {
-				return nodes.map((node) => {
-					if (node.id === id) {
-						const nodeData = node.data as ReactFlowModelData;
-						const portsKey =
-							portType === "input" ? "inputPorts" : "outputPorts";
-						const existingPorts = nodeData[portsKey] || [];
+	const handlePort = (
+		action: "add" | "remove",
+		portType: "input" | "output",
+		portId?: string,
+	) => {
+		setNodes((nodes) => {
+			return nodes.map((node) => {
+				if (node.id === id) {
+					const nodeData = node.data as ReactFlowModelData;
+					const portsKey = portType === "input" ? "inputPorts" : "outputPorts";
+					const existingPorts = nodeData[portsKey] || [];
 
-						let updatedPorts: ReactFlowPort[];
+					let updatedPorts: ReactFlowPort[];
 
-						if (action === "add") {
-							const newId = portId || `${uuidv4()}`;
-							const newPort: ReactFlowPort = { id: newId };
-							updatedPorts = [...existingPorts, newPort];
+					if (action === "add") {
+						const newId = portId || `${uuidv4()}`;
+						const newPort: ReactFlowPort = { id: newId };
+						updatedPorts = [...existingPorts, newPort];
+					} else {
+						if (portId) {
+							updatedPorts = existingPorts.filter((port) => port.id !== portId);
 						} else {
-							if (portId) {
-								updatedPorts = existingPorts.filter(
-									(port) => port.id !== portId,
-								);
+							if (existingPorts.length > 0) {
+								updatedPorts = existingPorts.slice(0, -1);
 							} else {
-								if (existingPorts.length > 0) {
-									updatedPorts = existingPorts.slice(0, -1);
-								} else {
-									return node;
-								}
+								return node;
 							}
 						}
-
-						return {
-							...node,
-							data: {
-								...node.data,
-								[portsKey]: updatedPorts,
-							},
-						};
 					}
-					updateNodeInternals(id);
-					return node;
-				});
+
+					return {
+						...node,
+						data: {
+							...node.data,
+							[portsKey]: updatedPorts,
+						},
+					};
+				}
+				updateNodeInternals(id);
+				return node;
 			});
-		};
+		});
+	};
 
 	if (!selected) return null;
 
