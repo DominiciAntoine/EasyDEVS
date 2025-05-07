@@ -21,6 +21,7 @@ type NavHeaderProps = {
 	showModeToggle?: boolean;
 	headerBgClass?: string;
 	headerExtraClass?: string;
+	saveFunction?: () => Promise<void>;
 };
 
 const NavHeader: React.FC<NavHeaderProps> = ({
@@ -29,6 +30,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({
 	showModeToggle = true,
 	headerBgClass = "bg-background",
 	headerExtraClass = "",
+	saveFunction,
 }) => {
 	const lastIndex = breadcrumbs.length - 1;
 
@@ -59,7 +61,9 @@ const NavHeader: React.FC<NavHeaderProps> = ({
 				</BreadcrumbList>
 			</Breadcrumb>
 			<div className="ml-auto px-3 flex items-center gap-2">
-				{showNavActions && <NavActions />}
+				{showNavActions && (
+					<NavActions {...(saveFunction ? { saveFunction } : {})} />
+				)}
 				{showModeToggle && <ModeToggle />}
 			</div>
 		</header>

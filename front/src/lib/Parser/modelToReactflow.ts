@@ -3,20 +3,24 @@ import { DEFAULT_NODE_SIZE } from "@/constants";
 import type { ReactFlowInput } from "@/types";
 import { addEdge } from "@xyflow/react";
 
-const DEFAULT_POSITION = { x: 0, y: 0 }
+const DEFAULT_POSITION = { x: 0, y: 0 };
 
 const connectionToEdge = ({
 	from,
 	to,
-}: components["schemas"]["json.ModelConnection"]): ReactFlowInput["edges"][number] => addEdge({
-	source: from.modelId,
-	target: to.modelId,
-	sourceHandle: from.port,
-	targetHandle: to.port,
-	type: "step",
-	animated: true,
-	zIndex: 1000,
-}, [])[0];
+}: components["schemas"]["json.ModelConnection"]): ReactFlowInput["edges"][number] =>
+	addEdge(
+		{
+			source: from.modelId,
+			target: to.modelId,
+			sourceHandle: from.port,
+			targetHandle: to.port,
+			type: "step",
+			animated: true,
+			zIndex: 1000,
+		},
+		[],
+	)[0];
 
 const modelToNode = (
 	model: components["schemas"]["response.ModelResponse"],

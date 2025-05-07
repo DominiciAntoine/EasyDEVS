@@ -1,3 +1,7 @@
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import { Loader } from "lucide-react";
+
 import ModelCodeEditorTemp from "@/components/custom/ModelCodeEditorTemp";
 import { ModelViewEditor } from "@/components/custom/ModelViewEditor";
 import NavDragModel from "@/components/nav/NavDragModel";
@@ -8,23 +12,93 @@ import {
 	ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
+import { reactflowToModel } from "@/lib/Parser/reactflowToModel";
 import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
-import { Loader } from "lucide-react";
-import { useParams } from "react-router-dom";
+import type { ReactFlowInput } from "@/types";
+
+import { client } from "@/api/client.ts";
+import { useToast } from "@/hooks/use-toast";
 
 export function EditModel() {
-	const { modelId } = useParams<{
-		modelId: string;
-	}>();
+	const { modelId } = useParams<{ modelId: string }>();
+
 	const { data, error, isLoading } = useGetModelByIdRecursive({
 		params: { path: { id: modelId ?? "" } },
 	});
+	const { toast } = useToast();
+	const [code, setCode] = useState("");
+	const [structure, setStructure] = useState<ReactFlowInput | undefined>(undefined);
 
-	if (!data) return null;
+	
+	useEffect(() => {
+		if (data && modelId) {
+			const root = data.find((model) => model.id === modelId);
+			setStructure(modelToReactflow(data));
+			if (root?.code) setCode(root.code);
+		}
+	}, [data, modelId]);
 
-	const reactFlowData = modelToReactflow(data);
 
-	const rootModel = data.find((model) => model.id === modelId);
+	const handleStructureChange = useCallback((newStructure: ReactFlowInput) => {
+		setStructure(newStructure);
+	}, []);
+
+	const saveModelChange = async (): Promise<void> => {
+		console.log("Code à sauvegarder :", code);
+		console.log("Structure à sauvegarder :", structure);
+		
+		if (!structure || !modelId) return;
+		
+		try {
+			const modelToSave = reactflowToModel(structure).find((model) => model.id === modelId);
+			
+			if (!modelToSave) {
+				toast({
+					title: "Erreur",
+					description: "Modèle non trouvé dans la structure",
+					variant: "destructive",
+				});
+				return;
+			}
+			
+			const response = await client.PATCH("/model/{id}", {
+				params: {
+					path: {
+						id: modelId,
+					},
+				},
+				body: {
+					code: modelToSave.code,
+					description: modelToSave.description,
+					name: modelToSave.name,
+					type: modelToSave.type,
+					components: [],
+					connections: modelToSave.connections,
+					ports: modelToSave.ports,
+					metadata: modelToSave.metadata,
+				},
+			});
+	
+			if (!response.data) {
+				throw new Error("No data received from API");
+			}
+			
+
+			toast({
+				title: "Modèle sauvegardé avec succès",
+			});
+			
+
+			// await mutate();
+	
+		} catch (error) {
+			toast({
+				title: "Erreur lors de la sauvegarde",
+				description: (error as Error).message,
+				variant: "destructive",
+			});
+		}
+	};
 
 	if (isLoading) {
 		return (
@@ -33,33 +107,47 @@ export function EditModel() {
 			</div>
 		);
 	}
+
 	if (error) return <div>Erreur lors du chargement.</div>;
+	if (!data || !structure) return null;
+
+	const rootModel = data.find((model) => model.id === modelId);
 
 	return (
 		<div className="flex flex-col h-screen w-full">
 			<NavHeader
 				breadcrumbs={[
 					{ label: "Libraries", href: "/library" },
-					{ label: "putlibraryname", href: "#putlibrarypath" },
+					{ label: "putlibraryname", href: "#" },
 					{ label: "Edit Model" },
 				]}
-				showNavActions={true}
-				showModeToggle={true}
+				showNavActions
+				showModeToggle
+				saveFunction={saveModelChange}
 			/>
+
 			<ResizablePanelGroup direction="horizontal">
 				<ResizablePanel defaultSize={50} minSize={20}>
-					<ModelCodeEditorTemp />
+					<ModelCodeEditorTemp code={code} onChangeCode={setCode} />
 				</ResizablePanel>
+
 				<ResizableHandle withHandle />
+
 				{rootModel?.type === "atomic" ? (
 					<ResizablePanel defaultSize={50} minSize={20}>
-						<ModelViewEditor models={reactFlowData} />
+						<ModelViewEditor 
+							models={structure} 
+							onChange={handleStructureChange} 
+						/>
 					</ResizablePanel>
 				) : (
 					<ResizablePanel defaultSize={50}>
 						<ResizablePanelGroup direction="vertical">
 							<ResizablePanel defaultSize={70} minSize={20}>
-								<ModelViewEditor models={reactFlowData} />
+								<ModelViewEditor 
+									models={structure} 
+									onChange={handleStructureChange} 
+								/>
 							</ResizablePanel>
 							<ResizableHandle withHandle />
 							<ResizablePanel defaultSize={30} minSize={20}>

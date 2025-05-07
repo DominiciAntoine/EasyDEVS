@@ -16,7 +16,7 @@ import {
 	BrowserRouter as Router,
 	Routes,
 } from "react-router-dom";
-import { ModelCodeEditor } from "./components/custom/ModelCodeEditor";
+
 import { CreateDiagram } from "./pages/diagram/CreateDiagram";
 import { CreateLibrary } from "./pages/library/CreateLibrary";
 import { CreateModel } from "./pages/model/CreateModel";

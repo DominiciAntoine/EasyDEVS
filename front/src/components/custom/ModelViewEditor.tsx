@@ -19,7 +19,7 @@ import { ZoomSlider } from "@/components/zoom-slider";
 import { getLayoutedElements } from "@/lib/getLayoutedElements.ts";
 import { useDnD } from "@/providers/DnDContext.tsx";
 import type { ReactFlowInput, ReactFlowModelData } from "@/types";
-import { type ComponentProps, useCallback, useRef, useState } from "react";
+import { type ComponentProps, useCallback, useRef, useState, useEffect } from "react";
 import ModelNode from "./reactFlow/ModelNode.tsx";
 
 import { client } from "@/api/client.ts";
@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast.ts";
 import { modelToReactflow } from "@/lib/Parser/modelToReactflow.ts";
 import { FindParentNodeId } from "@/lib/findParentNodeId.ts";
 import { v4 as uuidv4 } from "uuid";
+
 const nodeTypes = {
 	resizer: ModelNode,
 };
@@ -41,63 +42,68 @@ const defaultEdgeOptions = {
 	style: { zIndex: 1000 },
 };
 
-export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
-	const [ReactFlowData, setReactFlowData] = useState<
-		ReactFlowInput | undefined
-	>(models);
-	const { fitView } = useReactFlow();
-	const { screenToFlowPosition } = useReactFlow();
+export function ModelViewEditor({ 
+	models, 
+	onChange 
+}: { 
+	models: ReactFlowInput; 
+	onChange?: (structure: ReactFlowInput) => void 
+}) {
+	const { fitView, screenToFlowPosition } = useReactFlow();
 	const [dragId] = useDnD();
 	const { toast } = useToast();
+	
+	
+	const nodes = models?.nodes || [];
+	const edges = models?.edges || [];
 
 	const onNodesChange = useCallback(
 		(changes: NodeChange<Node<ReactFlowModelData>>[]) => {
-			setReactFlowData((prev) =>
-				prev
-					? {
-							...prev,
-							nodes: applyNodeChanges(changes, prev.nodes),
-						}
-					: undefined,
-			);
+			if (!onChange || !models) return;
+			
+			const updatedNodes = applyNodeChanges(changes, nodes);
+			onChange({
+				...models,
+				nodes: updatedNodes,
+			});
 		},
-		[],
+		[models, onChange, nodes],
 	);
 
-	const onEdgesChange = useCallback((changes: EdgeChange<Edge>[]) => {
-		setReactFlowData((prev) =>
-			prev
-				? {
-						...prev,
-						edges: applyEdgeChanges(changes, prev.edges),
-					}
-				: undefined,
-		);
-	}, []);
+	const onEdgesChange = useCallback(
+		(changes: EdgeChange<Edge>[]) => {
+			if (!onChange || !models) return;
+			
+			const updatedEdges = applyEdgeChanges(changes, edges);
+			onChange({
+				...models,
+				edges: updatedEdges,
+			});
+		}, 
+		[models, onChange, edges]
+	);
 
 	const onLayoutFn = useCallback(
 		({ direction = "RIGHT" }) => {
 			const opts = direction;
-			if (ReactFlowData) {
+			if (models) {
 				getLayoutedElements(
-					ReactFlowData.nodes,
-					ReactFlowData.edges,
+					models.nodes,
+					models.edges,
 					opts,
 				).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
-					setReactFlowData((prev) =>
-						prev
-							? {
-									...prev,
-									nodes: layoutedNodes,
-									edges: layoutedEdges,
-								}
-							: undefined,
-					);
-					setTimeout(() => fitView(), 200);
+					if (onChange) {
+						onChange({
+							...models,
+							nodes: layoutedNodes,
+							edges: layoutedEdges,
+						});
+						setTimeout(() => fitView(), 200);
+					}
 				});
 			}
 		},
-		[ReactFlowData, fitView],
+		[models, fitView, onChange],
 	);
 
 	const onOrganizeClick = () => {
@@ -106,27 +112,23 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 
 	const onInfoClick = (state: boolean) => {
 		toggleInfoForAllNodes(state);
-		console.log(ReactFlowData);
-		//suivi de la fonction 
 	};
 
 	const toggleInfoForAllNodes = (show: boolean) => {
-		setReactFlowData((prev) =>
-			prev
-				? {
-						...prev,
-						nodes: prev.nodes.map((node) => ({
-							...node,
-							data: {
-								...node.data,
-								alwaysShowExtraInfo: show,
-							},
-						})),
-					}
-				: undefined,
-		);
-
-		console.log(ReactFlowData);
+		if (!onChange || !models) return;
+		
+		const updatedNodes = models.nodes.map((node) => ({
+			...node,
+			data: {
+				...node.data,
+				alwaysShowExtraInfo: show,
+			},
+		}));
+		
+		onChange({
+			...models,
+			nodes: updatedNodes,
+		});
 	};
 
 	const onDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
@@ -144,7 +146,7 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 			event.preventDefault();
 
 			// check if the dropped element is valid
-			if (!dragId) {
+			if (!dragId || !onChange || !models) {
 				return;
 			}
 
@@ -162,9 +164,10 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 					description: "Can't load model data",
 					variant: "destructive",
 				});
+				return;
 			}
 
-			if (!ReactFlowData?.nodes || !data) return;
+			if (!models?.nodes || !data) return;
 
 			const position = screenToFlowPosition({
 				x: event.clientX,
@@ -177,48 +180,51 @@ export function ModelViewEditor({ models }: { models: ReactFlowInput }) {
 				(model) => model.id === dragId,
 			);
 
-			const targetId = FindParentNodeId(ReactFlowData?.nodes, position);
-			if (targetId && dragRootModel) {
+			const targetId = FindParentNodeId(models?.nodes, position);
+			const parentNode = models.nodes.find((n) => n.id === targetId);
+
+			if (targetId && dragRootModel && parentNode) {
+				const localX = position.x - parentNode.position.x;
+				const localY = position.y - parentNode.position.y;
+
 				dragRootModel.parentId = targetId;
 				dragRootModel.extent = "parent";
 				dragRootModel.id = uuidv4();
-				dragRootModel.style?.top = String(position.x) ?? "";
-				dragRootModel.position.y = position.y;
-			} else if (dragRootModel) {
+				dragRootModel.position = { x: localX, y: localY };
+			}
+			else if (dragRootModel) {
 				dragRootModel.id = uuidv4();
+				dragRootModel.position = position;
 			}
 
-			setReactFlowData((prev) =>
-				prev
-					? {
-							nodes: [...prev.nodes, ...dragReactFlowData.nodes],
-							edges: [...prev.edges, ...dragReactFlowData.edges],
-						}
-					: dragReactFlowData,
-			);
+			onChange({
+				nodes: [...models.nodes, ...dragReactFlowData.nodes],
+				edges: [...models.edges, ...dragReactFlowData.edges],
+			});
 		},
-		[screenToFlowPosition, dragId, toast, ReactFlowData],
+		[screenToFlowPosition, dragId, toast, models, onChange],
 	);
 
 	const onConnect = useCallback<
 		NonNullable<ComponentProps<typeof ReactFlow>["onConnect"]>
-	>((connection) => {
-		console.log("Trying to connect:", connection);
-		setReactFlowData((prev) =>
-			prev
-				? {
-						...prev,
-						edges: addEdge(connection, prev.edges),
-					}
-				: undefined,
-		);
-	}, []);
+	>(
+		(connection) => {
+			if (!onChange || !models) return;
+			
+			const updatedEdges = addEdge(connection, models.edges);
+			onChange({
+				...models,
+				edges: updatedEdges,
+			});
+		}, 
+		[models, onChange]
+	);
 
 	return (
 		<div className="h-full w-full flex flex-col">
 			<ReactFlow
-				nodes={ReactFlowData?.nodes}
-				edges={ReactFlowData?.edges}
+				nodes={nodes}
+				edges={edges}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				fitView
