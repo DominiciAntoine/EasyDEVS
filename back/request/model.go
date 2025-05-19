@@ -3,6 +3,7 @@ package request
 import (
 	"app/enum"
 	"app/json"
+	"app/model"
 )
 
 type ModelRequest struct {
@@ -16,4 +17,27 @@ type ModelRequest struct {
 	Ports       []json.ModelPort       `json:"ports" validate:"required"`
 	Metadata    json.ModelMetadata     `json:"metadata" validate:"required"`
 	Connections []json.ModelConnection `json:"connections" validate:"required"`
+}
+
+func (req ModelRequest) ToModel(userId string) model.Model {
+	components := make([]json.ModelComponent, 0)
+	for _, a_mc := range req.Components {
+		components = append(components, json.ModelComponent{
+			ComponentID: a_mc.ComponentID,
+			ModelID:     a_mc.ModelID,
+		})
+	}
+
+	return model.Model{
+		LibID:       req.LibID,
+		Name:        req.Name,
+		Description: req.Description,
+		Type:        req.Type,
+		Code:        req.Code,
+		UserID:      userId,
+		Components:  components,
+		Ports:       req.Ports,
+		Metadata:    req.Metadata,
+		Connections: req.Connections,
+	}
 }

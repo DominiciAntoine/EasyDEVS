@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 export function EditModel() {
 	const { modelId } = useParams<{ modelId: string }>();
 
-	const { data, error, isLoading } = useGetModelByIdRecursive({
+	const { data, error, isLoading, mutate } = useGetModelByIdRecursive({
 		params: { path: { id: modelId ?? "" } },
 	});
 	const { toast } = useToast();
@@ -33,7 +33,11 @@ export function EditModel() {
 	useEffect(() => {
 		if (data && modelId) {
 			const root = data.find((model) => model.id === modelId);
-			setStructure(modelToReactflow(data));
+			console.log( "transformation du modèle en RF : " , data)
+			const tmp = modelToReactflow(data)
+			console.log( "react flow " , tmp) 
+			setStructure(tmp);
+			
 			if (root?.code) setCode(root.code);
 		}
 	}, [data, modelId]);
@@ -44,14 +48,15 @@ export function EditModel() {
 	}, []);
 
 	const saveModelChange = async (): Promise<void> => {
-		console.log("Code à sauvegarder :", code);
-		console.log("Structure à sauvegarder :", structure);
+
+		
 		
 		if (!structure || !modelId) return;
 		
 		try {
+			console.log("Structure à sauvegarder en RF :", structure);
 			const modelToSave = reactflowToModel(structure).find((model) => model.id === modelId);
-			
+			console.log("Structure pret a save", modelToSave);
 			if (!modelToSave) {
 				toast({
 					title: "Erreur",
@@ -72,7 +77,7 @@ export function EditModel() {
 					description: modelToSave.description,
 					name: modelToSave.name,
 					type: modelToSave.type,
-					components: [],
+					components: modelToSave.components,
 					connections: modelToSave.connections,
 					ports: modelToSave.ports,
 					metadata: modelToSave.metadata,
@@ -89,7 +94,7 @@ export function EditModel() {
 			});
 			
 
-			// await mutate();
+			await mutate();
 	
 		} catch (error) {
 			toast({
@@ -150,7 +155,7 @@ export function EditModel() {
 								/>
 							</ResizablePanel>
 							<ResizableHandle withHandle />
-							<ResizablePanel defaultSize={30} minSize={20}>
+							<ResizablePanel defaultSize={30} minSize={20} >
 								<NavDragModel />
 							</ResizablePanel>
 						</ResizablePanelGroup>

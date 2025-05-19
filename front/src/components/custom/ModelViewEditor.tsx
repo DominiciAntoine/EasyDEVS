@@ -174,7 +174,7 @@ export function ModelViewEditor({
 				y: event.clientY,
 			});
 
-			const dragReactFlowData = modelToReactflow(data);
+			const dragReactFlowData = modelToReactflow(data, dragId);
 
 			const dragRootModel = dragReactFlowData.nodes.find(
 				(model) => model.id === dragId,

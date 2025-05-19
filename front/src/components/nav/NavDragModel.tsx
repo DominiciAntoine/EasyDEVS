@@ -26,14 +26,14 @@ export default function NavDragModelSimple() {
 	};
 
 	return (
-		<div className="p-4">
-			<h2 className="text-lg font-semibold mb-2">Libraries</h2>
-			<div className="space-y-2">
+		<div className="p-4 h-full flex flex-col relative">
+			<h2 className="text-lg font-semibold m-5">Libraries</h2>
+			<div className="space-y-2 overflow-y-auto flex-grow " style={{ scrollbarGutter: "stable"}}>
 				{navLibraries.map((lib) => (
 					<Collapsible
 						key={lib.title}
 						defaultOpen={lib.isActive}
-						className="border rounded"
+						className="border rounded mr-1 ml-4"
 					>
 						<CollapsibleTrigger className="w-full h-full flex items-center justify-between px-3 py-2 rounded-t cursor-pointer group">
 							<span>{lib.title}</span>

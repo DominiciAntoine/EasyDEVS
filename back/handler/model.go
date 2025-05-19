@@ -2,7 +2,6 @@ package handler
 
 import (
 	"app/database"
-	"app/json"
 	"app/middleware"
 	"app/model"
 	"app/request"
@@ -128,26 +127,7 @@ func createModel(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create model", "data": err})
 	}
 
-	components := make([]json.ModelComponent, 0)
-	for _, a_mc := range req.Components {
-		components = append(components, json.ModelComponent{
-			ComponentID: a_mc.ComponentID,
-			ModelID:     a_mc.ModelID,
-		})
-	}
-
-	model := model.Model{
-		LibID:       req.LibID,
-		Name:        req.Name,
-		Description: req.Description,
-		Type:        req.Type,
-		Code:        req.Code,
-		UserID:      c.Locals("user_id").(string),
-		Components:  components,
-		Ports:       req.Ports,
-		Metadata:    req.Metadata,
-		Connections: req.Connections,
-	}
+	model := req.ToModel(c.Locals("user_id").(string))
 
 	db.Create(&model)
 
@@ -203,7 +183,9 @@ func patchModel(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Invalid input", "data": err.Error()})
 	}
 
-	db.Model(&model).Updates(req)
+	modelUpdate := req.ToModel(model.UserID)
+
+	db.Omit("LibID", "ID", "UserID").Model(&model).UpdateColumns(modelUpdate)
 
 	res := response.CreateModelResponse(model)
 
