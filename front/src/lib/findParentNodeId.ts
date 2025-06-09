@@ -1,30 +1,28 @@
 import type { ReactFlowModelData } from "@/types";
-import type { Node, XYPosition } from "@xyflow/react";
+import type { InternalNode, Node, XYPosition } from "@xyflow/react";
+
+
 
 export const FindParentNodeId = (
 	nodes: Node<ReactFlowModelData>[],
 	dropPosition: XYPosition,
+	getInternalNode: (id: string) => InternalNode<Node> | undefined
 ) => {
-	console.log(`x : ${String(dropPosition.x)} -  y : ${String(dropPosition.y)}`);
-	console.log(`parsing through ${nodes.length} nodes`);
+	let final = null;
 
-	for (let i = nodes.length - 1; i >= 0; i--) {
-		const node = nodes[i];
-
+	for (const node of nodes) {
 		if (node.data?.modelType === "atomic") continue;
 
 		const width = Number(node.measured?.width) || 200;
 		const height = Number(node.measured?.height) || 200;
+		const internalNode = getInternalNode(node.id)?.internals.positionAbsolute
 
-		const left = node.position.x;
-		const top = node.position.y;
+		const left = internalNode?.x ?? 0;
+		const top = internalNode?.y ?? 0;
 		const right = left + width;
 		const bottom = top + height;
 
-		console.log(`node check : ${node.data.label}`);
-		console.log(
-			`left : ${left} - right : ${right} - top : ${top} - bottom : ${bottom}`,
-		);
+		
 
 		if (
 			dropPosition.x >= left &&
@@ -32,9 +30,9 @@ export const FindParentNodeId = (
 			dropPosition.y >= top &&
 			dropPosition.y <= bottom
 		) {
-			return node.id;
+			final = node.id;
 		}
-	}
+	}	
 
-	return null;
+	return final;
 };

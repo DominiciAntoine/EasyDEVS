@@ -98,7 +98,7 @@ const Main = () => {
 const App = () => (
 	<Router>
 		<AuthProvider>
-			<ReactFlowProvider>
+			<ReactFlowProvider fitView>
 				<DnDProvider>
 					<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
 						<SidebarProvider>

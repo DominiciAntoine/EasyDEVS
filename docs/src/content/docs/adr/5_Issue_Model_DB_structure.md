@@ -115,3 +115,21 @@ We are here gonna explain every data format :
 | `Ports`       | `[]json.ModelPort` | List of input/output ports of the model |
 | `Components`  | `[]Model`          | List of sub-models (used for coupled or diagram models) |
 
+### Update 04/06/2025
+
+After further reflection we are chosing to remove the Instance model idea from the final solution. Note : That could be use in hierarchy abstraction where you can define différent lelve of abstraction depending on the necessity.
+
+The solution is simple : 
+The root model ( the model at the base ) will contain all the information on the structure with his hierarchy.
+It will possess all his 1st degree component and connection. His sub component will have the same until the end of the strucutre.
+
+![Api model response](../../../assets/explain_api_model_response.png)
+
+### Update 05/06/2025
+
+An issue occured with the paramaters that need to be able to be change on the go. With the precedent solution, this fucntionnality will not work. To compensate that issue we decided to add on the model root layer, a configuration model wich allow to define all the configuration in the current coupled model.
+
+One model will be reusable everywhere, with own configuriation defined by default or be extended by the root model ( First Coupled layer model ).
+
+
+![New model system](../../../assets/new_start.png)

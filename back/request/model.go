@@ -23,8 +23,9 @@ func (req ModelRequest) ToModel(userId string) model.Model {
 	components := make([]json.ModelComponent, 0)
 	for _, a_mc := range req.Components {
 		components = append(components, json.ModelComponent{
-			ComponentID: a_mc.ComponentID,
-			ModelID:     a_mc.ModelID,
+			InstanceID:       a_mc.InstanceID,
+			ModelID:          a_mc.ModelID,
+			InstanceMetadata: a_mc.InstanceMetadata,
 		})
 	}
 

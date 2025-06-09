@@ -1336,6 +1336,72 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/model/{id}/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Generate simulations files
+         * @description generateSimulationFile generate a zip that will contain all infromations for simulation
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Model ID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user": {
         parameters: {
             query?: never;
@@ -1811,33 +1877,14 @@ export interface components {
         "enum.ModelPortDirection": "in" | "out";
         /** @enum {string} */
         "enum.ModelType": "atomic" | "coupled";
-        "json.InstanceModelConnection": {
-            from: components["schemas"]["json.InstanceModelLink"];
-            to: components["schemas"]["json.InstanceModelLink"];
-        };
-        "json.InstanceModelLink": {
-            instanceModelId: string;
-            port: string;
-        };
-        "json.InstanceModelMetadata": {
-            alwaysShowExtraInfo?: boolean;
-            alwaysShowToolbar?: boolean;
-            backgroundColor?: string;
-            position: components["schemas"]["json.InstanceModelPosition"];
-            style: components["schemas"]["json.InstanceModelStyle"];
-            toolbarPosition?: components["schemas"]["json.ToolbarPosition"];
-            toolbarVisible?: boolean;
-        };
-        "json.InstanceModelPosition": {
-            x: number;
-            y: number;
-        };
-        "json.InstanceModelStyle": {
-            height: number;
-            width: number;
+        "json.ModelColors": {
+            bodyBackgroundColor?: string;
+            headerBackgroundColor?: string;
+            headerTextColor?: string;
         };
         "json.ModelComponent": {
-            componentId: string;
+            instanceId: string;
+            instanceMetadata?: components["schemas"]["json.ModelMetadata"];
             modelId: string;
         };
         "json.ModelConnection": {
@@ -1845,17 +1892,25 @@ export interface components {
             to: components["schemas"]["json.ModelLink"];
         };
         "json.ModelLink": {
-            modelId: string;
+            instanceId: string;
             port: string;
         };
         "json.ModelMetadata": {
             alwaysShowExtraInfo?: boolean;
             alwaysShowToolbar?: boolean;
             backgroundColor?: string;
+            modelColors?: components["schemas"]["json.ModelColors"];
+            parameters?: components["schemas"]["json.ModelParameter"][];
             position: components["schemas"]["json.ModelPosition"];
             style: components["schemas"]["json.ModelStyle"];
             toolbarPosition?: components["schemas"]["json.ToolbarPosition"];
             toolbarVisible?: boolean;
+        };
+        "json.ModelParameter": {
+            description?: string;
+            name: string;
+            type: components["schemas"]["json.ParameterType"];
+            value: unknown;
         };
         "json.ModelPort": {
             id: string;
@@ -1870,39 +1925,26 @@ export interface components {
             width: number;
         };
         /** @enum {string} */
+        "json.ParameterType": "int" | "float" | "bool" | "string" | "object";
+        /** @enum {string} */
         "json.ToolbarPosition": "top" | "left" | "right" | "bottom";
         "model.Diagram": {
             createdAt?: string;
             deletedAt?: string;
             description?: string;
             id?: string;
-            instanceModelId?: components["schemas"]["model.InstanceModel"];
             modelId?: string;
             name: string;
             updatedAt?: string;
             userId?: string;
             workspaceId?: string;
         };
-        "model.InstanceModel": {
-            connections?: components["schemas"]["json.InstanceModelConnection"][];
-            createdAt?: string;
-            deletedAt?: string;
-            id?: string;
-            metadata?: components["schemas"]["json.InstanceModelMetadata"];
-            modelTypeID?: string;
-            parentID?: string;
-            ports?: components["schemas"]["json.ModelPort"][];
-            /** @description May be dont need me */
-            rootID?: string;
-            updatedAt?: string;
-            userID?: string;
-        };
         "model.Library": {
             createdAt?: string;
             deletedAt?: string;
             description?: string;
             id?: string;
-            modelTypes?: components["schemas"]["model.Model"][];
+            models?: components["schemas"]["model.Model"][];
             title?: string;
             updatedAt?: string;
             userId?: string;

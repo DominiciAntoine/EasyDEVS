@@ -2,10 +2,12 @@ package handler
 
 import (
 	"app/database"
+	"app/lib"
 	"app/middleware"
 	"app/model"
 	"app/request"
 	"app/response"
+	"app/services"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,6 +22,7 @@ func SetupModelRoutes(app *fiber.App) {
 	group.Delete("/:id", deleteModel)
 	group.Patch("/:id", patchModel)
 	group.Get("/:id/recursive", getModelRecursive)
+	group.Get("/:id/simulate", generateSimulationFile)
 }
 
 // getAllModels retrieves a list of all models
@@ -58,7 +61,7 @@ func getModel(c *fiber.Ctx) error {
 	var model model.Model
 	db.Find(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), id)
 	if model.Name == "" {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
+		return SendRequestError(c, fiber.StatusNotFound, nil)
 	}
 
 	res := response.CreateModelResponse(model)
@@ -76,37 +79,15 @@ func getModel(c *fiber.Ctx) error {
 // @Failure 404 {object} map[string]interface{}
 // @Router /model/{id}/recursive [get]
 func getModelRecursive(c *fiber.Ctx) error {
-	db := database.DB
-
-	componentsId := make([]string, 0)
-	componentsId = append(componentsId, c.Params("id"))
-	models := make([]response.ModelResponse, 0)
-
-	for len(componentsId) > 0 {
-		var model model.Model
-
-		flag := false
-
-		for _, v := range models {
-			if v.ID == componentsId[0] {
-				flag = true
-			}
-		}
-		if !flag {
-			db.Find(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), componentsId[0])
-			if model.Name == "" {
-				return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
-			} else {
-				models = append(models, response.CreateModelResponse(model))
-				for _, v := range model.Components {
-					componentsId = append(componentsId, v.ModelID)
-				}
-			}
-		}
-		componentsId = componentsId[1:]
+	res := make([]response.ModelResponse, 0)
+	models, err := services.GetModelRecursice(c.Params("id"), c.Locals("user_id").(string))
+	if err != nil {
+		return SendRequestError(c, fiber.StatusInternalServerError, err)
 	}
-
-	return c.JSON(models)
+	for _, model := range models {
+		res = append(res, response.CreateModelResponse(model))
+	}
+	return c.JSON(res)
 }
 
 // createModel creates a new model
@@ -124,7 +105,7 @@ func createModel(c *fiber.Ctx) error {
 	db := database.DB
 	req := new(request.ModelRequest)
 	if err := c.BodyParser(req); err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create model", "data": err})
+		return SendRequestError(c, fiber.StatusBadRequest, err)
 	}
 
 	model := req.ToModel(c.Locals("user_id").(string))
@@ -151,7 +132,7 @@ func deleteModel(c *fiber.Ctx) error {
 	var model model.Model
 	db.First(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), id)
 	if model.Name == "" {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No model found with ID", "data": nil})
+		return SendRequestError(c, fiber.StatusNotFound, nil)
 	}
 	db.Delete(&model)
 	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{"status": "success", "message": "Model successfully deleted", "data": nil})
@@ -175,12 +156,12 @@ func patchModel(c *fiber.Ctx) error {
 
 	var model model.Model
 	if err := db.First(&model, "user_id = ? AND id = ?", c.Locals("user_id").(string), id).Error; err != nil {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Model not found"})
+		return SendRequestError(c, fiber.StatusNotFound, err)
 	}
 
 	req := new(request.ModelRequest)
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Invalid input", "data": err.Error()})
+		return SendRequestError(c, fiber.StatusBadRequest, err)
 	}
 
 	modelUpdate := req.ToModel(model.UserID)
@@ -188,6 +169,29 @@ func patchModel(c *fiber.Ctx) error {
 	db.Omit("LibID", "ID", "UserID").Model(&model).UpdateColumns(modelUpdate)
 
 	res := response.CreateModelResponse(model)
+
+	return c.JSON(res)
+}
+
+// generateSimulationFile generate a zip that will contain all infromations for simulation
+// @Summary Generate simulations files
+// @Description generateSimulationFile generate a zip that will contain all infromations for simulation
+// @Tags models
+// @Produce json
+// @Param id path string true "Model ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /model/{id}/simulate [get]
+func generateSimulationFile(c *fiber.Ctx) error {
+	models, err := services.GetModelRecursice(c.Params("id"), c.Locals("user_id").(string))
+	if err != nil && err.Error() == "MODEL_NOT_FOUND" {
+		return SendRequestError(c, fiber.StatusNotFound, err)
+	}
+	res, err := lib.GetDevsSympyJSON(models, c.Params("id"))
+	if err != nil {
+		return SendRequestError(c, fiber.StatusInternalServerError, err)
+	}
 
 	return c.JSON(res)
 }

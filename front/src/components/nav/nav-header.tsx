@@ -22,6 +22,7 @@ type NavHeaderProps = {
 	headerBgClass?: string;
 	headerExtraClass?: string;
 	saveFunction?: () => Promise<void>;
+	simulateFunction?: () => Promise<void>;
 };
 
 const NavHeader: React.FC<NavHeaderProps> = ({
@@ -31,6 +32,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({
 	headerBgClass = "bg-background",
 	headerExtraClass = "",
 	saveFunction,
+	simulateFunction,
 }) => {
 	const lastIndex = breadcrumbs.length - 1;
 
@@ -62,7 +64,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({
 			</Breadcrumb>
 			<div className="ml-auto px-3 flex items-center gap-2">
 				{showNavActions && (
-					<NavActions {...(saveFunction ? { saveFunction } : {})} />
+					<NavActions saveFunction={saveFunction} simulateFunction={simulateFunction} />
 				)}
 				{showModeToggle && <ModeToggle />}
 			</div>

@@ -17,14 +17,12 @@ import { Toggle } from "./ui/toggle";
 
 type ZoomSliderProps = Omit<PanelProps, "children"> & {
 	onOrganizeClick?: () => void;
-	onInfoClick?: (state: boolean) => void;
 };
 
 const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
-	({ className, onOrganizeClick, onInfoClick, ...props }) => {
+	({ className, onOrganizeClick, ...props }) => {
 		const { zoom } = useViewport();
 		const { zoomTo, zoomIn, zoomOut, fitView } = useReactFlow();
-		const [infoToggled, setInfoToggled] = React.useState(false);
 
 		const { minZoom, maxZoom } = useStore(
 			(state) => ({
@@ -81,15 +79,6 @@ const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
 					</Button>
 				)}
 
-				<Toggle
-					pressed={infoToggled}
-					onPressedChange={(pressed) => {
-						setInfoToggled(pressed);
-						onInfoClick?.(pressed); // on envoie l'état mis à jour
-					}}
-				>
-					<Info className="h-4 w-4" />
-				</Toggle>
 			</Panel>
 		);
 	},

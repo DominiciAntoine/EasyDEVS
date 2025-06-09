@@ -13,5 +13,5 @@ type Library struct {
 	CreatedAt   time.Time `gorm:"type:timestamp;default:now()" json:"createdAt"`
 	UpdatedAt   time.Time `gorm:"type:timestamp;default:now()" json:"updatedAt"`
 	DeletedAt   time.Time `gorm:"index" json:"deletedAt"`
-	ModelTypes  []Model   `gorm:"foreignKey:LibID;constraint:OnDelete:CASCADE;" json:"modelTypes"`
+	Models      []Model   `gorm:"foreignKey:LibID;constraint:OnDelete:CASCADE;" json:"models"`
 }

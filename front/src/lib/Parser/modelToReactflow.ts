@@ -1,121 +1,115 @@
 import type { components } from "@/api/v1";
-import { DEFAULT_NODE_SIZE } from "@/constants";
-import type { ReactFlowInput } from "@/types";
-import { addEdge } from "@xyflow/react";
-import { v4 } from "uuid";
-
-const DEFAULT_POSITION = { x: 0, y: 0 };
-
-const connectionToEdge = ({
-	from,
-	to,
-}: components["schemas"]["json.ModelConnection"]): ReactFlowInput["edges"][number] =>
-	addEdge(
-		{
-			source: from.modelId,
-			target: to.modelId,
-			sourceHandle: from.port,
-			targetHandle: to.port,
-			type: "step",
-			animated: true,
-			zIndex: 1000,
-		},
-		[],
-	)[0];
-
-	//pour chauqe composant dans un model recupérer, il faudra check les composants, si un composant, il faudra créer a la volé une nouvelle isntance de de ce modèle avec uid fraichement générer pour eviter les conflits 
+import { DEFAULT_NODE_SIZE, DEFAULT_POSITION, INTERNAL_PREFIX } from "@/constants";
+import type { EdgeData, ReactFlowInput } from "@/types";
+import type { Edge } from "@xyflow/react";
 
 
-	// on part sur une focntion recursive 
-
-
-const modelToNode = (
-	model: components["schemas"]["response.ModelResponse"],
-): ReactFlowInput["nodes"][number] => {
+const createEdge = (conn: components['schemas']['json.ModelConnection'], component: components["schemas"]["json.ModelComponent"]): Edge<EdgeData> => {
+	const id = `${conn.from.instanceId === "root"? component.instanceId : conn.from.instanceId}->${conn.to.instanceId === "root"? component.instanceId : conn.to.instanceId}`
 
 	return {
-		id: v4() ?? "Unnamed model",
-		type: "resizer",
-		measured: {
-			height: model.metadata.style.height ?? DEFAULT_NODE_SIZE,
-			width: model.metadata.style.width ?? DEFAULT_NODE_SIZE,
-		},
+		id,
+		source: conn.from.instanceId === "root"? component.instanceId : conn.from.instanceId,
+		target: conn.to.instanceId === "root"? component.instanceId : conn.to.instanceId,
+		sourceHandle: conn.from.instanceId === "root" ? `${INTERNAL_PREFIX}${component.instanceId}:${conn.from.port}` : `${conn.from.instanceId}:${conn.from.port}`,
+		targetHandle: conn.to.instanceId === "root"? `${INTERNAL_PREFIX}${component.instanceId}:${conn.to.port}` : `${conn.to.instanceId}:${conn.to.port}`,
 		data: {
-			id: model.id ?? "Unnamed model",
-			modelType: model.type ?? "atomic",
-			label: model.name ?? "Unnamed model",
-			inputPorts: model.ports.filter((p) => 
-				p.type === "in").map((p) => ({id: p.id})),
-			outputPorts: model.ports.filter((p) => 
-				p.type === "out").map((p) => ({id: p.id})),
-			alwaysShowExtraInfo: false,
-			toolbarPosition: "top",
-			toolbarVisible: false
+			holderId: component.instanceId,
 		},
-		position: model.metadata.position ?? DEFAULT_POSITION,
-		height: model.metadata.style.height ?? DEFAULT_NODE_SIZE,
-		width: model.metadata.style.width ?? DEFAULT_NODE_SIZE,
-		selected: false,
-		dragging: false
-		// TODO
-		// extent: '',
-		// parentId: '',
-	};
-};
+	}
+}
 
-const createReactflowModel = (models: components["schemas"]["response.ModelResponse"][], actualModelID : string , parentModelID : string | null) : ReactFlowInput["nodes"][number] | null =>
-{
-	const model = models.find( (m) => m.id === actualModelID)
+const getModelMetadata = (
+	component: components["schemas"]["json.ModelComponent"],
+	model: components["schemas"]["response.ModelResponse"],
+): components["schemas"]["json.ModelMetadata"] =>
+	component.instanceMetadata ?? model.metadata;
+
+const createReactflowModel = (
+	models: components["schemas"]["response.ModelResponse"][],
+	component: (typeof models)[number]["components"][number],
+	parentComponent: components["schemas"]["json.ModelComponent"] | null,
+): ReactFlowInput["nodes"][number] | null => {
+	const model = models.find((m) => m.id === component.modelId);
 	if (!model) return null;
+
+	const metadata = getModelMetadata(component, model);
+
 	return {
 		// on devrait recréer un autre uuid ici
-		id: actualModelID ?? "Unnamed model",
+		id: component.instanceId || component.modelId,
 		type: "resizer",
 		measured: {
-			height: model.metadata.style.height ?? DEFAULT_NODE_SIZE,
-			width: model.metadata.style.width ?? DEFAULT_NODE_SIZE,
+			height: metadata.style.height ?? DEFAULT_NODE_SIZE,
+			width: metadata.style.width ?? DEFAULT_NODE_SIZE,
 		},
 		data: {
 			id: model.id ?? "Unnamed model",
 			modelType: model.type ?? "atomic",
 			label: model.name ?? "Unnamed model",
-			inputPorts: model.ports.filter((p) => 
-				p.type === "in").map((p) => ({id: p.id})),
-			outputPorts: model.ports.filter((p) => 
-				p.type === "out").map((p) => ({id: p.id})),
+			inputPorts: model.ports
+				.filter((p) => p.type === "in")
+				.map((p) => ({ id: p.id })),
+			outputPorts: model.ports
+				.filter((p) => p.type === "out")
+				.map((p) => ({ id: p.id })),
+			...(model.metadata.modelColors
+			? { reactFlowModelGraphicalData: model.metadata.modelColors }
+			: {}),
+			parameters: model.metadata.parameters
 		},
-		position: model.metadata.position ?? DEFAULT_POSITION,
-		height: model.metadata.style.height ?? DEFAULT_NODE_SIZE,
-		width: model.metadata.style.width ?? DEFAULT_NODE_SIZE,
-		...(parentModelID ? { extent: "parent", parentId: parentModelID } : {}),
+		dragging: false,
+		selected: false,
+		position: metadata.position ?? DEFAULT_POSITION,
+		height: metadata.style.height ?? DEFAULT_NODE_SIZE,
+		width: metadata.style.width ?? DEFAULT_NODE_SIZE,
+		...(parentComponent
+			? { extent: "parent", parentId: parentComponent.instanceId }
+			: {}),
 	};
-}
-
-const recursiveModelParsing = (models: components["schemas"]["response.ModelResponse"][], modelID: string, parentModelID: string | null ): ReactFlowInput["nodes"][]=> {
-	const actualModel = models.find((m) => m.id === modelID);
-	if (!actualModel || !actualModel.id ) return [];
-
-
-	const childNodes = actualModel.components?.flatMap((c) =>
-		recursiveModelParsing(models, c.modelId, actualModel.id ?? null)
-	) ?? [];
-
-
-	const currentNode = createReactflowModel(models, actualModel.id , parentModelID);
-
-
-	return currentNode ? [...childNodes, currentNode] : childNodes;
 };
 
-export const modelToReactflow = (res: components["schemas"]["response.ModelResponse"][] , rootID : string, ): ReactFlowInput => 
-{
-	const result = 
-	{
-		nodes: res.map((model) => modelToNode(model)),
-		edges: res.flatMap((model) => {
-			return model.connections.map(connectionToEdge);
-		})
-	}
-	return result
-}
+const recursiveModelParsing = (
+	models: components["schemas"]["response.ModelResponse"][],
+	component: components["schemas"]["json.ModelComponent"],
+	parentComponent: components["schemas"]["json.ModelComponent"] | null,
+): ReactFlowInput => {
+	const actualModel = models.find((m) => m.id === component.modelId);
 
+	if (!actualModel || !actualModel.id) return { nodes: [], edges: [] };
+
+	const actualEdge = actualModel.connections.map<Edge<EdgeData>>((conn) => createEdge(conn, component));
+
+	const childNodes =
+		actualModel.components?.flatMap((c) =>
+			recursiveModelParsing(models, c, component),
+		) ?? [];
+
+	const currentNode = createReactflowModel(models, component, parentComponent);
+
+	const nodesAndEdges = {
+		nodes: currentNode
+			? [childNodes.map(({ nodes }) => nodes), currentNode].flat(2)
+			: childNodes.flatMap(({ nodes }) => nodes),
+		edges: [childNodes.map(({ edges }) => edges), actualEdge].flat(2),
+	};
+
+	return nodesAndEdges;
+};
+
+export const modelToReactflow = (
+	res: components["schemas"]["response.ModelResponse"][],
+	rootID: string,
+): ReactFlowInput => {
+	const firstComponent: components["schemas"]["json.ModelComponent"] = {
+		instanceId: rootID,
+		modelId: rootID,
+	};
+
+	const result = recursiveModelParsing(res, firstComponent, null);
+
+	return {
+		nodes: result.nodes.sort((a, b) => a.id.localeCompare(b.id)),
+		edges: result.edges.sort((a, b) => a.id.localeCompare(b.id))
+	}
+};

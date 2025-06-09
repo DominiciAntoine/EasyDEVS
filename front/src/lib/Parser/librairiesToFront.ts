@@ -18,7 +18,7 @@ type Library = {
 
 export function librairiesToFront(
 	libraryData: components["schemas"]["model.Library"][],
-	modelData: components["schemas"]["model.Model"][],
+	modelData: components["schemas"]["response.ModelResponse"][],
 ): Library["items"] {
 	return libraryData.map((lib) => ({
 		title: lib.title ?? "Sans titre",

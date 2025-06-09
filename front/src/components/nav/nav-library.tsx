@@ -34,18 +34,45 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "../ui/context-menu";
+import { useDnD } from "@/providers/DnDContext";
+import { useEffect, useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
+import { components } from "@/api/v1";
+import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
+import { ReactFlowInput } from "@/types";
+import { ModelView } from "../custom/ModelView";
 
 export function NavLibrary() {
 	//a voir avec dorian si on met ca dans ce composant ou le composant parent
 	const libraries = useGetLibraries();
 	const models = useGetModels();
-
+	const [, setDragId] = useDnD();
 	const navigate = useNavigate();
+
+	const [hoveredId, setHoveredId] = useState<string | null>(null);
+const { data, isLoading } = useGetModelByIdRecursive(
+  hoveredId ? { params: { path: { id: hoveredId } } } : (null as any)
+);
+
+	const hoveredModel =
+		hoveredId && data ? modelToReactflow(data, hoveredId) : undefined;
 
 	const navLibraries = librairiesToFront(
 		libraries.data ?? [],
 		models.data ?? [],
 	);
+
+	
+
+	const onHoverModel = (modelId: string | null) => {
+		setHoveredId(modelId);
+	};
+
+	const onDragStart = (event: React.DragEvent, nodeId: string) => {
+		setDragId(nodeId);
+		event.dataTransfer.effectAllowed = "move";
+	};
 
 	return (
 		<SidebarGroup>
@@ -79,7 +106,7 @@ export function NavLibrary() {
 						<SidebarMenuItem>
 							<ContextMenu modal={false}>
 								<ContextMenuTrigger>
-									<CollapsibleTrigger asChild>
+									<CollapsibleTrigger asChild draggable>
 										<SidebarMenuButton tooltip={item.title}>
 											<span>{item.title}</span>
 											<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -121,12 +148,41 @@ export function NavLibrary() {
 												<ContextMenuTrigger>
 													<SidebarMenuSubItem className="relative z-10">
 														<SidebarMenuSubButton asChild>
-															<Link
-																to={`/library/${item.id}/model/${subItem.id}`}
-															>
-																{subItem.icon && <subItem.icon />}
-																<span>{subItem.title}</span>
-															</Link>
+															<Popover open={hoveredId === subItem.id}>
+																<PopoverTrigger asChild>
+																	<Link
+																		className="flex h-6 text-xs items-center"
+																		onMouseEnter={() =>
+																			onHoverModel(subItem.id ?? null)
+																		}
+																		onMouseLeave={() => onHoverModel(null)}
+																		draggable
+																		onDragStart={(e) =>
+																			onDragStart(e, subItem.id ?? "")
+																		}
+																		to={`/library/${item.id}/model/${subItem.id}`}
+																	>
+																		{subItem.icon && <subItem.icon />}
+																		<span>{subItem.title}</span>
+																	</Link>
+																</PopoverTrigger>
+																<PopoverContent
+																	side="right"
+																	align="start"
+																	className="w-80 h-80 pointer-events-none select-none"
+																	onMouseEnter={() =>
+																		setHoveredId(subItem.id ?? null)
+																	}
+																	onMouseLeave={() => setHoveredId(null)}
+																>
+																	{isLoading && <span>Chargement…</span>}
+																	{hoveredModel ? (
+																		<ModelView models={hoveredModel} />
+																	) : (
+																		<span>Aucun aperçu</span>
+																	)}
+																</PopoverContent>
+															</Popover>
 														</SidebarMenuSubButton>
 													</SidebarMenuSubItem>
 												</ContextMenuTrigger>

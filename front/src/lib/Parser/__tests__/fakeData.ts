@@ -1,193 +1,285 @@
 import type { components } from "@/api/v1";
 import type { ReactFlowInput } from "@/types";
-import { expect } from "vitest";
 
 export const mockReactFlowModelLibrary: ReactFlowInput = {
 	nodes: [
 		{
-			id: "fa5af68e-c879-4f77-bc93-c9e655ac77a9",
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf",
 			type: "resizer",
+			measured: {
+				height: 927,
+				width: 1028,
+			},
 			data: {
-				id: "fa5af68e-c879-4f77-bc93-c9e655ac77a9",
+				id: "2fe58217-47ae-4527-8983-ac8b54754abf",
 				modelType: "coupled",
-				label: "Light_group",
-				inputPorts: [
-					{
-						id: "82762b6b-1aa6-4895-99b4-6206e3b4a1a7",
-					},
-				],
+				label: "Root",
+				inputPorts: [],
 				outputPorts: [],
-				toolbarVisible: false,
-				toolbarPosition: "top",
-				alwaysShowExtraInfo: expect.toBeOneOf([false, undefined]),
 			},
 			position: {
-				x: -35.00000000000001,
-				y: -134.00000000000003,
+				x: -351.70230386436424,
+				y: -423.311332070595,
 			},
-			measured: {
-				width: 953,
-				height: 840,
-			},
-			selected: true,
+			height: 927,
+			width: 1028,
 			dragging: false,
-			width: 953,
-			height: 840,
-			resizing: false,
+			selected: false,
 		},
 		{
-			id: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
 			type: "resizer",
+			measured: {
+				height: 793,
+				width: 722,
+			},
 			data: {
-				id: "020f4dbd-9b91-44f5-9ae0-ae8847e29267",
+				id: "47e9cfa4-ea9f-46cb-a0c8-bbf8b47a7511",
 				modelType: "coupled",
-				label: "sub_light_group",
+				label: "Beta",
 				inputPorts: [
 					{
-						id: "47b48e13-09fa-40f6-b924-f9e764c00b84",
+						id: "e75ed355-7100-45b9-a4ba-4433332e090e",
 					},
 				],
 				outputPorts: [
 					{
-						id: "fa922221-b3ce-4834-8f8b-e88e783a3eca",
+						id: "ad7c4558-a937-47b4-8503-6ba1a298c971",
 					},
 				],
-				toolbarVisible: false,
-				toolbarPosition: "top",
-				alwaysShowExtraInfo: expect.toBeOneOf([false, undefined]),
 			},
 			position: {
-				x: 82.82179269859705,
-				y: 70.6804920892271,
+				x: 34.44565430186219,
+				y: 71.43263248466263,
 			},
-			parentId: "fa5af68e-c879-4f77-bc93-c9e655ac77a9",
+			height: 793,
+			width: 722,
+			parentId: "2fe58217-47ae-4527-8983-ac8b54754abf",
 			extent: "parent",
-			measured: {
-				width: 391,
-				height: 360,
-			},
 			selected: false,
 			dragging: false,
-			width: 391,
-			height: 360,
-			resizing: false,
 		},
 		{
-			id: "0742ce95-d349-486f-9701-96f40d918f6a",
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
 			type: "resizer",
+			measured: {
+				height: 417,
+				width: 565,
+			},
 			data: {
-				id: "2137aa67-c857-4881-9810-2723438c8680",
-				modelType: "atomic",
-				label: "Light",
+				id: "63cc59b1-45e7-4861-8c1d-d35f22de4194",
+				modelType: "coupled",
+				label: "Alpha",
 				inputPorts: [
 					{
-						id: "e31fd581-2222-4d28-930e-66c36908b33b",
+						id: "3027641e-bb51-4798-834f-a0daedb048a0",
 					},
 				],
 				outputPorts: [
 					{
-						id: "361f5fbf-65b8-4d85-8fc6-a45413091cfa",
+						id: "20eb3850-aaed-4450-8079-b010e92d7226",
 					},
 				],
-				toolbarVisible: false,
-				toolbarPosition: "top",
-				alwaysShowExtraInfo: expect.toBeOneOf([false, undefined]),
 			},
 			position: {
-				x: 83.69736389555317,
-				y: 103.14130060936999,
+				x: 65.13492069058077,
+				y: 96.80682834164062,
 			},
-			parentId: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
+			height: 417,
+			width: 565,
+			parentId:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
 			extent: "parent",
-			measured: {
-				width: 137,
-				height: 147,
-			},
 			selected: false,
 			dragging: false,
-			width: 137,
-			height: 147,
-			resizing: false,
 		},
 		{
-			id: "4d3cf815-531b-4dc7-99c7-5a58ed6771b6",
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446",
 			type: "resizer",
-			data: {
-				id: "2137aa67-c857-4881-9810-2723438c8680",
-				modelType: "atomic",
-				label: "Light",
-				inputPorts: [
-					{
-						id: "976f05da-9ae5-423a-aed2-f2f46c0d074a",
-					},
-				],
-				outputPorts: [],
-				toolbarVisible: false,
-				toolbarPosition: "top",
-                alwaysShowExtraInfo: expect.toBeOneOf([false, undefined]),
-			},
-			position: {
-				x: 603.4590519370295,
-				y: 207.16274199134452,
-			},
-			parentId: "fa5af68e-c879-4f77-bc93-c9e655ac77a9",
-			extent: "parent",
 			measured: {
-				width: 200,
 				height: 200,
+				width: 200,
 			},
+			data: {
+				id: "58c5fc0f-9c59-42ec-a2a6-90c99171be65",
+				modelType: "atomic",
+				label: "Charlie",
+				inputPorts: [
+					{
+						id: "291f2776-e585-479c-8c83-1b68bc72fad6",
+					},
+				],
+				outputPorts: [
+					{
+						id: "86af6923-c378-4b22-9436-f9eaa74b5f4b",
+					},
+				],
+			},
+			position: {
+				x: 55.337456432243016,
+				y: 145.41475433229658,
+			},
+			height: 200,
+			width: 200,
+			parentId:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			extent: "parent",
+			selected: false,
+			dragging: false,
+		},
+		{
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea",
+			type: "resizer",
+			measured: {
+				height: 200,
+				width: 200,
+			},
+			data: {
+				id: "58c5fc0f-9c59-42ec-a2a6-90c99171be65",
+				modelType: "atomic",
+				label: "Charlie",
+				inputPorts: [
+					{
+						id: "291f2776-e585-479c-8c83-1b68bc72fad6",
+					},
+				],
+				outputPorts: [
+					{
+						id: "86af6923-c378-4b22-9436-f9eaa74b5f4b",
+					},
+				],
+			},
+			position: {
+				x: 320.730800379744,
+				y: 141.9414979094488,
+			},
+			height: 200,
+			width: 200,
+			parentId:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			extent: "parent",
+			selected: false,
+			dragging: false,
+		},
+		{
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/e78589e5-5dca-4d1f-a4bd-0dfc759a7866",
+			type: "resizer",
+			measured: {
+				height: 200,
+				width: 200,
+			},
+			data: {
+				id: "5de4a9ed-bfbc-4764-8ab4-b93f634ae268",
+				modelType: "atomic",
+				label: "Delta",
+				inputPorts: [
+					{
+						id: "7b421cdf-e030-46db-8109-06dd509ac2e8",
+					},
+				],
+				outputPorts: [],
+			},
+			position: {
+				x: 817.7118582602075,
+				y: 380.4702881565224,
+			},
+			height: 200,
+			width: 200,
+			parentId: "2fe58217-47ae-4527-8983-ac8b54754abf",
+			extent: "parent",
 			selected: false,
 			dragging: false,
 		},
 	],
 	edges: [
 		{
-			type: "step",
-			animated: true,
-			style: {
-				zIndex: 1000,
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451->2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			source:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
+			sourceHandle:
+				"internal-2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451:e75ed355-7100-45b9-a4ba-4433332e090e",
+			target:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			targetHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784:3027641e-bb51-4798-834f-a0daedb048a0",
+			data: {
+				holderId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
 			},
-			source: "fa5af68e-c879-4f77-bc93-c9e655ac77a9",
-			sourceHandle: "in-internal-82762b6b-1aa6-4895-99b4-6206e3b4a1a7",
-			target: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
-			targetHandle: "in-47b48e13-09fa-40f6-b924-f9e764c00b84",
-			id: "xy-edge__fa5af68e-c879-4f77-bc93-c9e655ac77a9in-internal-82762b6b-1aa6-4895-99b4-6206e3b4a1a7-8a1fd02d-e429-43ff-ac8f-cd9c511bb310in-47b48e13-09fa-40f6-b924-f9e764c00b84",
 		},
 		{
-			type: "step",
-			animated: true,
-			style: {
-				zIndex: 1000,
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784->2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446",
+			source:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			sourceHandle:
+				"internal-2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784:3027641e-bb51-4798-834f-a0daedb048a0",
+			target:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446",
+			targetHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446:291f2776-e585-479c-8c83-1b68bc72fad6",
+			data: {
+				holderId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
 			},
-			source: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
-			sourceHandle: "in-internal-47b48e13-09fa-40f6-b924-f9e764c00b84",
-			target: "0742ce95-d349-486f-9701-96f40d918f6a",
-			targetHandle: "in-e31fd581-2222-4d28-930e-66c36908b33b",
-			id: "xy-edge__8a1fd02d-e429-43ff-ac8f-cd9c511bb310in-internal-47b48e13-09fa-40f6-b924-f9e764c00b84-0742ce95-d349-486f-9701-96f40d918f6ain-e31fd581-2222-4d28-930e-66c36908b33b",
 		},
 		{
-			type: "step",
-			animated: true,
-			style: {
-				zIndex: 1000,
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446->2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea",
+			source:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446",
+			sourceHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446:86af6923-c378-4b22-9436-f9eaa74b5f4b",
+			target:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea",
+			targetHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea:acd4fc51-6314-4d2c-9bc2-f810f95c1bd8",
+			data: {
+				holderId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
 			},
-			source: "0742ce95-d349-486f-9701-96f40d918f6a",
-			sourceHandle: "out-361f5fbf-65b8-4d85-8fc6-a45413091cfa",
-			target: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
-			targetHandle: "out-internal-fa922221-b3ce-4834-8f8b-e88e783a3eca",
-			id: "xy-edge__0742ce95-d349-486f-9701-96f40d918f6aout-361f5fbf-65b8-4d85-8fc6-a45413091cfa-8a1fd02d-e429-43ff-ac8f-cd9c511bb310out-internal-fa922221-b3ce-4834-8f8b-e88e783a3eca",
 		},
 		{
-			type: "step",
-			animated: true,
-			style: {
-				zIndex: 1000,
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea->2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			source:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea",
+			sourceHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea:c4df7805-8f07-4e30-b81e-aedf143fa1ab",
+			target:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			targetHandle:
+				"internal-2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784:20eb3850-aaed-4450-8079-b010e92d7226",
+			data: {
+				holderId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
 			},
-			source: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
-			sourceHandle: "out-fa922221-b3ce-4834-8f8b-e88e783a3eca",
-			target: "4d3cf815-531b-4dc7-99c7-5a58ed6771b6",
-			targetHandle: "in-976f05da-9ae5-423a-aed2-f2f46c0d074a",
-			id: "xy-edge__8a1fd02d-e429-43ff-ac8f-cd9c511bb310out-fa922221-b3ce-4834-8f8b-e88e783a3eca-4d3cf815-531b-4dc7-99c7-5a58ed6771b6in-976f05da-9ae5-423a-aed2-f2f46c0d074a",
+		},
+		{
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784->2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
+			source:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+			sourceHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784:20eb3850-aaed-4450-8079-b010e92d7226",
+			target:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
+			targetHandle:
+				"internal-2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451:ad7c4558-a937-47b4-8503-6ba1a298c971",
+			data: {
+				holderId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
+			},
+		},
+		{
+			id: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451->2fe58217-47ae-4527-8983-ac8b54754abf/e78589e5-5dca-4d1f-a4bd-0dfc759a7866",
+			source:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
+			sourceHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451:ad7c4558-a937-47b4-8503-6ba1a298c971",
+			target:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/e78589e5-5dca-4d1f-a4bd-0dfc759a7866",
+			targetHandle:
+				"2fe58217-47ae-4527-8983-ac8b54754abf/e78589e5-5dca-4d1f-a4bd-0dfc759a7866:7b421cdf-e030-46db-8109-06dd509ac2e8",
+			data: {
+				holderId: "2fe58217-47ae-4527-8983-ac8b54754abf",
+			},
 		},
 	],
 };
@@ -195,171 +287,273 @@ export const mockReactFlowModelLibrary: ReactFlowInput = {
 // Ajouter components, ports, connections
 export const mockApiModel: components["schemas"]["request.ModelRequest"][] = [
 	{
-		id: "fa5af68e-c879-4f77-bc93-c9e655ac77a9",
 		code: "",
+		description: "",
+		metadata: {
+			position: {
+				x: -351.70230386436424,
+				y: -423.311332070595,
+			},
+			style: {
+				height: 927,
+				width: 1028,
+			},
+		},
+		name: "Root",
+		ports: [],
+		type: "coupled",
+		id: "2fe58217-47ae-4527-8983-ac8b54754abf",
+		libId: undefined,
 		components: [
 			{
-				modelId: "020f4dbd-9b91-44f5-9ae0-ae8847e29267",
-				componentId: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
+				instanceId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
+				modelId: "47e9cfa4-ea9f-46cb-a0c8-bbf8b47a7511",
+				instanceMetadata: {
+					style: {
+						height: 793,
+						width: 722,
+					},
+					position: {
+						x: 34.44565430186219,
+						y: 71.43263248466263,
+					},
+				},
 			},
 			{
-				modelId: "2137aa67-c857-4881-9810-2723438c8680",
-				componentId: "4d3cf815-531b-4dc7-99c7-5a58ed6771b6",
+				instanceId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/e78589e5-5dca-4d1f-a4bd-0dfc759a7866",
+				modelId: "5de4a9ed-bfbc-4764-8ab4-b93f634ae268",
+				instanceMetadata: {
+					style: {
+						height: 200,
+						width: 200,
+					},
+					position: {
+						x: 817.7118582602075,
+						y: 380.4702881565224,
+					},
+				},
 			},
 		],
 		connections: [
 			{
 				from: {
-					port: "82762b6b-1aa6-4895-99b4-6206e3b4a1a7",
-					modelId: "fa5af68e-c879-4f77-bc93-c9e655ac77a9",
+					instanceId:
+						"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451",
+					port: "ad7c4558-a937-47b4-8503-6ba1a298c971",
 				},
 				to: {
-					port: "47b48e13-09fa-40f6-b924-f9e764c00b84",
-					modelId: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
-				},
-			},
-			{
-				from: {
-					port: "fa922221-b3ce-4834-8f8b-e88e783a3eca",
-					modelId: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
-				},
-				to: {
-					port: "976f05da-9ae5-423a-aed2-f2f46c0d074a",
-					modelId: "4d3cf815-531b-4dc7-99c7-5a58ed6771b6",
+					instanceId:
+						"2fe58217-47ae-4527-8983-ac8b54754abf/e78589e5-5dca-4d1f-a4bd-0dfc759a7866",
+					port: "7b421cdf-e030-46db-8109-06dd509ac2e8",
 				},
 			},
 		],
-		description: "",
-		metadata: {
-			position: {
-				x: -35.00000000000001,
-				y: -134.00000000000003,
-			},
-			style: {
-				width: 953,
-				height: 840,
-			},
-		},
-		name: "Light_group",
-		ports: [
-			{
-				type: "in",
-				id: "82762b6b-1aa6-4895-99b4-6206e3b4a1a7",
-			},
-		],
-		type: "coupled",
-		libId: undefined,
 	},
 	{
-		id: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
+		id: "47e9cfa4-ea9f-46cb-a0c8-bbf8b47a7511",
 		code: "",
 		components: [
 			{
-				componentId: "0742ce95-d349-486f-9701-96f40d918f6a",
-				modelId: "2137aa67-c857-4881-9810-2723438c8680",
+				modelId: "63cc59b1-45e7-4861-8c1d-d35f22de4194",
+				instanceId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+				instanceMetadata: {
+					position: {
+						x: 65.13492069058077,
+						y: 96.80682834164062,
+					},
+					style: {
+						height: 417,
+						width: 565,
+					},
+				},
 			},
 		],
 		connections: [
 			{
 				from: {
-					port: "47b48e13-09fa-40f6-b924-f9e764c00b84",
-					modelId: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
+					port: "e75ed355-7100-45b9-a4ba-4433332e090e",
+					instanceId: "root",
 				},
 				to: {
-					port: "e31fd581-2222-4d28-930e-66c36908b33b",
-					modelId: "0742ce95-d349-486f-9701-96f40d918f6a",
+					port: "3027641e-bb51-4798-834f-a0daedb048a0",
+					instanceId:
+						"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
 				},
 			},
 			{
 				from: {
-					port: "361f5fbf-65b8-4d85-8fc6-a45413091cfa",
-					modelId: "0742ce95-d349-486f-9701-96f40d918f6a",
+					instanceId:
+						"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784",
+					port: "20eb3850-aaed-4450-8079-b010e92d7226",
 				},
 				to: {
-					port: "fa922221-b3ce-4834-8f8b-e88e783a3eca",
-					modelId: "8a1fd02d-e429-43ff-ac8f-cd9c511bb310",
+					instanceId: "root",
+					port: "ad7c4558-a937-47b4-8503-6ba1a298c971",
 				},
 			},
 		],
 		description: "",
 		metadata: {
 			position: {
-				x: 82.82179269859705,
-				y: 70.6804920892271,
+				x: 0,
+				y: 0,
 			},
 			style: {
-				width: 391,
-				height: 360,
-			},
-		},
-		name: "sub_light_group",
-		ports: [
-			{
-				id: "47b48e13-09fa-40f6-b924-f9e764c00b84",
-				type: "in",
-			},
-			{
-				id: "fa922221-b3ce-4834-8f8b-e88e783a3eca",
-				type: "out",
-			},
-		],
-		type: "coupled",
-		libId: undefined,
-	},
-	{
-		id: "0742ce95-d349-486f-9701-96f40d918f6a",
-		code: "",
-		components: [],
-		connections: [],
-		description: "",
-		metadata: {
-			position: {
-				x: 83.69736389555317,
-				y: 103.14130060936999,
-			},
-			style: {
-				width: 137,
-				height: 147,
-			},
-		},
-		name: "Light",
-		ports: [
-			{
-				id: "e31fd581-2222-4d28-930e-66c36908b33b",
-				type: "in",
-			},
-			{
-				id: "361f5fbf-65b8-4d85-8fc6-a45413091cfa",
-				type: "out",
-			},
-		],
-		type: "atomic",
-		libId: undefined,
-	},
-	{
-		id: "4d3cf815-531b-4dc7-99c7-5a58ed6771b6",
-		code: "",
-		components: [],
-		connections: [],
-		description: "",
-		metadata: {
-			position: {
-				x: 603.4590519370295,
-				y: 207.16274199134452,
-			},
-			style: {
-				width: 200,
 				height: 200,
+				width: 200,
 			},
 		},
-		name: "Light",
+		name: "Beta",
 		ports: [
 			{
-				id: "976f05da-9ae5-423a-aed2-f2f46c0d074a",
+				type: "in",
+				id: "e75ed355-7100-45b9-a4ba-4433332e090e",
+			},
+			{
+				type: "out",
+				id: "ad7c4558-a937-47b4-8503-6ba1a298c971",
+			},
+		],
+		type: "coupled",
+		libId: undefined,
+	},
+	{
+		code: "",
+		id: "63cc59b1-45e7-4861-8c1d-d35f22de4194",
+		type: "coupled",
+		name: "Alpha",
+		description: "",
+		libId: undefined,
+		metadata: {
+			position: {
+				x: 0,
+				y: 0,
+			},
+			style: {
+				height: 200,
+				width: 200,
+			},
+		},
+		ports: [
+			{ id: "3027641e-bb51-4798-834f-a0daedb048a0", type: "in" },
+			{ id: "20eb3850-aaed-4450-8079-b010e92d7226", type: "out" },
+		],
+		components: [
+			{
+				instanceId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446",
+				modelId: "58c5fc0f-9c59-42ec-a2a6-90c99171be65",
+				instanceMetadata: {
+					position: {
+						x: 55.337456432243016,
+						y: 145.41475433229658,
+					},
+					style: {
+						height: 200,
+						width: 200,
+					},
+				},
+			},
+			{
+				instanceId:
+					"2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea",
+				modelId: "58c5fc0f-9c59-42ec-a2a6-90c99171be65",
+				instanceMetadata: {
+					position: {
+						x: 320.730800379744,
+						y: 141.9414979094488,
+					},
+					style: {
+						height: 200,
+						width: 200,
+					},
+				},
+			},
+		],
+		connections: [
+			{
+				from: {
+					instanceId: "root",
+					port: "3027641e-bb51-4798-834f-a0daedb048a0",
+				},
+				to: {
+					instanceId: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446",
+					port: "291f2776-e585-479c-8c83-1b68bc72fad6",
+				},
+			},
+			{
+				from: {
+					instanceId: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/5ef6d06f-ca1f-402d-a2c8-88c6d8d8b446",
+					port: "86af6923-c378-4b22-9436-f9eaa74b5f4b",
+				},
+				to: {
+					instanceId: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea",
+					port: "acd4fc51-6314-4d2c-9bc2-f810f95c1bd8",
+				},
+			},
+			{
+				from: {
+					instanceId: "2fe58217-47ae-4527-8983-ac8b54754abf/c9474e1f-01ab-41f5-bd4a-510109d55451/af0d0800-75f1-4648-bada-2f516292e784/ee55ad8a-122c-416b-a245-2beca2581dea",
+					port: "c4df7805-8f07-4e30-b81e-aedf143fa1ab",
+				},
+				to: {
+					instanceId: "root",
+					port: "20eb3850-aaed-4450-8079-b010e92d7226",
+				},
+			},
+		],
+	},
+	{
+		code: "",
+		id: "58c5fc0f-9c59-42ec-a2a6-90c99171be65",
+		components: [],
+		connections: [],
+		description: "",
+		metadata: {
+			position: {
+				x: 0,
+				y: 0,
+			},
+			style: {
+				height: 200,
+				width: 200,
+			},
+		},
+		name: "Charlie",
+		ports: [
+			{ id: "291f2776-e585-479c-8c83-1b68bc72fad6", type: "in" },
+			{ id: "86af6923-c378-4b22-9436-f9eaa74b5f4b", type: "out" },
+		],
+		type: "atomic",
+		libId: undefined,
+	},
+	{
+		code: "",
+		components: [],
+		connections: [],
+		description: "",
+		metadata: {
+			position: {
+				x: 0,
+				y: 0,
+			},
+			style: {
+				height: 200,
+				width: 200,
+			},
+		},
+		name: "Delta",
+		ports: [
+			{
+				id: "7b421cdf-e030-46db-8109-06dd509ac2e8",
 				type: "in",
 			},
 		],
 		type: "atomic",
+		id: "5de4a9ed-bfbc-4764-8ab4-b93f634ae268",
 		libId: undefined,
 	},
 ];

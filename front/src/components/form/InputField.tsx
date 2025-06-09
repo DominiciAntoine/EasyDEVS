@@ -83,7 +83,6 @@ export const InputField = <
 					}}
 					ref={field.ref}
 					disabled={field.disabled || props.disabled}
-					className="ena"
 					value={`${field.value ?? ""}`}
 				/>
 			</FormControl>

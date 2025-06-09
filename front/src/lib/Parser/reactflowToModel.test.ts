@@ -1,9 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { reactflowToModel } from "./reactflowToModel";
+import { describe, assert, it } from "vitest";
 import { mockApiModel, mockReactFlowModelLibrary } from "./__tests__/fakeData";
+import { mockApiModel as mockApiModel2, mockReactFlowModelLibrary as mockReactFlowModelLibrary2 } from "./__tests__/fakeData2";
+import { reactflowToModel } from "./reactflowToModel";
 
 describe("reactflowToModel", () => {
 	it("should convert a model library to api request", () => {
-		expect(reactflowToModel(mockReactFlowModelLibrary)).toStrictEqual(mockApiModel);
+		assert.deepEqual(reactflowToModel(mockReactFlowModelLibrary), mockApiModel)
+	});
+	it("should convert a model library to api request 2", () => {
+		assert.deepEqual(reactflowToModel(mockReactFlowModelLibrary2), mockApiModel2)
 	});
 });

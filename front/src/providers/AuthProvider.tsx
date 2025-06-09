@@ -79,7 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 					setToken(null);
 					return;
 				}
-				console.log("coucou");
 
 				setToken(storedToken);
 

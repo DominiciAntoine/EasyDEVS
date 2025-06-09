@@ -1034,6 +1034,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/model/{id}/simulate": {
+            "get": {
+                "description": "generateSimulationFile generate a zip that will contain all infromations for simulation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "models"
+                ],
+                "summary": "Generate simulations files",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "description": "Retrieve a list of all user",
@@ -1429,105 +1473,32 @@ const docTemplate = `{
                 "Coupled"
             ]
         },
-        "json.InstanceModelConnection": {
+        "json.ModelColors": {
             "type": "object",
-            "required": [
-                "from",
-                "to"
-            ],
             "properties": {
-                "from": {
-                    "$ref": "#/definitions/json.InstanceModelLink"
-                },
-                "to": {
-                    "$ref": "#/definitions/json.InstanceModelLink"
-                }
-            }
-        },
-        "json.InstanceModelLink": {
-            "type": "object",
-            "required": [
-                "instanceModelId",
-                "port"
-            ],
-            "properties": {
-                "instanceModelId": {
+                "bodyBackgroundColor": {
                     "type": "string"
                 },
-                "port": {
-                    "type": "string"
-                }
-            }
-        },
-        "json.InstanceModelMetadata": {
-            "type": "object",
-            "required": [
-                "position",
-                "style"
-            ],
-            "properties": {
-                "alwaysShowExtraInfo": {
-                    "type": "boolean"
-                },
-                "alwaysShowToolbar": {
-                    "type": "boolean"
-                },
-                "backgroundColor": {
+                "headerBackgroundColor": {
                     "type": "string"
                 },
-                "position": {
-                    "$ref": "#/definitions/json.InstanceModelPosition"
-                },
-                "style": {
-                    "$ref": "#/definitions/json.InstanceModelStyle"
-                },
-                "toolbarPosition": {
-                    "$ref": "#/definitions/json.ToolbarPosition"
-                },
-                "toolbarVisible": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "json.InstanceModelPosition": {
-            "type": "object",
-            "required": [
-                "x",
-                "y"
-            ],
-            "properties": {
-                "x": {
-                    "type": "integer"
-                },
-                "y": {
-                    "type": "integer"
-                }
-            }
-        },
-        "json.InstanceModelStyle": {
-            "type": "object",
-            "required": [
-                "height",
-                "width"
-            ],
-            "properties": {
-                "height": {
-                    "type": "integer"
-                },
-                "width": {
-                    "type": "integer"
+                "headerTextColor": {
+                    "type": "string"
                 }
             }
         },
         "json.ModelComponent": {
             "type": "object",
             "required": [
-                "componentId",
+                "instanceId",
                 "modelId"
             ],
             "properties": {
-                "componentId": {
+                "instanceId": {
                     "type": "string"
+                },
+                "instanceMetadata": {
+                    "$ref": "#/definitions/json.ModelMetadata"
                 },
                 "modelId": {
                     "type": "string"
@@ -1552,11 +1523,11 @@ const docTemplate = `{
         "json.ModelLink": {
             "type": "object",
             "required": [
-                "modelId",
+                "instanceId",
                 "port"
             ],
             "properties": {
-                "modelId": {
+                "instanceId": {
                     "type": "string"
                 },
                 "port": {
@@ -1580,6 +1551,15 @@ const docTemplate = `{
                 "backgroundColor": {
                     "type": "string"
                 },
+                "modelColors": {
+                    "$ref": "#/definitions/json.ModelColors"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/json.ModelParameter"
+                    }
+                },
                 "position": {
                     "$ref": "#/definitions/json.ModelPosition"
                 },
@@ -1592,6 +1572,26 @@ const docTemplate = `{
                 "toolbarVisible": {
                     "type": "boolean"
                 }
+            }
+        },
+        "json.ModelParameter": {
+            "type": "object",
+            "required": [
+                "name",
+                "type",
+                "value"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/json.ParameterType"
+                },
+                "value": {}
             }
         },
         "json.ModelPort": {
@@ -1617,10 +1617,10 @@ const docTemplate = `{
             ],
             "properties": {
                 "x": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "y": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -1632,12 +1632,29 @@ const docTemplate = `{
             ],
             "properties": {
                 "height": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "width": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
+        },
+        "json.ParameterType": {
+            "type": "string",
+            "enum": [
+                "int",
+                "float",
+                "bool",
+                "string",
+                "object"
+            ],
+            "x-enum-varnames": [
+                "ParameterTypeInt",
+                "ParameterTypeFloat",
+                "ParameterTypeBool",
+                "ParameterTypeString",
+                "ParameterTypeObject"
+            ]
         },
         "json.ToolbarPosition": {
             "type": "string",
@@ -1672,9 +1689,6 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "instanceModelId": {
-                    "$ref": "#/definitions/model.InstanceModel"
-                },
                 "modelId": {
                     "type": "string"
                 },
@@ -1694,51 +1708,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.InstanceModel": {
-            "type": "object",
-            "properties": {
-                "connections": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/json.InstanceModelConnection"
-                    }
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "$ref": "#/definitions/json.InstanceModelMetadata"
-                },
-                "modelTypeID": {
-                    "type": "string"
-                },
-                "parentID": {
-                    "type": "string"
-                },
-                "ports": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/json.ModelPort"
-                    }
-                },
-                "rootID": {
-                    "description": "May be dont need me",
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "userID": {
-                    "type": "string"
-                }
-            }
-        },
         "model.Library": {
             "type": "object",
             "properties": {
@@ -1754,7 +1723,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "modelTypes": {
+                "models": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Model"

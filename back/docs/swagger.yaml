@@ -16,74 +16,25 @@ definitions:
     x-enum-varnames:
     - Atomic
     - Coupled
-  json.InstanceModelConnection:
+  json.ModelColors:
     properties:
-      from:
-        $ref: '#/definitions/json.InstanceModelLink'
-      to:
-        $ref: '#/definitions/json.InstanceModelLink'
-    required:
-    - from
-    - to
-    type: object
-  json.InstanceModelLink:
-    properties:
-      instanceModelId:
+      bodyBackgroundColor:
         type: string
-      port:
+      headerBackgroundColor:
         type: string
-    required:
-    - instanceModelId
-    - port
-    type: object
-  json.InstanceModelMetadata:
-    properties:
-      alwaysShowExtraInfo:
-        type: boolean
-      alwaysShowToolbar:
-        type: boolean
-      backgroundColor:
+      headerTextColor:
         type: string
-      position:
-        $ref: '#/definitions/json.InstanceModelPosition'
-      style:
-        $ref: '#/definitions/json.InstanceModelStyle'
-      toolbarPosition:
-        $ref: '#/definitions/json.ToolbarPosition'
-      toolbarVisible:
-        type: boolean
-    required:
-    - position
-    - style
-    type: object
-  json.InstanceModelPosition:
-    properties:
-      x:
-        type: integer
-      "y":
-        type: integer
-    required:
-    - x
-    - "y"
-    type: object
-  json.InstanceModelStyle:
-    properties:
-      height:
-        type: integer
-      width:
-        type: integer
-    required:
-    - height
-    - width
     type: object
   json.ModelComponent:
     properties:
-      componentId:
+      instanceId:
         type: string
+      instanceMetadata:
+        $ref: '#/definitions/json.ModelMetadata'
       modelId:
         type: string
     required:
-    - componentId
+    - instanceId
     - modelId
     type: object
   json.ModelConnection:
@@ -98,12 +49,12 @@ definitions:
     type: object
   json.ModelLink:
     properties:
-      modelId:
+      instanceId:
         type: string
       port:
         type: string
     required:
-    - modelId
+    - instanceId
     - port
     type: object
   json.ModelMetadata:
@@ -114,6 +65,12 @@ definitions:
         type: boolean
       backgroundColor:
         type: string
+      modelColors:
+        $ref: '#/definitions/json.ModelColors'
+      parameters:
+        items:
+          $ref: '#/definitions/json.ModelParameter'
+        type: array
       position:
         $ref: '#/definitions/json.ModelPosition'
       style:
@@ -125,6 +82,20 @@ definitions:
     required:
     - position
     - style
+    type: object
+  json.ModelParameter:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      type:
+        $ref: '#/definitions/json.ParameterType'
+      value: {}
+    required:
+    - name
+    - type
+    - value
     type: object
   json.ModelPort:
     properties:
@@ -139,9 +110,9 @@ definitions:
   json.ModelPosition:
     properties:
       x:
-        type: integer
+        type: number
       "y":
-        type: integer
+        type: number
     required:
     - x
     - "y"
@@ -149,13 +120,27 @@ definitions:
   json.ModelStyle:
     properties:
       height:
-        type: integer
+        type: number
       width:
-        type: integer
+        type: number
     required:
     - height
     - width
     type: object
+  json.ParameterType:
+    enum:
+    - int
+    - float
+    - bool
+    - string
+    - object
+    type: string
+    x-enum-varnames:
+    - ParameterTypeInt
+    - ParameterTypeFloat
+    - ParameterTypeBool
+    - ParameterTypeString
+    - ParameterTypeObject
   json.ToolbarPosition:
     enum:
     - top
@@ -178,8 +163,6 @@ definitions:
         type: string
       id:
         type: string
-      instanceModelId:
-        $ref: '#/definitions/model.InstanceModel'
       modelId:
         type: string
       name:
@@ -195,36 +178,6 @@ definitions:
     required:
     - name
     type: object
-  model.InstanceModel:
-    properties:
-      connections:
-        items:
-          $ref: '#/definitions/json.InstanceModelConnection'
-        type: array
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      id:
-        type: string
-      metadata:
-        $ref: '#/definitions/json.InstanceModelMetadata'
-      modelTypeID:
-        type: string
-      parentID:
-        type: string
-      ports:
-        items:
-          $ref: '#/definitions/json.ModelPort'
-        type: array
-      rootID:
-        description: May be dont need me
-        type: string
-      updatedAt:
-        type: string
-      userID:
-        type: string
-    type: object
   model.Library:
     properties:
       createdAt:
@@ -235,7 +188,7 @@ definitions:
         type: string
       id:
         type: string
-      modelTypes:
+      models:
         items:
           $ref: '#/definitions/model.Model'
         type: array
@@ -1372,6 +1325,37 @@ paths:
             additionalProperties: true
             type: object
       summary: Get a model by ID
+      tags:
+      - models
+  /model/{id}/simulate:
+    get:
+      description: generateSimulationFile generate a zip that will contain all infromations
+        for simulation
+      parameters:
+      - description: Model ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Generate simulations files
       tags:
       - models
   /user:
