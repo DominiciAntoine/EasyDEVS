@@ -73,6 +73,7 @@ const createReactflowModel = (
 				? { reactFlowModelGraphicalData: model.metadata.modelColors }
 				: {}),
 			parameters: model.metadata.parameters,
+			code:model.code
 		},
 		dragging: false,
 		selected: false,

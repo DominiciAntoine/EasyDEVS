@@ -78,7 +78,7 @@ export function ModelPropertyEditor({
 					<AccordionTrigger className="font-semibold text-md">
 						Information
 					</AccordionTrigger>
-					<AccordionContent className="flex flex-col gap-4 text-balance">
+					<AccordionContent className="flex flex-col gap-4 text-balance p-1">
 						<div>
 							<Label>Model Name</Label>
 							<Input
@@ -127,7 +127,7 @@ export function ModelPropertyEditor({
 					<AccordionTrigger className="font-semibold">
 						Parameters
 					</AccordionTrigger>
-					<AccordionContent>
+					<AccordionContent className="flex flex-col gap-4 text-balance p-1">
 						<ModelParameterEditor
 							parameters={model.data.parameters ?? []}
 							onParametersChange={handleParametersChange}
@@ -138,7 +138,7 @@ export function ModelPropertyEditor({
 					<AccordionTrigger className="font-semibold">
 						Graphical Options
 					</AccordionTrigger>
-					<AccordionContent className="flex flex-col gap-4 text-balance">
+					<AccordionContent className="flex flex-col gap-4 text-balance p-1">
 						<div className="space-y-1">
 							<Label className="text-xs">Header Background Color</Label>
 							<Input
@@ -171,6 +171,42 @@ export function ModelPropertyEditor({
 								}
 							/>
 						</div>
+						
+					</AccordionContent>
+				</AccordionItem>
+				<AccordionItem value="item-4">
+					<AccordionTrigger className="font-semibold text-md">
+						Extra Information
+					</AccordionTrigger>
+					<AccordionContent className="flex flex-col gap-4 text-balance p-1">
+						<div>
+							<Label>Instance ID</Label>
+							<Input
+								value={model.id}
+								disabled
+								className="mt-1"
+							/>
+						</div>
+						<div>
+							<Label>Model ID</Label>
+							<Input
+								value={model.data.id}
+								disabled
+								className="mt-1"
+							/>
+						</div>
+
+						
+					</AccordionContent>
+				</AccordionItem>
+				<AccordionItem value="item-5">
+					<AccordionTrigger className="font-semibold text-md">
+						Export
+					</AccordionTrigger>
+					<AccordionContent className="flex flex-col gap-4 text-balance p-1">
+						 
+
+						
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>

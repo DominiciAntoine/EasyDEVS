@@ -51,11 +51,13 @@
 		"react-dom": "^18.3.1",
 		"react-flow-renderer": "^10.3.17",
 		"react-hook-form": "^7.53.2",
+		"react-hotkeys-hook": "^5.1.0",
 		"react-resizable-panels": "^2.1.7",
 		"react-router-dom": "^7.0.1",
 		"swr-openapi": "^5.1.4",
 		"tailwind-merge": "^2.5.4",
 		"tailwindcss-animate": "^1.0.7",
+		"use-undo": "^1.1.1",
 		"usehooks-ts": "^3.1.1",
 		"uuid": "^11.1.0",
 		"zod": "^3.23.8"

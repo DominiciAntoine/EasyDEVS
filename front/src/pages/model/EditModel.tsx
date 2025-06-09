@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { ModelViewEditor } from "@/components/custom/ModelViewEditor";
-import NavDragModel from "@/components/nav/NavDragModel";
 import NavHeader from "@/components/nav/nav-header";
 import {
 	ResizableHandle,
@@ -21,7 +20,8 @@ import ModelCodeEditorTemp from "@/components/custom/ModelCodeEditorTemp";
 import { ModelPropertyEditor } from "@/components/custom/ModelPropertyEditor";
 import { useToast } from "@/hooks/use-toast";
 import { useGetLibraryById } from "@/queries/library/useGetLibraryById";
-import { type Node, useReactFlow } from "@xyflow/react";
+import { type Node, useReactFlow } from "@xyflow/react";import { useHotkeys } from 'react-hotkeys-hook';
+import useUndo from "use-undo";
 
 export function EditModel() {
 	const { libraryId, modelId } = useParams<{
@@ -36,10 +36,32 @@ export function EditModel() {
 		params: { path: { id: libraryId ?? "" } },
 	});
 	const { toast } = useToast();
-	const [code, setCode] = useState("");
-	const [structure, setStructure] = useState<ReactFlowInput | undefined>(
-		undefined,
-	);
+	const [
+  structureState,
+  {
+    set: setStructure,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    reset
+  }
+] = useUndo<ReactFlowInput | undefined>(undefined);
+const structure = structureState.present;
+
+    useHotkeys('ctrl+s, meta+s', (e) => {
+    e.preventDefault();
+     e.stopPropagation();
+     console.log('Ctrl+S ou Cmd+S capté !');
+    saveModelChange();
+  }, ); 
+
+  
+useHotkeys("ctrl+z, meta+z", (e) => { e.preventDefault(); undo(); });
+useHotkeys("ctrl+y, meta+y", (e) => { e.preventDefault(); redo(); });
+
+
+
 
 	useEffect(() => {
 		if (data && modelId) {
@@ -47,14 +69,14 @@ export function EditModel() {
 			const tmp = modelToReactflow(data, modelId);
 			tmp.nodes.sort((a, b) => a.id.length - b.id.length);
 			setStructure(tmp);
-
-			if (root?.code) setCode(root.code);
 		}
-	}, [data, modelId]);
+	}, [data, modelId, setStructure]);
+
+    
 
 	const handleStructureChange = useCallback((newStructure: ReactFlowInput) => {
 		setStructure(newStructure);
-	}, []);
+	}, [setStructure]);
 
 	const saveModelChange = async (): Promise<void> => {
 		if (!structure || !modelId) return;
@@ -110,6 +132,8 @@ export function EditModel() {
 		}
 	};
 
+    
+
 	const simulateModel = async (): Promise<void> => {
 		if (!structure || !modelId) return;
 
@@ -131,19 +155,41 @@ export function EditModel() {
 			});
 		}
 	};
+const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
+    // Structure actuel : structureState.present ou structure (comme dans la réponse précédente)
+    if (!structure) return;
 
-	const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
-		setStructure((prev) => {
-			if (!prev) return undefined;
+    const newStructure = {
+        ...structure,
+        nodes: structure.nodes.map((node) =>
+            node.id === updatedNode.id ? updatedNode : node
+        ),
+    };
 
-			return {
-				...prev,
-				nodes: prev.nodes.map((node) =>
-					node.id === updatedNode.id ? updatedNode : node,
-				),
-			};
-		});
-	};
+    setStructure(newStructure); // Pas de callback !
+};
+
+    const onChangeCode = (newCode: string, codeID: string) => {
+    if (!structure) return;
+
+    const newStructure = {
+        ...structure,
+        nodes: structure.nodes.map((node) =>
+            node.id === codeID
+                ? {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        code: newCode
+                    }
+                }
+                : node
+        ),
+    };
+
+    setStructure(newStructure); 
+};
+
 
 	if (isLoading || isLoadingLib) {
 		return (
@@ -178,7 +224,7 @@ export function EditModel() {
 			{mainModel?.data.modelType === "atomic" ? (
 				<ResizablePanelGroup direction="horizontal">
 					<ResizablePanel defaultSize={50} minSize={20}>
-						<ModelCodeEditor code={code} onCodeChange={setCode} />
+						<ModelCodeEditor code={mainModel.data.code} onCodeChange={onChangeCode} modelId={mainModel.id} saveModelChange={saveModelChange}/>
 					</ResizablePanel>
 
 					<ResizableHandle withHandle />

@@ -46,6 +46,7 @@ const reactFlowModelLibrary: ReactFlowInput = {
 				label: "Root",
 				inputPorts: [],
 				outputPorts: [],
+                code:""
 			},
 			position: {
 				x: -351.70230386436424,
@@ -78,6 +79,7 @@ const reactFlowModelLibrary: ReactFlowInput = {
 						id: "ad7c4558-a937-47b4-8503-6ba1a298c971",
 					},
 				],
+                code:""
 			},
 			position: {
 				x: 34.44565430186219,
@@ -112,6 +114,7 @@ const reactFlowModelLibrary: ReactFlowInput = {
 						id: "20eb3850-aaed-4450-8079-b010e92d7226",
 					},
 				],
+                code:""
 			},
 			position: {
 				x: 65.13492069058077,
@@ -147,6 +150,7 @@ const reactFlowModelLibrary: ReactFlowInput = {
 						id: "86af6923-c378-4b22-9436-f9eaa74b5f4b",
 					},
 				],
+                code:""
 			},
 			position: {
 				x: 55.337456432243016,
@@ -181,6 +185,7 @@ const reactFlowModelLibrary: ReactFlowInput = {
 						id: "c4df7805-8f07-4e30-b81e-aedf143fa1ab",
 					},
 				],
+                code:""
 			},
 			position: {
 				x: 320.730800379744,
@@ -211,6 +216,7 @@ const reactFlowModelLibrary: ReactFlowInput = {
 					},
 				],
 				outputPorts: [],
+                code:""
 			},
 			position: {
 				x: 817.7118582602075,
@@ -334,7 +340,7 @@ export function TestModel() {
 				edgeTypes={edgeTypes}
 				defaultEdgeOptions={defaultEdgeOptions}
 				connectionMode={ConnectionMode.Loose}
-			></ReactFlow>
+			/>
 		</div>
 	);
 }

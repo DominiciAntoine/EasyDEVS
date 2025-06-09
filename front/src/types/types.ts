@@ -16,6 +16,7 @@ export type ReactFlowModelData = {
 	outputPorts?: ReactFlowPort[];
 	reactFlowModelGraphicalData?: ReactFlowModelGraphicalData;
 	parameters?: components["schemas"]["json.ModelParameter"][];
+	code:string;
 };
 
 export type EdgeData = {

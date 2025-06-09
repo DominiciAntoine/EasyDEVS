@@ -76,7 +76,7 @@ const nodeToModel = (
 	return {
 		name: node.data.label,
 		id: node.data.id,
-		code: "",
+		code: node.data.code,
 		components: comp,
 		ports: getModelPorts(node),
 		description: "",
