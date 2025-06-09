@@ -27,12 +27,11 @@ async function loadPyodideAndRun(code: string): Promise<WorkerResponse> {
 		// Libérer la mémoire si possible
 		pyodide = null;
 		working = false;
-		if (error instanceof Error)  {
+		if (error instanceof Error) {
 			return { diagnostics: [], error: error };
-		} 
-		console.error(error)
+		}
+		console.error(error);
 		return { diagnostics: [], error: new Error("Unknown error") };
-		
 	}
 }
 

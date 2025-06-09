@@ -1,23 +1,39 @@
 import type { components } from "@/api/v1";
-import { DEFAULT_NODE_SIZE, DEFAULT_POSITION, INTERNAL_PREFIX } from "@/constants";
+import {
+	DEFAULT_NODE_SIZE,
+	DEFAULT_POSITION,
+	INTERNAL_PREFIX,
+} from "@/constants";
 import type { EdgeData, ReactFlowInput } from "@/types";
 import type { Edge } from "@xyflow/react";
 
-
-const createEdge = (conn: components['schemas']['json.ModelConnection'], component: components["schemas"]["json.ModelComponent"]): Edge<EdgeData> => {
-	const id = `${conn.from.instanceId === "root"? component.instanceId : conn.from.instanceId}->${conn.to.instanceId === "root"? component.instanceId : conn.to.instanceId}`
+const createEdge = (
+	conn: components["schemas"]["json.ModelConnection"],
+	component: components["schemas"]["json.ModelComponent"],
+): Edge<EdgeData> => {
+	const id = `${conn.from.instanceId === "root" ? component.instanceId : conn.from.instanceId}->${conn.to.instanceId === "root" ? component.instanceId : conn.to.instanceId}`;
 
 	return {
 		id,
-		source: conn.from.instanceId === "root"? component.instanceId : conn.from.instanceId,
-		target: conn.to.instanceId === "root"? component.instanceId : conn.to.instanceId,
-		sourceHandle: conn.from.instanceId === "root" ? `${INTERNAL_PREFIX}${component.instanceId}:${conn.from.port}` : `${conn.from.instanceId}:${conn.from.port}`,
-		targetHandle: conn.to.instanceId === "root"? `${INTERNAL_PREFIX}${component.instanceId}:${conn.to.port}` : `${conn.to.instanceId}:${conn.to.port}`,
+		source:
+			conn.from.instanceId === "root"
+				? component.instanceId
+				: conn.from.instanceId,
+		target:
+			conn.to.instanceId === "root" ? component.instanceId : conn.to.instanceId,
+		sourceHandle:
+			conn.from.instanceId === "root"
+				? `${INTERNAL_PREFIX}${component.instanceId}:${conn.from.port}`
+				: `${conn.from.instanceId}:${conn.from.port}`,
+		targetHandle:
+			conn.to.instanceId === "root"
+				? `${INTERNAL_PREFIX}${component.instanceId}:${conn.to.port}`
+				: `${conn.to.instanceId}:${conn.to.port}`,
 		data: {
 			holderId: component.instanceId,
 		},
-	}
-}
+	};
+};
 
 const getModelMetadata = (
 	component: components["schemas"]["json.ModelComponent"],
@@ -54,9 +70,9 @@ const createReactflowModel = (
 				.filter((p) => p.type === "out")
 				.map((p) => ({ id: p.id })),
 			...(model.metadata.modelColors
-			? { reactFlowModelGraphicalData: model.metadata.modelColors }
-			: {}),
-			parameters: model.metadata.parameters
+				? { reactFlowModelGraphicalData: model.metadata.modelColors }
+				: {}),
+			parameters: model.metadata.parameters,
 		},
 		dragging: false,
 		selected: false,
@@ -78,7 +94,9 @@ const recursiveModelParsing = (
 
 	if (!actualModel || !actualModel.id) return { nodes: [], edges: [] };
 
-	const actualEdge = actualModel.connections.map<Edge<EdgeData>>((conn) => createEdge(conn, component));
+	const actualEdge = actualModel.connections.map<Edge<EdgeData>>((conn) =>
+		createEdge(conn, component),
+	);
 
 	const childNodes =
 		actualModel.components?.flatMap((c) =>
@@ -110,6 +128,6 @@ export const modelToReactflow = (
 
 	return {
 		nodes: result.nodes.sort((a, b) => a.id.localeCompare(b.id)),
-		edges: result.edges.sort((a, b) => a.id.localeCompare(b.id))
-	}
+		edges: result.edges.sort((a, b) => a.id.localeCompare(b.id)),
+	};
 };

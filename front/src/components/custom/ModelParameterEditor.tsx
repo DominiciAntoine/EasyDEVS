@@ -1,7 +1,7 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { Label } from "@/components/ui/label";
+import type { components } from "@/api/v1";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -10,12 +10,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Edit, Code, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { z } from "zod";
-import type { components } from "@/api/v1";
+import { Textarea } from "@/components/ui/textarea";
 import { POSSIBLE_PARAMETER_TYPE } from "@/constants";
-import { Form } from "../form/Form";
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -24,10 +20,14 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { Code, Edit, Plus } from "lucide-react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Form } from "../form/Form";
 import { InputField } from "../form/InputField";
-import { Submit } from "../form/Submit";
 import { SelectField } from "../form/SelectField";
+import { Submit } from "../form/Submit";
 import { ParameterInput } from "./reactFlow/ParameterInput";
 
 const ParameterSchema = z.array(
@@ -92,7 +92,6 @@ export function ModelParameterEditor({
 				</Button>
 			</div>
 
-
 			{editAsJSON ? (
 				<Textarea
 					value={jsonInput}
@@ -110,7 +109,13 @@ export function ModelParameterEditor({
 			) : (
 				parameters.map((param, index) => (
 					<div key={`${param.name}-${index}`} className="space-y-2">
-						<ParameterInput index={index} name={param.name} type={param.type} updateParameter={updateParameter}value={param.value}/>
+						<ParameterInput
+							index={index}
+							name={param.name}
+							type={param.type}
+							updateParameter={updateParameter}
+							value={param.value}
+						/>
 
 						{param.description ? (
 							<p className="text-xs text-muted-foreground">

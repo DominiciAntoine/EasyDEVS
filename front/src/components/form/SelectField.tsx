@@ -1,9 +1,9 @@
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 } from "@/components/ui/select";
 import type { ComponentProps, ReactNode } from "react";
 import {
@@ -27,7 +27,7 @@ type SelectFieldProps<
 	UseControllerProps<TFieldValues, TName> & {
 		label: ReactNode;
 		description?: ReactNode;
-        placeholder?: string
+		placeholder?: string;
 	};
 
 export const SelectField = <
@@ -40,8 +40,8 @@ export const SelectField = <
 	defaultValue,
 	label,
 	description,
-    placeholder,
-    children,
+	placeholder,
+	children,
 	...props
 }: SelectFieldProps<TFieldValues, TName>) => {
 	const { field } = useController({
@@ -65,29 +65,25 @@ export const SelectField = <
 			<FormLabel>{label}</FormLabel>
 			<FormControl>
 				<Select
-                    {...props}
+					{...props}
 					name={field.name}
-					
 					disabled={field.disabled || props.disabled}
 					value={`${field.value ?? ""}`}
-                    onValueChange={(value) => {
+					onValueChange={(value) => {
 						field.onChange(value);
 						props.onValueChange?.(value);
-                    }}
-
-                    onOpenChange={(open) => {
-                        if (!open) {
-                            field.onBlur()
-                        }
-                    }}
-                >
-                    <SelectTrigger ref={field.ref}>
-                        <SelectValue placeholder={placeholder} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {children}
-                    </SelectContent>
-                </Select>
+					}}
+					onOpenChange={(open) => {
+						if (!open) {
+							field.onBlur();
+						}
+					}}
+				>
+					<SelectTrigger ref={field.ref}>
+						<SelectValue placeholder={placeholder} />
+					</SelectTrigger>
+					<SelectContent>{children}</SelectContent>
+				</Select>
 			</FormControl>
 			{description ? <FormDescription>{description}</FormDescription> : null}
 			<FormMessage />

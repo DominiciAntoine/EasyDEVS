@@ -1,5 +1,11 @@
-import { Label } from "@/components/ui/label";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -7,17 +13,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { v4 as uuidv4 } from "uuid";
-import type { Node } from "@xyflow/react";
 import type { ReactFlowModelData } from "@/types";
-import { PortCountEditor } from "./reactFlow/PortCountEditor";
+import type { Node } from "@xyflow/react";
+import { v4 as uuidv4 } from "uuid";
 import { ModelParameterEditor } from "./ModelParameterEditor";
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@/components/ui/accordion";
+import { PortCountEditor } from "./reactFlow/PortCountEditor";
 
 export function ModelPropertyEditor({
 	model,
@@ -73,14 +73,11 @@ export function ModelPropertyEditor({
 
 	return (
 		<div className="h-full w-full bg-card p-4 space-y-4 text-sm">
-			<Accordion
-				type="multiple"
-				className="w-full"
-				defaultValue={["item-1"]}
-
-			>
+			<Accordion type="multiple" className="w-full" defaultValue={["item-1"]}>
 				<AccordionItem value="item-1">
-					<AccordionTrigger className="font-semibold text-md">Information</AccordionTrigger>
+					<AccordionTrigger className="font-semibold text-md">
+						Information
+					</AccordionTrigger>
 					<AccordionContent className="flex flex-col gap-4 text-balance">
 						<div>
 							<Label>Model Name</Label>
@@ -127,49 +124,53 @@ export function ModelPropertyEditor({
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="item-2">
-					<AccordionTrigger className="font-semibold">Parameters</AccordionTrigger>
+					<AccordionTrigger className="font-semibold">
+						Parameters
+					</AccordionTrigger>
 					<AccordionContent>
-				<ModelParameterEditor
-					parameters={model.data.parameters ?? []}
-					onParametersChange={handleParametersChange}
-				/>
+						<ModelParameterEditor
+							parameters={model.data.parameters ?? []}
+							onParametersChange={handleParametersChange}
+						/>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="item-3">
-					<AccordionTrigger  className="font-semibold">Graphical Options</AccordionTrigger>
+					<AccordionTrigger className="font-semibold">
+						Graphical Options
+					</AccordionTrigger>
 					<AccordionContent className="flex flex-col gap-4 text-balance">
 						<div className="space-y-1">
-						<Label className="text-xs">Header Background Color</Label>
-						<Input
-							type="color"
-							value={graphicalData.headerBackgroundColor || "#000000"}
-							onChange={(e) =>
-								updateGraphical("headerBackgroundColor", e.target.value)
-							}
-						/>
-					</div>
+							<Label className="text-xs">Header Background Color</Label>
+							<Input
+								type="color"
+								value={graphicalData.headerBackgroundColor || "#000000"}
+								onChange={(e) =>
+									updateGraphical("headerBackgroundColor", e.target.value)
+								}
+							/>
+						</div>
 
-					<div className="space-y-1">
-						<Label className="text-xs">Header Text Color</Label>
-						<Input
-							type="color"
-							value={graphicalData.headerTextColor || "#ffffff"}
-							onChange={(e) =>
-								updateGraphical("headerTextColor", e.target.value)
-							}
-						/>
-					</div>
+						<div className="space-y-1">
+							<Label className="text-xs">Header Text Color</Label>
+							<Input
+								type="color"
+								value={graphicalData.headerTextColor || "#ffffff"}
+								onChange={(e) =>
+									updateGraphical("headerTextColor", e.target.value)
+								}
+							/>
+						</div>
 
-					<div className="space-y-1">
-						<Label className="text-xs">Body Background Color</Label>
-						<Input
-							type="color"
-							value={graphicalData.bodyBackgroundColor || "#eeeeee"}
-							onChange={(e) =>
-								updateGraphical("bodyBackgroundColor", e.target.value)
-							}
-						/>
-					</div>
+						<div className="space-y-1">
+							<Label className="text-xs">Body Background Color</Label>
+							<Input
+								type="color"
+								value={graphicalData.bodyBackgroundColor || "#eeeeee"}
+								onChange={(e) =>
+									updateGraphical("bodyBackgroundColor", e.target.value)
+								}
+							/>
+						</div>
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>

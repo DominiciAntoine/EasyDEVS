@@ -20,12 +20,19 @@ import {
 
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 
+import { components } from "@/api/v1";
 import { librairiesToFront } from "@/lib/Parser/librairiesToFront";
+import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
 import { LibraryDeleteDialog } from "@/modals/library/LibraryDeleteDialog";
 import { ModelDeleteDialog } from "@/modals/model/ModelDeleteDialog";
+import { useDnD } from "@/providers/DnDContext";
 import { useGetLibraries } from "@/queries/library/useGetLibraries";
+import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
 import { useGetModels } from "@/queries/model/useGetModels";
+import { ReactFlowInput } from "@/types";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ModelView } from "../custom/ModelView";
 import { Button } from "../ui/button";
 import {
 	ContextMenu,
@@ -34,14 +41,7 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "../ui/context-menu";
-import { useDnD } from "@/providers/DnDContext";
-import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
-import { components } from "@/api/v1";
-import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
-import { ReactFlowInput } from "@/types";
-import { ModelView } from "../custom/ModelView";
 
 export function NavLibrary() {
 	//a voir avec dorian si on met ca dans ce composant ou le composant parent
@@ -51,9 +51,9 @@ export function NavLibrary() {
 	const navigate = useNavigate();
 
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
-const { data, isLoading } = useGetModelByIdRecursive(
-  hoveredId ? { params: { path: { id: hoveredId } } } : (null as any)
-);
+	const { data, isLoading } = useGetModelByIdRecursive(
+		hoveredId ? { params: { path: { id: hoveredId } } } : (null as any),
+	);
 
 	const hoveredModel =
 		hoveredId && data ? modelToReactflow(data, hoveredId) : undefined;
@@ -62,8 +62,6 @@ const { data, isLoading } = useGetModelByIdRecursive(
 		libraries.data ?? [],
 		models.data ?? [],
 	);
-
-	
 
 	const onHoverModel = (modelId: string | null) => {
 		setHoveredId(modelId);

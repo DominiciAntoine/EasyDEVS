@@ -1,8 +1,8 @@
+import { INTERNAL_PREFIX } from "@/constants";
 import type { ReactFlowModelData } from "@/types";
 import { Handle, NodeResizer, Position } from "@xyflow/react";
 import { memo } from "react";
 import ModelHeader from "./ModelHeader";
-import { INTERNAL_PREFIX } from "@/constants";
 
 type ModelNodeProps = {
 	id: string;
@@ -22,17 +22,20 @@ function ModelNode({ id, data, selected }: ModelNodeProps) {
 			<div className="h-full w-full border-border border rounded-lg border-solid ">
 				<ModelHeader selected={selected} data={data} id={id} />
 				<div
-  className={
-    `flex relative h-[calc(100%-2.5rem)] ${
-      !data.reactFlowModelGraphicalData?.bodyBackgroundColor ? "bg-card" : ""
-    }`
-  }
-  style={
-    data.reactFlowModelGraphicalData?.bodyBackgroundColor
-      ? { backgroundColor: data.reactFlowModelGraphicalData.bodyBackgroundColor }
-      : undefined
-  }
->
+					className={`flex relative h-[calc(100%-2.5rem)] ${
+						!data.reactFlowModelGraphicalData?.bodyBackgroundColor
+							? "bg-card"
+							: ""
+					}`}
+					style={
+						data.reactFlowModelGraphicalData?.bodyBackgroundColor
+							? {
+									backgroundColor:
+										data.reactFlowModelGraphicalData.bodyBackgroundColor,
+								}
+							: undefined
+					}
+				>
 					<div className="flex flex-col justify-evenly relative -left-2 text-primary">
 						{data.inputPorts?.map((port: { id: string }) => (
 							<div

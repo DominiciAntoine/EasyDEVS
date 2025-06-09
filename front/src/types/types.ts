@@ -14,20 +14,18 @@ export type ReactFlowModelData = {
 	label: string;
 	inputPorts?: ReactFlowPort[];
 	outputPorts?: ReactFlowPort[];
-	reactFlowModelGraphicalData? : ReactFlowModelGraphicalData;
-	parameters?: components[
-	'schemas'
-	]['json.ModelParameter'][];
+	reactFlowModelGraphicalData?: ReactFlowModelGraphicalData;
+	parameters?: components["schemas"]["json.ModelParameter"][];
 };
 
 export type EdgeData = {
-	holderId: string
+	holderId: string;
 };
 
 export type ReactFlowModelGraphicalData = {
-	headerBackgroundColor? : string;
-	headerTextColor? : string;
-	bodyBackgroundColor? : string;
+	headerBackgroundColor?: string;
+	headerTextColor?: string;
+	bodyBackgroundColor?: string;
 };
 
 export type WorkerResponse = {

@@ -78,7 +78,6 @@ const ZoomSlider = React.forwardRef<HTMLDivElement, ZoomSliderProps>(
 						<ReplaceAll className="h-4 w-4" />
 					</Button>
 				)}
-
 			</Panel>
 		);
 	},

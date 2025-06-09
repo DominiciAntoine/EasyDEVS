@@ -64,7 +64,10 @@ const NavHeader: React.FC<NavHeaderProps> = ({
 			</Breadcrumb>
 			<div className="ml-auto px-3 flex items-center gap-2">
 				{showNavActions && (
-					<NavActions saveFunction={saveFunction} simulateFunction={simulateFunction} />
+					<NavActions
+						saveFunction={saveFunction}
+						simulateFunction={simulateFunction}
+					/>
 				)}
 				{showModeToggle && <ModeToggle />}
 			</div>

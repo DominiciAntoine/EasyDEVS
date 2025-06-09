@@ -117,14 +117,17 @@ type NavActionsProps = {
 	simulateFunction?: () => Promise<void>;
 };
 
-export function NavActions({ saveFunction, simulateFunction }: NavActionsProps) {
+export function NavActions({
+	saveFunction,
+	simulateFunction,
+}: NavActionsProps) {
 	const [isOpen, setIsOpen] = React.useState(false);
 
 	return (
 		<div className="flex items-center gap-2 text-sm">
 			{saveFunction && (
 				<Button size="icon" className="h-7 w-7" onClick={simulateFunction}>
-					<Play/>
+					<Play />
 				</Button>
 			)}
 			{saveFunction && (
@@ -133,7 +136,6 @@ export function NavActions({ saveFunction, simulateFunction }: NavActionsProps) 
 				</Button>
 			)}
 
-			
 			<div className="hidden font-medium text-muted-foreground md:inline-block">
 				Edit Oct 08
 			</div>

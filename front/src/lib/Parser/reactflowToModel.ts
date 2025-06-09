@@ -14,14 +14,17 @@ const getModelComponent = (
 		.map((nodeInNodes) => ({
 			instanceId: nodeInNodes.id,
 			modelId: nodeInNodes.data.id,
-			instanceMetadata:{
-				position: {x:nodeInNodes.position.x, y:nodeInNodes.position.y},
-				style: { height: nodeInNodes.measured?.height ?? DEFAULT_NODE_SIZE, width: nodeInNodes.measured?.width  ?? DEFAULT_NODE_SIZE},
+			instanceMetadata: {
+				position: { x: nodeInNodes.position.x, y: nodeInNodes.position.y },
+				style: {
+					height: nodeInNodes.measured?.height ?? DEFAULT_NODE_SIZE,
+					width: nodeInNodes.measured?.width ?? DEFAULT_NODE_SIZE,
+				},
 				...(nodeInNodes.data.reactFlowModelGraphicalData
-			? { modelColors: nodeInNodes.data.reactFlowModelGraphicalData }
-			: {}),
-			parameters: nodeInNodes.data.parameters
-			}
+					? { modelColors: nodeInNodes.data.reactFlowModelGraphicalData }
+					: {}),
+				parameters: nodeInNodes.data.parameters,
+			},
 		}));
 };
 
@@ -29,22 +32,23 @@ const getModelConnection = (
 	node: ReactFlowInput["nodes"][number],
 	nodesAndEdges: ReactFlowInput,
 ): components["schemas"]["json.ModelConnection"][] => {
-	
-	const holdersEdge = nodesAndEdges.edges.filter((edge)=>edge.data?.holderId === node.id);
+	const holdersEdge = nodesAndEdges.edges.filter(
+		(edge) => edge.data?.holderId === node.id,
+	);
 
-	const modelConnection = holdersEdge.flatMap((anEdge)=>[
+	const modelConnection = holdersEdge.flatMap((anEdge) => [
 		{
-		from: {
-			instanceId: anEdge.source===node.id ? "root": anEdge.source,
-			port: cleanHandleId(anEdge.sourceHandle)?.split(":")[1] ?? "",
+			from: {
+				instanceId: anEdge.source === node.id ? "root" : anEdge.source,
+				port: cleanHandleId(anEdge.sourceHandle)?.split(":")[1] ?? "",
+			},
+			to: {
+				instanceId: anEdge.target === node.id ? "root" : anEdge.target,
+				port: cleanHandleId(anEdge.targetHandle)?.split(":")[1] ?? "",
+			},
 		},
-		to: {
-			instanceId: anEdge.target===node.id? "root": anEdge.target,
-			port: cleanHandleId(anEdge.targetHandle)?.split(":")[1] ?? "",
-		},
-	}
-	])
-	
+	]);
+
 	return modelConnection;
 };
 
@@ -72,26 +76,28 @@ const nodeToModel = (
 	return {
 		name: node.data.label,
 		id: node.data.id,
-		code: '',
+		code: "",
 		components: comp,
 		ports: getModelPorts(node),
 		description: "",
 		type: node.data.modelType,
 		metadata: {
-			position: !node.id.includes("/")? { x: node.position.x, y: node.position.y }:{ x: 0, y: 0 },
-			style: !node.id.includes("/")? {
-				
-				height: node.measured?.height ?? DEFAULT_NODE_SIZE,
-				width: node.measured?.width ?? DEFAULT_NODE_SIZE,
-			}: {
-				
-				height: DEFAULT_NODE_SIZE,
-				width: DEFAULT_NODE_SIZE,
-			},
+			position: !node.id.includes("/")
+				? { x: node.position.x, y: node.position.y }
+				: { x: 0, y: 0 },
+			style: !node.id.includes("/")
+				? {
+						height: node.measured?.height ?? DEFAULT_NODE_SIZE,
+						width: node.measured?.width ?? DEFAULT_NODE_SIZE,
+					}
+				: {
+						height: DEFAULT_NODE_SIZE,
+						width: DEFAULT_NODE_SIZE,
+					},
 			...(node.data.reactFlowModelGraphicalData && !node.id.includes("/")
-			? { modelColors: node.data.reactFlowModelGraphicalData }
-			: {}),
-			parameters: node.data.parameters
+				? { modelColors: node.data.reactFlowModelGraphicalData }
+				: {}),
+			parameters: node.data.parameters,
 		},
 		libId: undefined,
 		connections:
@@ -101,15 +107,12 @@ const nodeToModel = (
 	};
 };
 
-
 export const reactflowToModel = (
-	res: ReactFlowInput, 
+	res: ReactFlowInput,
 ): components["schemas"]["request.ModelRequest"][] => {
-
 	const models = res.nodes.map((n) => nodeToModel(n, res));
-	const uniqueModels = models.filter((model, index, self) =>
-        index === self.findIndex((m) => m.id === model.id)
-    );
+	const uniqueModels = models.filter(
+		(model, index, self) => index === self.findIndex((m) => m.id === model.id),
+	);
 	return uniqueModels;
-
 };
