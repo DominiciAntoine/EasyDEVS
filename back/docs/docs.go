@@ -811,10 +811,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/response.ModelResponse"
-                                }
+                                "$ref": "#/definitions/response.ModelResponse"
                             }
                         }
                     },
@@ -2259,10 +2256,12 @@ const docTemplate = `{
                 "components",
                 "connections",
                 "description",
+                "id",
                 "metadata",
                 "name",
                 "ports",
-                "type"
+                "type",
+                "userId"
             ],
             "properties": {
                 "code": {

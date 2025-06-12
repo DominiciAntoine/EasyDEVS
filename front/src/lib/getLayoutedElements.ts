@@ -1,12 +1,15 @@
+import { DEFAULT_NODE_SIZE } from "@/constants";
 import type { ReactFlowInput } from "@/types";
-import ELK, { type ElkNode } from "elkjs/lib/elk.bundled.js";
+import ELK, { type ElkNode } from "elkjs/lib/elk.bundled";
 
 const elk = new ELK();
-const elkOptions = {
+const elkOptions: NonNullable<ElkNode["layoutOptions"]> = {
 	"elk.algorithm": "layered",
-	"elk.layered.spacing.nodeNodeBetweenLayers": "100",
-	"elk.spacing.nodeNode": "80",
-	"elk.hierarchyHandling": "INCLUDE_CHILDREN", // Ajout de cette option
+	"elk.layered.spacing.nodeNodeBetweenLayers": "200",
+	"elk.spacing.nodeNode": "200",
+	"elk.hierarchyHandling": "INCLUDE_CHILDREN",
+	"elk.radial.centerOnRoot": "true",
+	"elk.layered.nodePlacement.strategy": "SIMPLE",
 };
 
 // Fonction pour construire la hiérarchie des nœuds avec leurs enfants
@@ -18,11 +21,14 @@ const buildHierarchy = (nodes: ReactFlowInput["nodes"]) => {
 	nodes.forEach((node) => {
 		nodeMap[node.id] = {
 			id: node.id,
-			layoutOptions: { "elk.padding": "[top=120,left=40,bottom=40,right=40]" },
+			layoutOptions: {
+				...elkOptions,
+				"elk.padding": "[top=80,left=40,bottom=40,right=40]",
+			},
 			//targetPosition: isHorizontal ? 'left' : 'top',
 			//sourcePosition: isHorizontal ? 'right' : 'bottom',
-			width: Number(node.style?.width) || 150,
-			height: Number(node.style?.height) || 50,
+			width: Number(node.style?.width) || DEFAULT_NODE_SIZE,
+			height: Number(node.style?.height) || DEFAULT_NODE_SIZE,
 			children: [],
 		};
 	});
@@ -64,7 +70,7 @@ export const getLayoutedElements = async (
 	direction = "RIGHT",
 ): Promise<ReactFlowInput> => {
 	// Construire la hiérarchie de graphes avec les nœuds et leurs enfants
-	const graph = {
+	const graph: ElkNode = {
 		id: "root",
 		layoutOptions: { ...elkOptions, "elk.direction": direction },
 		children: buildHierarchy(nodes),
@@ -92,6 +98,10 @@ export const getLayoutedElements = async (
 						width: node.width,
 						height: node.height,
 						position: node.position,
+						measured: {
+							width: node.width,
+							height: node.height,
+						},
 					};
 				}
 

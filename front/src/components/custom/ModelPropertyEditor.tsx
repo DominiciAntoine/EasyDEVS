@@ -19,13 +19,13 @@ import { v4 as uuidv4 } from "uuid";
 import { ModelParameterEditor } from "./ModelParameterEditor";
 import { PortCountEditor } from "./reactFlow/PortCountEditor";
 
-export function ModelPropertyEditor({
-	model,
-	onChange,
-}: {
+type Props = {
 	model: Node<ReactFlowModelData>;
 	onChange?: (model: Node<ReactFlowModelData>) => void;
-}) {
+	disabled: boolean;
+};
+
+export function ModelPropertyEditor({ model, onChange, disabled }: Props) {
 	const update = (changes: Partial<ReactFlowModelData>) => {
 		onChange?.({
 			...model,
@@ -85,6 +85,7 @@ export function ModelPropertyEditor({
 								value={model.data.label}
 								onChange={(e) => update({ label: e.target.value })}
 								className="mt-1"
+								disabled={disabled}
 							/>
 						</div>
 
@@ -96,6 +97,7 @@ export function ModelPropertyEditor({
 								onValueChange={(value) =>
 									update({ modelType: value as "atomic" | "coupled" })
 								}
+								disabled={disabled}
 							>
 								<SelectTrigger className="mt-1">
 									<SelectValue placeholder="Select model type" />
@@ -113,6 +115,7 @@ export function ModelPropertyEditor({
 							count={model.data.inputPorts?.length ?? 0}
 							onAdd={() => handlePortUpdate("add", "input")}
 							onRemove={() => handlePortUpdate("remove", "input")}
+							disabled={disabled}
 						/>
 
 						<PortCountEditor
@@ -120,6 +123,7 @@ export function ModelPropertyEditor({
 							count={model.data.outputPorts?.length ?? 0}
 							onAdd={() => handlePortUpdate("add", "output")}
 							onRemove={() => handlePortUpdate("remove", "output")}
+							disabled={disabled}
 						/>
 					</AccordionContent>
 				</AccordionItem>
@@ -131,6 +135,7 @@ export function ModelPropertyEditor({
 						<ModelParameterEditor
 							parameters={model.data.parameters ?? []}
 							onParametersChange={handleParametersChange}
+							disabled={disabled}
 						/>
 					</AccordionContent>
 				</AccordionItem>
@@ -147,6 +152,7 @@ export function ModelPropertyEditor({
 								onChange={(e) =>
 									updateGraphical("headerBackgroundColor", e.target.value)
 								}
+								disabled={disabled}
 							/>
 						</div>
 
@@ -158,6 +164,7 @@ export function ModelPropertyEditor({
 								onChange={(e) =>
 									updateGraphical("headerTextColor", e.target.value)
 								}
+								disabled={disabled}
 							/>
 						</div>
 
@@ -169,9 +176,9 @@ export function ModelPropertyEditor({
 								onChange={(e) =>
 									updateGraphical("bodyBackgroundColor", e.target.value)
 								}
+								disabled={disabled}
 							/>
 						</div>
-						
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="item-4">
@@ -181,22 +188,28 @@ export function ModelPropertyEditor({
 					<AccordionContent className="flex flex-col gap-4 text-balance p-1">
 						<div>
 							<Label>Instance ID</Label>
-							<Input
-								value={model.id}
-								disabled
-								className="mt-1"
-							/>
+							<Input value={model.id} disabled className="mt-1" />
 						</div>
 						<div>
 							<Label>Model ID</Label>
-							<Input
-								value={model.data.id}
-								disabled
-								className="mt-1"
-							/>
+							<Input value={model.data.id} disabled className="mt-1" />
 						</div>
-
-						
+						<Label>Input Ports</Label>
+						{model.data.inputPorts?.map((ip) => {
+							return (
+								<div key={`inputport${ip.id}`}>
+									<Input value={ip.id} disabled className="mt-1" />
+								</div>
+							);
+						})}
+						<Label>Output Ports</Label>
+						{model.data.outputPorts?.map((op) => {
+							return (
+								<div key={`outputport${op.id}`}>
+									<Input value={op.id} disabled className="mt-1" />
+								</div>
+							);
+						})}
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="item-5">
@@ -204,9 +217,7 @@ export function ModelPropertyEditor({
 						Export
 					</AccordionTrigger>
 					<AccordionContent className="flex flex-col gap-4 text-balance p-1">
-						 
-
-						
+						TODO
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>

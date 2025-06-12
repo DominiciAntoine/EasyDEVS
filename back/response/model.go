@@ -12,8 +12,8 @@ type ModelComponentResponse struct {
 }
 
 type ModelResponse struct {
-	ID          string                 `json:"id"`
-	UserID      string                 `json:"userId"`
+	ID          string                 `json:"id" validate:"required"`
+	UserID      string                 `json:"userId" validate:"required"`
 	LibID       *string                `json:"libId"`
 	Name        string                 `json:"name" validate:"required"`
 	Type        enum.ModelType         `json:"type" validate:"required"`

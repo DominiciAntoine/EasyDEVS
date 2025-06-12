@@ -7,6 +7,6 @@ const path: keyof paths = "/workspace";
 type GetRequestType = TypesForRequest<paths, "get", typeof path>;
 
 export const useGetWorkspaces = (
-	params: GetRequestType["Init"] = undefined,
+	params: GetRequestType["Init"] | null = undefined,
 	config: GetRequestType["SWRConfig"] = {},
 ) => useQuery(path, params, config);

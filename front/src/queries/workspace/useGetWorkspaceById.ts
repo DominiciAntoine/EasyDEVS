@@ -7,6 +7,6 @@ const path: keyof paths = "/workspace/{id}";
 type GetRequestType = TypesForRequest<paths, "get", typeof path>;
 
 export const useGetWorkspacesById = (
-	params: GetRequestType["Init"],
+	params: GetRequestType["Init"] | null,
 	config: GetRequestType["SWRConfig"] = {},
 ) => useQuery(path, params, config);

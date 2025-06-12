@@ -17,17 +17,28 @@ import { ZoomSlider } from "@/components/zoom-slider";
 import { getLayoutedElements } from "@/lib/getLayoutedElements.ts";
 import { useDnD } from "@/providers/DnDContext.tsx";
 import type { EdgeData, ReactFlowInput } from "@/types";
-import { type ComponentProps, useCallback, useEffect, useRef } from "react";
+import {
+	type ComponentProps,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import ModelNode from "./reactFlow/ModelNode.tsx";
 
 import { client } from "@/api/client.ts";
 import { useToast } from "@/hooks/use-toast.ts";
-import { modelToReactflow } from "@/lib/Parser/modelToReactflow.ts";
+import { modelToReactflow } from "@/lib/modelToReactflow.ts";
 import { findHolderId } from "@/lib/findHolderId.ts";
 import { FindParentNodeId } from "@/lib/findParentNodeId.ts";
-import { v4 as uuidv4 } from "uuid";
+import { reactflowToModel } from "@/lib/reactflowToModel.ts";
+import { addModelsToModels } from "@/lib/addModelsToModels.ts";
+import { DEFAULT_NODE_SIZE } from "@/constants.ts";
+import { useHotkeys } from "react-hotkeys-hook";
+import type { components } from "@/api/v1.js";
+import { useDebouncedCallback } from "use-debounce";
 
-const nodeTypes = {
+const nodeTypes: NonNullable<ComponentProps<typeof ReactFlow>["nodeTypes"]> = {
 	resizer: ModelNode,
 };
 
@@ -43,7 +54,7 @@ const defaultEdgeOptions = {
 
 type Props = {
 	models: ReactFlowInput;
-	onChange?: (structure: ReactFlowInput) => void;
+	onChange: (structure: ReactFlowInput) => void;
 	isLoadingNodes?: boolean;
 };
 
@@ -52,21 +63,68 @@ export function ModelViewEditor({ models, onChange, isLoadingNodes }: Props) {
 	const [dragId] = useDnD();
 	const { toast } = useToast();
 	const needAutoFitView = useRef(true);
+	const [internalStructure, setInternalStructure] = useState(models);
 
-	const nodes = models?.nodes || [];
-	const edges = models?.edges || [];
+	const [copyModelId, setCopyModelId] = useState<string | undefined>(undefined);
+	const { nodes, edges } = internalStructure;
+	const selectedModel = nodes.find(({ selected }) => selected);
+	const debouncedChange = useDebouncedCallback(
+		(params: ReactFlowInput) => onChange(params),
+		250,
+	);
+
+	useHotkeys(["ctrl+c", "meta+c"], (e) => {
+		e.preventDefault();
+		setCopyModelId(selectedModel?.data.id);
+	});
+	useHotkeys(["ctrl+v", "meta+v"], async (e) => {
+		e.preventDefault();
+		if (!copyModelId) return;
+
+		const { data, error } = await client.GET("/model/{id}/recursive", {
+			params: {
+				path: {
+					id: copyModelId,
+				},
+			},
+		});
+
+		if (error) {
+			toast({
+				title: "An error occured",
+				description: "Can't load model data",
+				variant: "destructive",
+			});
+			return;
+		}
+
+		if (!models?.nodes || !data || !selectedModel?.id) return;
+
+		addModels(data, selectedModel?.id, {
+			position: {
+				x: selectedModel.position.x + 20,
+				y: selectedModel.position.y + 20,
+			},
+			style: {
+				height: selectedModel.measured?.height ?? DEFAULT_NODE_SIZE,
+				width: selectedModel.measured?.width ?? DEFAULT_NODE_SIZE,
+			},
+		});
+	});
 
 	const onNodesChange = useCallback(
 		(changes: NodeChange<(typeof nodes)[number]>[]) => {
 			if (!onChange || !models) return;
 
 			const updatedNodes = applyNodeChanges(changes, nodes);
-			onChange({
+			const newState = {
 				...models,
 				nodes: updatedNodes,
-			});
+			};
+			setInternalStructure(newState);
+			debouncedChange(newState);
 		},
-		[models, onChange, nodes],
+		[models, onChange, nodes, debouncedChange],
 	);
 
 	const onEdgesChange = useCallback(
@@ -103,29 +161,6 @@ export function ModelViewEditor({ models, onChange, isLoadingNodes }: Props) {
 		onLayoutFn({ direction: "RIGHT" });
 	};
 
-	const onInfoClick = (state: boolean) => {
-		toggleInfoForAllNodes(state);
-	};
-
-	const toggleInfoForAllNodes = (show: boolean) => {
-		if (!onChange || !models) return;
-
-		console.log({ nodes, edges });
-
-		const updatedNodes = models.nodes.map((node) => ({
-			...node,
-			data: {
-				...node.data,
-				alwaysShowExtraInfo: show,
-			},
-		}));
-
-		onChange({
-			...models,
-			nodes: updatedNodes,
-		});
-	};
-
 	const onDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
 		(event) => {
 			event.preventDefault();
@@ -133,6 +168,41 @@ export function ModelViewEditor({ models, onChange, isLoadingNodes }: Props) {
 		},
 		[],
 	);
+
+	const addModels = async (
+		modelsToAdd: components["schemas"]["response.ModelResponse"][],
+		modelIdToPut: string,
+		metadata?: components["schemas"]["json.ModelMetadata"],
+	) => {
+		const parentNode = models.nodes.find((n) => n.id === modelIdToPut);
+
+		const actualModels = reactflowToModel(models);
+
+		if (!modelIdToPut || !parentNode || !actualModels) {
+			return;
+		}
+		let newModelIdToput = modelIdToPut;
+
+		if (
+			(parentNode && parentNode.data.modelType !== "coupled") ||
+			modelIdToPut === parentNode.id
+		) {
+			newModelIdToput = newModelIdToput.split("/").shift() ?? "";
+		}
+		console.log(modelIdToPut);
+
+		const newModels = addModelsToModels(
+			actualModels,
+			newModelIdToput,
+			modelsToAdd,
+			metadata,
+		);
+		const newReactFlowData = modelToReactflow(newModels);
+
+		newReactFlowData.nodes.sort((a, b) => a.id.length - b.id.length);
+
+		onChange(newReactFlowData);
+	};
 
 	const onDrop: NonNullable<
 		ComponentProps<typeof ReactFlow>["onDrop"]
@@ -168,29 +238,29 @@ export function ModelViewEditor({ models, onChange, isLoadingNodes }: Props) {
 			y: event.clientY,
 		});
 
-		const dragReactFlowData = modelToReactflow(data, dragId);
-
-		const dragRootModel = dragReactFlowData.nodes.find(
-			(model) => model.id === dragId,
-		);
-
 		const targetId = FindParentNodeId(models?.nodes, position, getInternalNode);
 		const parentNode = models.nodes.find((n) => n.id === targetId);
 
-		if (targetId && dragRootModel && parentNode) {
-			const localX = position.x - parentNode.position.x;
-			const localY = position.y - parentNode.position.y;
+		const actualModels = reactflowToModel(models);
 
-			dragRootModel.parentId = targetId;
-			dragRootModel.extent = "parent";
-			dragRootModel.id = `${targetId}/${uuidv4()}`;
-			dragRootModel.position = { x: localX, y: localY };
+		if (!targetId || !parentNode || !actualModels) {
+			console.log("pute");
+			return;
 		}
 
-		onChange({
-			nodes: [...models.nodes, ...dragReactFlowData.nodes],
-			edges: [...models.edges, ...dragReactFlowData.edges],
+		const newModels = addModelsToModels(actualModels, targetId, data, {
+			position: {
+				x: position.x - parentNode.position.x,
+				y: position.y - parentNode.position.y,
+			},
+			style: { height: DEFAULT_NODE_SIZE, width: DEFAULT_NODE_SIZE },
 		});
+		console.log(newModels);
+		const newReactFlowData = modelToReactflow(newModels);
+
+		newReactFlowData.nodes.sort((a, b) => a.id.length - b.id.length);
+
+		onChange(newReactFlowData);
 	};
 
 	const onConnect: NonNullable<
@@ -237,6 +307,10 @@ export function ModelViewEditor({ models, onChange, isLoadingNodes }: Props) {
 			needAutoFitView.current = false;
 		}
 	}, [fitView, models, edges, isLoadingNodes]);
+
+	useEffect(() => {
+		setInternalStructure(models);
+	}, [models]);
 
 	return (
 		<div className="h-full w-full flex flex-col">

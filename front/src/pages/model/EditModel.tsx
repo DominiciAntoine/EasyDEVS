@@ -1,5 +1,5 @@
 import { Loader } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { ModelViewEditor } from "@/components/custom/ModelViewEditor";
@@ -9,19 +9,27 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
-import { reactflowToModel } from "@/lib/Parser/reactflowToModel";
+import { modelToReactflow } from "@/lib/modelToReactflow";
+import { reactflowToModel } from "@/lib/reactflowToModel";
 import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
 import type { ReactFlowInput, ReactFlowModelData } from "@/types";
-
 import { client } from "@/api/client.ts";
 import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
-import ModelCodeEditorTemp from "@/components/custom/ModelCodeEditorTemp";
 import { ModelPropertyEditor } from "@/components/custom/ModelPropertyEditor";
 import { useToast } from "@/hooks/use-toast";
 import { useGetLibraryById } from "@/queries/library/useGetLibraryById";
-import { type Node, useReactFlow } from "@xyflow/react";import { useHotkeys } from 'react-hotkeys-hook';
+import type { Node } from "@xyflow/react";
+import { useHotkeys, type Options } from "react-hotkeys-hook";
 import useUndo from "use-undo";
+import { updateCodeBasedOnProperties } from "@/lib/updateCodeBasedOnProperties";
+
+const hotkeyOptions: Options = {
+	document,
+	preventDefault: true,
+	keydown: true,
+	enableOnFormTags: true,
+	enableOnContentEditable: true,
+};
 
 export function EditModel() {
 	const { libraryId, modelId } = useParams<{
@@ -29,54 +37,67 @@ export function EditModel() {
 		modelId: string;
 	}>();
 
-	const { data, error, isLoading, mutate } = useGetModelByIdRecursive({
-		params: { path: { id: modelId ?? "" } },
-	});
-	const { data: dataLib, isLoading: isLoadingLib } = useGetLibraryById({
-		params: { path: { id: libraryId ?? "" } },
-	});
+	const { data, error, isLoading, mutate } = useGetModelByIdRecursive(
+		modelId
+			? {
+					params: { path: { id: modelId ?? "" } },
+				}
+			: null,
+	);
+	const { data: dataLib, isLoading: isLoadingLib } = useGetLibraryById(
+		libraryId
+			? {
+					params: { path: { id: libraryId ?? "" } },
+				}
+			: null,
+	);
 	const { toast } = useToast();
-	const [
-  structureState,
-  {
-    set: setStructure,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-    reset
-  }
-] = useUndo<ReactFlowInput | undefined>(undefined);
-const structure = structureState.present;
+	const [structureState, { set: setStructure, undo, redo }] = useUndo<
+		ReactFlowInput | undefined
+	>(undefined, { useCheckpoints: true });
+	const structure = structureState.present;
 
-    useHotkeys('ctrl+s, meta+s', (e) => {
-    e.preventDefault();
-     e.stopPropagation();
-     console.log('Ctrl+S ou Cmd+S capté !');
-    saveModelChange();
-  }, ); 
+	useHotkeys(
+		["ctrl+s", "meta+s"],
+		(e) => {
+			e.preventDefault();
+			saveModelChange();
+		},
+		hotkeyOptions,
+	);
 
-  
-useHotkeys("ctrl+z, meta+z", (e) => { e.preventDefault(); undo(); });
-useHotkeys("ctrl+y, meta+y", (e) => { e.preventDefault(); redo(); });
+	useHotkeys(
+		["ctrl+w", "meta+w", "ctrl+z", "meta+z"],
+		(e) => {
+			e.preventDefault();
+			undo();
+		},
+		hotkeyOptions,
+	);
 
-
-
+	useHotkeys(
+		["ctrl+shift+w", "meta+shift+w", "ctrl+shift+z", "meta+shift+z"],
+		(e) => {
+			e.preventDefault();
+			redo();
+		},
+		hotkeyOptions,
+	);
 
 	useEffect(() => {
 		if (data && modelId) {
-			const root = data.find((model) => model.id === modelId);
-			const tmp = modelToReactflow(data, modelId);
+			const tmp = modelToReactflow(data);
 			tmp.nodes.sort((a, b) => a.id.length - b.id.length);
 			setStructure(tmp);
 		}
 	}, [data, modelId, setStructure]);
 
-    
-
-	const handleStructureChange = useCallback((newStructure: ReactFlowInput) => {
-		setStructure(newStructure);
-	}, [setStructure]);
+	const handleStructureChange = useCallback(
+		(newStructure: ReactFlowInput) => {
+			setStructure(newStructure, true);
+		},
+		[setStructure],
+	);
 
 	const saveModelChange = async (): Promise<void> => {
 		if (!structure || !modelId) return;
@@ -132,8 +153,6 @@ useHotkeys("ctrl+y, meta+y", (e) => { e.preventDefault(); redo(); });
 		}
 	};
 
-    
-
 	const simulateModel = async (): Promise<void> => {
 		if (!structure || !modelId) return;
 
@@ -155,41 +174,42 @@ useHotkeys("ctrl+y, meta+y", (e) => { e.preventDefault(); redo(); });
 			});
 		}
 	};
-const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
-    // Structure actuel : structureState.present ou structure (comme dans la réponse précédente)
-    if (!structure) return;
+	const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
+		// Structure actuel : structureState.present ou structure (comme dans la réponse précédente)
+		if (!structure) return;
 
-    const newStructure = {
-        ...structure,
-        nodes: structure.nodes.map((node) =>
-            node.id === updatedNode.id ? updatedNode : node
-        ),
-    };
+		const newStructure = {
+			...structure,
+			nodes: structure.nodes.map((node) =>
+				node.id === updatedNode.id
+					? updateCodeBasedOnProperties(updatedNode)
+					: node,
+			),
+		};
 
-    setStructure(newStructure); // Pas de callback !
-};
+		setStructure(newStructure, true); // Pas de callback !
+	};
 
-    const onChangeCode = (newCode: string, codeID: string) => {
-    if (!structure) return;
+	const onChangeCode = (newCode: string, codeID: string) => {
+		if (!structure) return;
 
-    const newStructure = {
-        ...structure,
-        nodes: structure.nodes.map((node) =>
-            node.id === codeID
-                ? {
-                    ...node,
-                    data: {
-                        ...node.data,
-                        code: newCode
-                    }
-                }
-                : node
-        ),
-    };
+		const newStructure = {
+			...structure,
+			nodes: structure.nodes.map((node) =>
+				node.id === codeID
+					? {
+							...node,
+							data: {
+								...node.data,
+								code: newCode,
+							},
+						}
+					: node,
+			),
+		};
 
-    setStructure(newStructure); 
-};
-
+		setStructure(newStructure);
+	};
 
 	if (isLoading || isLoadingLib) {
 		return (
@@ -203,6 +223,11 @@ const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
 	if (!data || !structure) return null;
 
 	const mainModel = structure.nodes.find((m) => m.id === modelId);
+
+	const selectedModel = structure.nodes.find(({ selected }) => selected);
+
+	const disableCustomization =
+		!!selectedModel && !!mainModel && selectedModel.id !== mainModel.id;
 
 	return (
 		<div className="flex flex-col h-screen w-full">
@@ -224,7 +249,11 @@ const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
 			{mainModel?.data.modelType === "atomic" ? (
 				<ResizablePanelGroup direction="horizontal">
 					<ResizablePanel defaultSize={50} minSize={20}>
-						<ModelCodeEditor code={mainModel.data.code} onCodeChange={onChangeCode} modelId={mainModel.id} saveModelChange={saveModelChange}/>
+						<ModelCodeEditor
+							code={mainModel.data.code}
+							onCodeChange={onChangeCode}
+							modelId={mainModel.id}
+						/>
 					</ResizablePanel>
 
 					<ResizableHandle withHandle />
@@ -238,8 +267,9 @@ const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
 
 					<ResizablePanel defaultSize={20} minSize={20}>
 						<ModelPropertyEditor
-							model={mainModel}
-							onChange={onChangeProperty}
+							model={selectedModel ?? mainModel}
+							onChange={disableCustomization ? () => {} : onChangeProperty}
+							disabled={disableCustomization}
 						/>
 					</ResizablePanel>
 				</ResizablePanelGroup>
@@ -257,8 +287,9 @@ const onChangeProperty = (updatedNode: Node<ReactFlowModelData>) => {
 
 					<ResizablePanel defaultSize={30} minSize={20}>
 						<ModelPropertyEditor
-							model={mainModel}
-							onChange={onChangeProperty}
+							model={selectedModel ?? mainModel}
+							onChange={disableCustomization ? () => {} : onChangeProperty}
+							disabled={disableCustomization}
 						/>
 					</ResizablePanel>
 				</ResizablePanelGroup>

@@ -12,7 +12,7 @@ const getModelComponent = (
 	return nodes
 		.filter((nodeInNodes) => nodeInNodes.parentId === parentNode.id)
 		.map((nodeInNodes) => ({
-			instanceId: nodeInNodes.id,
+			instanceId: nodeInNodes.id.split("/").pop() ?? "",
 			modelId: nodeInNodes.data.id,
 			instanceMetadata: {
 				position: { x: nodeInNodes.position.x, y: nodeInNodes.position.y },
@@ -23,7 +23,7 @@ const getModelComponent = (
 				...(nodeInNodes.data.reactFlowModelGraphicalData
 					? { modelColors: nodeInNodes.data.reactFlowModelGraphicalData }
 					: {}),
-				parameters: nodeInNodes.data.parameters,
+				// parameters: nodeInNodes.data.parameters,
 			},
 		}));
 };
@@ -39,11 +39,17 @@ const getModelConnection = (
 	const modelConnection = holdersEdge.flatMap((anEdge) => [
 		{
 			from: {
-				instanceId: anEdge.source === node.id ? "root" : anEdge.source,
+				instanceId:
+					anEdge.source === node.id
+						? "root"
+						: (anEdge.source.split("/").pop() ?? ""),
 				port: cleanHandleId(anEdge.sourceHandle)?.split(":")[1] ?? "",
 			},
 			to: {
-				instanceId: anEdge.target === node.id ? "root" : anEdge.target,
+				instanceId:
+					anEdge.target === node.id
+						? "root"
+						: (anEdge.target.split("/").pop() ?? ""),
 				port: cleanHandleId(anEdge.targetHandle)?.split(":")[1] ?? "",
 			},
 		},
@@ -97,7 +103,7 @@ const nodeToModel = (
 			...(node.data.reactFlowModelGraphicalData && !node.id.includes("/")
 				? { modelColors: node.data.reactFlowModelGraphicalData }
 				: {}),
-			parameters: node.data.parameters,
+			// parameters: node.data.parameters ?? undefined,
 		},
 		libId: undefined,
 		connections:

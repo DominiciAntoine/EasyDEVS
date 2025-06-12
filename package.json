@@ -9,7 +9,8 @@
 		"start:front": "cd front && npm run dev",
 		"start:back": "cd back && docker compose up --watch",
 		"start": "docker-compose up --watch --build",
-		"clean:back": "cd back && docker compose down -v"
+		"clean:back": "cd back && docker compose down -v",
+		"typecheck": "cd front && pnpm tsc --noEmit"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",

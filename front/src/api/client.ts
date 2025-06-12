@@ -21,7 +21,6 @@ const getAuthToken = (): string | null => localStorage.getItem("accessToken");
 const myMiddleware: Middleware = {
 	async onRequest({ request }) {
 		const token = getAuthToken();
-		console.log(token);
 		if (token) {
 			request.headers.set("Authorization", `Bearer ${token}`);
 		}

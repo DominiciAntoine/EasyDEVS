@@ -12,17 +12,17 @@ type ModelNodeProps = {
 
 function ModelNode({ id, data, selected }: ModelNodeProps) {
 	return (
-		<>
+		<div className="flex flex-col h-full w-full">
+			<ModelHeader selected={selected} data={data} id={id} />
 			<NodeResizer
 				isVisible={selected}
 				minWidth={100}
 				minHeight={30}
 				handleClassName="h-2 w-2 z-50 before:content-[''] before:absolute before:inset-[-10px] before:bg-transparent"
 			/>
-			<div className="h-full w-full border-border border rounded-lg border-solid ">
-				<ModelHeader selected={selected} data={data} id={id} />
+			<div className="h-full w-full flex flex-col border-border border rounded-lg border-solid ">
 				<div
-					className={`flex relative h-[calc(100%-2.5rem)] ${
+					className={`flex relative flex-grow ${
 						!data.reactFlowModelGraphicalData?.bodyBackgroundColor
 							? "bg-card"
 							: ""
@@ -85,7 +85,7 @@ function ModelNode({ id, data, selected }: ModelNodeProps) {
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 

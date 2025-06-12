@@ -7,6 +7,6 @@ const path: keyof paths = "/library/{id}";
 type GetRequestType = TypesForRequest<paths, "get", typeof path>;
 
 export const useGetLibraryById = (
-	params: GetRequestType["Init"],
+	params: GetRequestType["Init"] | null,
 	config: GetRequestType["SWRConfig"] = {},
 ) => useQuery(path, params, config);

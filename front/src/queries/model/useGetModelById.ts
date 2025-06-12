@@ -7,6 +7,6 @@ const path: keyof paths = "/model/{id}";
 type GetRequestType = TypesForRequest<paths, "get", typeof path>;
 
 export const useGetModelById = (
-	params: GetRequestType["Init"],
+	params: GetRequestType["Init"] | null,
 	config: GetRequestType["SWRConfig"] = {},
 ) => useQuery(path, params, config);

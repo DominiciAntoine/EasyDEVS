@@ -20,7 +20,7 @@ import {
 
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 
-import { workspacesToFront } from "@/lib/Parser/workspacesToFront";
+import { workspacesToFront } from "@/lib/workspacesToFront";
 import { DiagramDeleteDialog } from "@/modals/diagram/DiagramDeleteDialog";
 import { WorkspaceDeleteDialog } from "@/modals/workspace/WorkspaceDeleteDialog";
 import { useGetDiagrams } from "@/queries/diagram/useGetDiagrams";

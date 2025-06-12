@@ -30,7 +30,7 @@ func SetupModelRoutes(app *fiber.App) {
 // @Description Retrieve a list of all models
 // @Tags models
 // @Produce json
-// @Success 200 {array} []response.ModelResponse
+// @Success 200 {object} []response.ModelResponse
 // @Failure 500 {object} map[string]interface{}
 // @Router /model [get]
 func getAllModels(c *fiber.Ctx) error {

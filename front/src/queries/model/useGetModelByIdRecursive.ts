@@ -7,6 +7,6 @@ const path: keyof paths = "/model/{id}/recursive";
 type GetRequestType = TypesForRequest<paths, "get", typeof path>;
 
 export const useGetModelByIdRecursive = (
-	params: GetRequestType["Init"],
+	params: GetRequestType["Init"] | null,
 	config: GetRequestType["SWRConfig"] = {},
 ) => useQuery(path, params, config);

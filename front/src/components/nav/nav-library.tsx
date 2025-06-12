@@ -20,17 +20,15 @@ import {
 
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 
-import { components } from "@/api/v1";
-import { librairiesToFront } from "@/lib/Parser/librairiesToFront";
-import { modelToReactflow } from "@/lib/Parser/modelToReactflow";
+import { librairiesToFront } from "@/lib/librairiesToFront";
+import { modelToReactflow } from "@/lib/modelToReactflow";
 import { LibraryDeleteDialog } from "@/modals/library/LibraryDeleteDialog";
 import { ModelDeleteDialog } from "@/modals/model/ModelDeleteDialog";
 import { useDnD } from "@/providers/DnDContext";
 import { useGetLibraries } from "@/queries/library/useGetLibraries";
 import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
 import { useGetModels } from "@/queries/model/useGetModels";
-import { ReactFlowInput } from "@/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ModelView } from "../custom/ModelView";
 import { Button } from "../ui/button";
@@ -51,12 +49,12 @@ export function NavLibrary() {
 	const navigate = useNavigate();
 
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
+
 	const { data, isLoading } = useGetModelByIdRecursive(
-		hoveredId ? { params: { path: { id: hoveredId } } } : (null as any),
+		hoveredId ? { params: { path: { id: hoveredId ?? "" } } } : null,
 	);
 
-	const hoveredModel =
-		hoveredId && data ? modelToReactflow(data, hoveredId) : undefined;
+	const hoveredModel = hoveredId && data ? modelToReactflow(data) : undefined;
 
 	const navLibraries = librairiesToFront(
 		libraries.data ?? [],

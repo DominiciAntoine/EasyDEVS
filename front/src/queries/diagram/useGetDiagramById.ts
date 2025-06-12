@@ -7,6 +7,6 @@ const path: keyof paths = "/diagram/{id}";
 type GetRequestType = TypesForRequest<paths, "get", typeof path>;
 
 export const useGetDiagramById = (
-	params: GetRequestType["Init"],
+	params: GetRequestType["Init"] | null,
 	config: GetRequestType["SWRConfig"] = {},
 ) => useQuery(path, params, config);

@@ -578,10 +578,12 @@ definitions:
     - components
     - connections
     - description
+    - id
     - metadata
     - name
     - ports
     - type
+    - userId
     type: object
   response.ModelType:
     enum:
@@ -1176,9 +1178,7 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/response.ModelResponse'
-              type: array
+              $ref: '#/definitions/response.ModelResponse'
             type: array
         "500":
           description: Internal Server Error

@@ -1064,7 +1064,7 @@ export interface paths {
 						[name: string]: unknown;
 					};
 					content: {
-						"application/json": components["schemas"]["response.ModelResponse"][][];
+						"application/json": components["schemas"]["response.ModelResponse"][];
 					};
 				};
 				/** @description Internal Server Error */
@@ -2092,13 +2092,13 @@ export interface components {
 			components: components["schemas"]["json.ModelComponent"][];
 			connections: components["schemas"]["json.ModelConnection"][];
 			description: string;
-			id?: string;
+			id: string;
 			libId?: string;
 			metadata: components["schemas"]["json.ModelMetadata"];
 			name: string;
 			ports: components["schemas"]["json.ModelPort"][];
 			type: components["schemas"]["enum.ModelType"];
-			userId?: string;
+			userId: string;
 		};
 		/** @enum {string} */
 		"response.ModelType": "atomic" | "coupled";

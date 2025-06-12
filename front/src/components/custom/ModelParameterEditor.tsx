@@ -1,27 +1,16 @@
 import type { components } from "@/api/v1";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { SelectItem } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { POSSIBLE_PARAMETER_TYPE } from "@/constants";
 import {
 	DropdownMenu,
-	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { Code, Edit, Plus } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../form/Form";
@@ -29,6 +18,7 @@ import { InputField } from "../form/InputField";
 import { SelectField } from "../form/SelectField";
 import { Submit } from "../form/Submit";
 import { ParameterInput } from "./reactFlow/ParameterInput";
+import { getParameterDefaultValue } from "@/lib/getParameterDefaultValue";
 
 const ParameterSchema = z.array(
 	z.object({
@@ -39,10 +29,7 @@ const ParameterSchema = z.array(
 	}),
 );
 
-export function ModelParameterEditor({
-	parameters,
-	onParametersChange,
-}: {
+type Props = {
 	parameters: NonNullable<
 		components["schemas"]["response.ModelResponse"]["metadata"]["parameters"]
 	>;
@@ -51,7 +38,14 @@ export function ModelParameterEditor({
 			components["schemas"]["response.ModelResponse"]["metadata"]["parameters"]
 		>,
 	) => void;
-}) {
+	disabled: boolean;
+};
+
+export function ModelParameterEditor({
+	parameters,
+	onParametersChange,
+	disabled,
+}: Props) {
 	const [editAsJSON, setEditAsJSON] = useState(false);
 	const [jsonInput, setJsonInput] = useState(
 		JSON.stringify(parameters, null, 2),
@@ -72,7 +66,10 @@ export function ModelParameterEditor({
 
 	const onSubmitAddParameter = (newParam: (typeof parameters)[number]) => {
 		if (!newParam.name || !newParam.type) return;
-		onParametersChange([...parameters, newParam]);
+		onParametersChange([
+			...parameters,
+			{ ...newParam, value: getParameterDefaultValue(newParam) },
+		]);
 		methods.reset({ name: "", type: "string", value: "" });
 	};
 
@@ -97,6 +94,7 @@ export function ModelParameterEditor({
 					value={jsonInput}
 					className="font-mono h-64"
 					onChange={(e) => setJsonInput(e.target.value)}
+					disabled={disabled}
 					onBlur={() => {
 						try {
 							const parsed = ParameterSchema.parse(JSON.parse(jsonInput));
@@ -115,6 +113,7 @@ export function ModelParameterEditor({
 							type={param.type}
 							updateParameter={updateParameter}
 							value={param.value}
+							disabled={disabled}
 						/>
 
 						{param.description ? (

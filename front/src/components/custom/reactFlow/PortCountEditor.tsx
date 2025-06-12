@@ -8,6 +8,7 @@ type PortCountEditorProps = {
 	count: number;
 	onAdd: () => void;
 	onRemove: () => void;
+	disabled: boolean;
 };
 
 export function PortCountEditor({
@@ -15,6 +16,7 @@ export function PortCountEditor({
 	count,
 	onAdd,
 	onRemove,
+	disabled,
 }: PortCountEditorProps) {
 	return (
 		<div className="space-y-1">
@@ -28,6 +30,7 @@ export function PortCountEditor({
 					variant="ghost"
 					onClick={onAdd}
 					className="border-l border-input rounded-none hover:bg-accent flex-none"
+					disabled={disabled}
 				>
 					<Plus className="w-4 h-4" />
 				</Button>
@@ -35,6 +38,7 @@ export function PortCountEditor({
 					size="icon"
 					variant="ghost"
 					onClick={onRemove}
+					disabled={disabled}
 					className="border-l border-input rounded-none hover:bg-accent flex-none"
 				>
 					<Minus className="w-4 h-4" />
