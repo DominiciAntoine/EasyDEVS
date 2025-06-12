@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { addModelsToModels } from "./addModelsToModels";
 import {
 	mockAddModelResult,
 	mockApiModelWithoutAlpha,
 	mockModelsToAdd,
 } from "./__tests__/mockAddModelsToModels";
+import { addModelsToModels } from "./addModelsToModels";
 
 describe("addModelsToModels", () => {
 	it("should return fakeData model", () => {

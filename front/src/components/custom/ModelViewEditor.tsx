@@ -27,15 +27,15 @@ import {
 import ModelNode from "./reactFlow/ModelNode.tsx";
 
 import { client } from "@/api/client.ts";
+import type { components } from "@/api/v1.js";
+import { DEFAULT_NODE_SIZE } from "@/constants.ts";
 import { useToast } from "@/hooks/use-toast.ts";
-import { modelToReactflow } from "@/lib/modelToReactflow.ts";
+import { addModelsToModels } from "@/lib/addModelsToModels.ts";
 import { findHolderId } from "@/lib/findHolderId.ts";
 import { FindParentNodeId } from "@/lib/findParentNodeId.ts";
+import { modelToReactflow } from "@/lib/modelToReactflow.ts";
 import { reactflowToModel } from "@/lib/reactflowToModel.ts";
-import { addModelsToModels } from "@/lib/addModelsToModels.ts";
-import { DEFAULT_NODE_SIZE } from "@/constants.ts";
 import { useHotkeys } from "react-hotkeys-hook";
-import type { components } from "@/api/v1.js";
 import { useDebouncedCallback } from "use-debounce";
 
 const nodeTypes: NonNullable<ComponentProps<typeof ReactFlow>["nodeTypes"]> = {

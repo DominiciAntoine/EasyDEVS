@@ -1,6 +1,6 @@
 import type { ReactFlowModelData } from "@/types";
-import { memo } from "react";
 import clsx from "clsx";
+import { memo } from "react";
 
 type ModelNodeProps = {
 	data: ReactFlowModelData;

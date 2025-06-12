@@ -2,6 +2,9 @@ import { Loader } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
+import { client } from "@/api/client.ts";
+import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
+import { ModelPropertyEditor } from "@/components/custom/ModelPropertyEditor";
 import { ModelViewEditor } from "@/components/custom/ModelViewEditor";
 import NavHeader from "@/components/nav/nav-header";
 import {
@@ -9,19 +12,16 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { useToast } from "@/hooks/use-toast";
 import { modelToReactflow } from "@/lib/modelToReactflow";
 import { reactflowToModel } from "@/lib/reactflowToModel";
+import { updateCodeBasedOnProperties } from "@/lib/updateCodeBasedOnProperties";
+import { useGetLibraryById } from "@/queries/library/useGetLibraryById";
 import { useGetModelByIdRecursive } from "@/queries/model/useGetModelByIdRecursive";
 import type { ReactFlowInput, ReactFlowModelData } from "@/types";
-import { client } from "@/api/client.ts";
-import { ModelCodeEditor } from "@/components/custom/ModelCodeEditor";
-import { ModelPropertyEditor } from "@/components/custom/ModelPropertyEditor";
-import { useToast } from "@/hooks/use-toast";
-import { useGetLibraryById } from "@/queries/library/useGetLibraryById";
 import type { Node } from "@xyflow/react";
-import { useHotkeys, type Options } from "react-hotkeys-hook";
+import { type Options, useHotkeys } from "react-hotkeys-hook";
 import useUndo from "use-undo";
-import { updateCodeBasedOnProperties } from "@/lib/updateCodeBasedOnProperties";
 
 const hotkeyOptions: Options = {
 	document,

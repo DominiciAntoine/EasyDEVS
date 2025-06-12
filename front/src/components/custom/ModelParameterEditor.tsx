@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { SelectItem } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { POSSIBLE_PARAMETER_TYPE } from "@/constants";
+import { getParameterDefaultValue } from "@/lib/getParameterDefaultValue";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,7 +19,6 @@ import { InputField } from "../form/InputField";
 import { SelectField } from "../form/SelectField";
 import { Submit } from "../form/Submit";
 import { ParameterInput } from "./reactFlow/ParameterInput";
-import { getParameterDefaultValue } from "@/lib/getParameterDefaultValue";
 
 const ParameterSchema = z.array(
 	z.object({
