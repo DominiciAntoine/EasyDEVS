@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"app/middleware"
-	"app/prompt"
-	"app/request"
-	"app/response"
 	"context"
+	"devsforge/back/middleware"
+	"devsforge/back/prompt"
+	"devsforge/back/request"
+	"devsforge/back/response"
 	"encoding/json"
 	"fmt"
 	"log"

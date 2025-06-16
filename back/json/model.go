@@ -1,7 +1,7 @@
 package json
 
 import (
-	"app/enum"
+	"devsforge/back/enum"
 )
 
 type ModelPort struct {

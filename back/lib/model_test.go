@@ -1,8 +1,8 @@
 package lib_test
 
 import (
-	"app/lib"
-	"app/model"
+	"devsforge/back/lib"
+	"devsforge/back/model"
 	"encoding/json"
 	"testing"
 )

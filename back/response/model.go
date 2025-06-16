@@ -1,9 +1,9 @@
 package response
 
 import (
-	"app/enum"
-	"app/json"
-	"app/model"
+	"devsforge/back/enum"
+	"devsforge/back/json"
+	"devsforge/back/model"
 )
 
 type ModelComponentResponse struct {

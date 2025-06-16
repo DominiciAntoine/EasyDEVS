@@ -3,8 +3,8 @@ package model
 import (
 	"time"
 
-	"app/enum"
-	"app/json"
+	"devsforge/back/enum"
+	"devsforge/back/json"
 )
 
 type Model struct {

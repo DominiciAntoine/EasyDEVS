@@ -1,6 +1,10 @@
-FROM cosmtrek/air:v1.61.7
+FROM golang:1.24
 
-WORKDIR /app
+
+COPY . .
+RUN go install github.com/cosmtrek/air@latest
+RUN go mod tidy 
+WORKDIR /app/back
 VOLUME [ "/app" ]
 
 EXPOSE 3000

@@ -1,22 +1,22 @@
 services:    
   backend:
     build:
-      context: ./
-      dockerfile: Dockerfile.dev
+      context: ../
+      dockerfile: back/Dockerfile.dev
     env_file:
-      - ./.env.back
+      - ./back/.env.back
     ports:
       - 3000:3000
     volumes:
-      - ./:/app
+      - ../:/app
     depends_on:
       db:
         condition: service_healthy
     develop:
       watch:
         - action: sync
-          path: ./
-          target: /app
+          path: ./back
+          target: /app/back
   db:
     image: postgres:alpine
     env_file:

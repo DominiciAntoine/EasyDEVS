@@ -3,10 +3,10 @@ package handler
 import (
 	"strconv"
 
-	"app/database"
-	"app/middleware"
-	"app/model"
-	"app/request"
+	"devsforge/back/database"
+	"devsforge/back/middleware"
+	"devsforge/back/model"
+	"devsforge/back/request"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
